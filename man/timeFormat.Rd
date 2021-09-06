@@ -4,17 +4,15 @@
 \alias{timeFormat}
 \title{timeFormat}
 \usage{
-timeFormat(myString)
+timeFormat(myString, addTime)
 }
 \arguments{
 \item{myString}{Information about date and time from tracklogs.}
+
+\item{addTime}{A number of time to be added which happens when the timezone is not defined yet (e.g. Jakarta is UTC+7, so need to add 7 if the current time zone is UTC/GMT).}
 }
 \value{
 a new string with DateTime format (as.Date or as.POSIXct).
-
-
-# Reformat the datetime
-swts::trackTime(TrackSP = df, TimeZone = "UTC")
 }
 \description{
 A function to reformat date and time.
