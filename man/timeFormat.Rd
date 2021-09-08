@@ -4,12 +4,12 @@
 \alias{timeFormat}
 \title{timeFormat}
 \usage{
-timeFormat(myString, addTime)
+timeFormat(myString, addTime = "00")
 }
 \arguments{
 \item{myString}{Information about date and time from tracklogs.}
 
-\item{addTime}{A number of time to be added which happens when the timezone is not defined yet (e.g. Jakarta is UTC+7, so need to add 7 if the current time zone is UTC/GMT).}
+\item{addTime}{A number of time to be added which happens when the timezone is not defined yet (e.g. Jakarta is UTC+7, so need to add 7 if the current time zone is UTC/GMT). Default is "00}
 }
 \value{
 a new string with DateTime format (as.Date or as.POSIXct).

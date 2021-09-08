@@ -3,14 +3,14 @@
 #' @description A function to reformat date and time.
 #'
 #' @param myString Information about date and time from tracklogs.
-#' @param addTime A number of time to be added which happens when the timezone is not defined yet (e.g. Jakarta is UTC+7, so need to add 7 if the current time zone is UTC/GMT).
+#' @param addTime A number of time to be added which happens when the timezone is not defined yet (e.g. Jakarta is UTC+7, so need to add 7 if the current time zone is UTC/GMT). Default is "00
 #'
 #' @return a new string with DateTime format (as.Date or as.POSIXct).
 #'
 #'
 #'
 #' @export
-timeFormat <- function(myString, addTime){
+timeFormat <- function(myString, addTime = "00"){
   # Remove anything other than number from the string
   justNo <- gsub("[^0-9]", "", myString)
 
