@@ -1,12 +1,31 @@
 # track2dm package
-# Background
+This is an R package that can be used to create detection matrix from transect lines and account for topography variability. The scripts were developed based on the structure of dataset from the survey manuals. We used small sample of the data collected from the tiger occupancy survey in Sumatra. The main purpose of this document is to review how the package works in converting the field survey data into detection matrix to be used in occupancy analysis
 
-One of the questions which frequently addresses by wildlife scientists is about where the species occures in the landscape. This question is hampered by the fact that most of wildlife species cannot be perfectly detected due to several conditions such as the weather conditions, landscape characteristics, the observer experience, or the ecology of the species. For these reasons, the animals may present in the site, but the observer failed to detect it (__False Absence__) or the species was truly absent (__True Absence__). However, failing to detect species will underestimate the true occupancy of the species in the study areas. The management actions taken from incorrect estimation of species occurence will have negative impact to the species, especially when occupied habitat is cleared for other purposes. 
-
-In 2002, a statistical model by MacKenzie et al. [-@MacKenzie2002] is introduced which can estimate both probability of occurence (known as **psi**) as well as the probability of detection (known as **p**) to account for detectability of the animals. The detectability can be estimated from repeated observations for each unit/site [@Bailey2005]. The replication can be in the form of temporal or spatial replications. Temporal replications are when a number of sites (units) are visited several times. Whilst spatial replications are when the survey efforts are splitted into several equal parts. For instance, a sampling unit was observed by using 5 km transect, each km will be served as a replicate. We will focus to deal with the spatial replication.
-
-Most of the wildlife studies are using transect based method to look for the presence or absence of the animals in the landscape. In order to have enough number of spatial replicates to count for detectability, a certain length of transects will be randomly selected in the study sites and then observation are done along the tracks. This is the ideal condition. However, this can be very expensive and requires a lot of resources which are usually limited in developing countries. In practice, some studies on wildlife were conducted without or less likely to incorporate randomness to the survey design. In this kind of study, the survey tracks are splitted into equal lengths, and each part will used as a replicate. 
-
-However, splitting the transects into equal length can be very tedious work especially when we want to incorporate the topography variability to avoid bias in measuring the length. Currently there is no applications that provide such tools, except the one that split lines into equal areas in ArcGis or other GIS softwares which do not count for the topography variability. The distance measurement can be very bias in a rugged areas compare to flat areas without account for the altitudinal differences. 
-
-In this study, we developed an R package which we called "swts" that can be used to create detection matrix from transect lines and account for topography variability. The scripts were developed based on the structure of dataset from the survey manuals. We used small sample of the data collected from the tiger occupancy survey in Sumatra [see @Wibisono2011]. The main purpose of this document is to review how the package works in converting the field survey data into detection matrix to be used in occupancy analysis. 
+```{r echo=FALSE}
+functions <- c("col2geo()","df2Spatial()","dist3D()","geoUTM()","plotDM()","plotRAW()",
+                "pointTime()", "pointTracks()", "speciesDM()", "trackTime()")
+purposes <- c("Convert degree, minute, and second from columns to decimal degree",
+              "Convert dataframe to spatial object dataframe",
+              "Calculate distance based on X, Y, and Z information from a dataframe",
+              "Convert decimal degree to UTM projection",
+              "Plot detection matrix", "Plot raw data from observation along the tracklogs",
+              "Reformat the date and time from observation dataframe",
+              "Combine observations and tracklogs based on date, time, X, and Y",
+              "Create detection matrix from selected species",
+              "Reformat the time and date from tracklogs downloaded from GPS")
+arguments <- c("degree, minute, seconds", "dataFrame, UTMZone", "dataFrame, repLength" ,
+               "SPdataframe, UTMZone","detMatrix, label", "Tracks, Points", 
+               "SpeciesRecords, TimeZone = UTC", "pointDF, TrackDF",
+               "detectMatrix, speciesName", "TrackSP, TimeZone")
+r_functions <- data.frame(functions, purposes, arguments)
+colnames(r_functions) <- c("SWTS Function", "Purpose", "Arguments/inputs")
+```
+```{r tab1, echo=FALSE}
+library(knitr)
+library(kableExtra)
+knitr::kable(r_functions, longtable=FALSE, booktabs = TRUE,
+  caption = 'A summary of functions developed to proces occupancy data')%>%
+kable_styling(latex_options = c("striped", "hold_position"))%>%
+column_spec(1, width = "3cm") %>% column_spec(2, width = "8cm") %>% 
+  column_spec(3, width = "4cm")
+```
