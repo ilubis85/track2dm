@@ -39,12 +39,12 @@ speciesDM <-  function(speciesDF, speciesCol, species, extractVars){
   # The output should be extracted automatically and the result would be based on data type
   # If, numeric, take the mean, If character, take the modus
   # FOr character variables
-  varChar <- speciesDF %>% dplyr::select(-ID, -DateTime, -X, -Y, -Z, -Dist, -Presence) %>%
+  varChar <- speciesDF %>% dplyr::select(-DateTime, -X, -Y, -Z, -Dist, -Presence) %>%
     dplyr::group_by(Replicate) %>%
     dplyr::summarise(across(where(is.character), modus))
 
   # For Numeric variables
-  varNum <- speciesDF %>% dplyr::select(-ID, -DateTime, -X, -Y, -Z, -Dist, -Presence) %>%
+  varNum <- speciesDF %>% dplyr::select(-DateTime, -X, -Y, -Z, -Dist, -Presence) %>%
     dplyr::group_by(Replicate) %>%
     dplyr::summarise(across(where(is.numeric), mean))
 
