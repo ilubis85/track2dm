@@ -13,4 +13,6 @@ Imports:
     dplyr(>= 1.0.0),
     sp(>= 1.4-2),
     rgeos(>= 0.5-3),
-    stringr(>= 1.4.0)
+    raster(>= 3.4-5),
+    stringr(>= 1.4.0),
+    lubridate(>= 1.7.9.2)

@@ -2,5 +2,7 @@
 
 export(clearPoint)
 export(df2sp)
+export(dist3D)
 export(meanPoint)
+export(speciesDM)
 export(timeFormat)
