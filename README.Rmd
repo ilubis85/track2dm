@@ -1,5 +1,6 @@
 ---
 output: github_document
+always_allow_html: true
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -43,7 +44,7 @@ data("track")
 # Read the observation from the package
 data("observation")
 
-# Convert dataframe (track and observation to spatial points data-frame
+# Convert dataframe (track and observation to spatial points data-frame)
 track_pt <- track2dm::df2sp(track, UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
 observation_pt <- track2dm::df2sp(observation, UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
 
@@ -56,7 +57,7 @@ head(track, 5)
 head(observation, 5)
 ```
 
-This is the data look like when we plot them using tmap package:
+This is the data look like when we plot them using tmap package. The data is used with permission from WCS Indonesia and the data has been published in journal of (TO BE UPDATED)!!.
 
 ```{r elevation, echo = FALSE}
 library(tmap)
@@ -66,4 +67,37 @@ tm_shape(elevation) +
   tm_shape(observation_pt) + tm_dots(col = "red", shape=16, size=0.6)
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+So how the package works? Below is the list of functions currently developed to create detection matrix for a species. 
+
+```{r echo=FALSE}
+functions <- c("timeFormat()", "df2Spatial()", "meanPoint()", "clearPoint()","dist3D()", "speciesDM()")
+
+purposes <- c("reformat time",
+              "Convert dataframe to spatial object dataframe",
+              "Calculate the means of points",
+              "Clear the points from points",
+              "Calculate distance based on X, Y, and Z information from a dataframe",
+              "Extract detection matrix from the species observation")
+
+arguments <- c("myString, addTime", 
+               "dataFrame, UTMZone", 
+               "dataFrame, nPoint", 
+               "dataFrame, UTMZone, distLength", 
+               "dataFrame, elevData, repLength",
+               "speciesDF, speciesCol, species, extractVars")
+
+r_functions <- data.frame(functions, purposes, arguments)
+colnames(r_functions) <- c("Function", "Purpose", "Arguments/inputs")
+```
+
+```{r tab1, echo=FALSE}
+library(knitr)
+library(kableExtra)
+r_functions %>% 
+  kbl() %>% 
+  kable_styling()
+```
+
+
+
+

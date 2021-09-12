@@ -39,7 +39,7 @@ data("track")
 # Read the observation from the package
 data("observation")
 
-# Convert dataframe (track and observation to spatial points data-frame
+# Convert dataframe (track and observation to spatial points data-frame)
 track_pt <- track2dm::df2sp(track, UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
 observation_pt <- track2dm::df2sp(observation, UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
 ```
@@ -73,9 +73,95 @@ head(observation, 5)
 #> 5 Tanda Satwa
 ```
 
-This is the data look like when we plot them using tmap package:
+This is the data look like when we plot them using tmap package. The
+data is used with permission from WCS Indonesia and the data has been
+published in journal of (TO BE UPDATED)!!.
 
 <img src="man/figures/README-elevation-1.png" width="100%" />
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+So how the package works? Below is the list of functions currently
+developed to create detection matrix for a species.
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Function
+</th>
+<th style="text-align:left;">
+Purpose
+</th>
+<th style="text-align:left;">
+Arguments/inputs
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+timeFormat()
+</td>
+<td style="text-align:left;">
+reformat time
+</td>
+<td style="text-align:left;">
+myString, addTime
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+df2Spatial()
+</td>
+<td style="text-align:left;">
+Convert dataframe to spatial object dataframe
+</td>
+<td style="text-align:left;">
+dataFrame, UTMZone
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+meanPoint()
+</td>
+<td style="text-align:left;">
+Calculate the means of points
+</td>
+<td style="text-align:left;">
+dataFrame, nPoint
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+clearPoint()
+</td>
+<td style="text-align:left;">
+Clear the points from points
+</td>
+<td style="text-align:left;">
+dataFrame, UTMZone, distLength
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dist3D()
+</td>
+<td style="text-align:left;">
+Calculate distance based on X, Y, and Z information from a dataframe
+</td>
+<td style="text-align:left;">
+dataFrame, elevData, repLength
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+speciesDM()
+</td>
+<td style="text-align:left;">
+Extract detection matrix from the species observation
+</td>
+<td style="text-align:left;">
+speciesDF, speciesCol, species, extractVars
+</td>
+</tr>
+</tbody>
+</table>
