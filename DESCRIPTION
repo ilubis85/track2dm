@@ -20,3 +20,5 @@ Imports:
     knitr(>= 1.33),
     rmarkdown(>= 2.10)
 Suggests: rmarkdown
+Depends: 
+    R (>= 2.10)
