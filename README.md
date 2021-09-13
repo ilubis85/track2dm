@@ -25,8 +25,8 @@ devtools::install_github("ilubis85/track2dm")
 
 We have provided some dataset to play with to understand how the package
 works. Three types of data are needed, the track where the survey is
-recorded spatially, the observation along the tracks and elevation as
-raster data downloaded from USGS website.
+recorded, the observation along the track and digital elevation model
+(DEM) as raster data.
 
 ``` r
 # LOAD ALL DATA
