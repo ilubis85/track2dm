@@ -57,9 +57,9 @@ head(track, 5)
 head(observation, 5)
 ```
 
-This is the data look like when we plot them using tmap package. The data is used with permission from WCS Indonesia and the data has been published in journal of (TO BE UPDATED)!!.
+This figure below shows what the data look like when we plot them using tmap package. The data is used with permission from WCS Indonesia and the data has been published in journal of (TO BE UPDATED)!!.
 
-```{r elevation, echo = FALSE}
+```{r fig_1, out.width='100%', fig.align='center',  fig.pos="H", fig.cap="Survey tracks and points with elevation information", collapse = TRUE, echo = FALSE}
 library(tmap)
 tm_shape(elevation) +
   tm_raster(style = "cont") +
@@ -90,14 +90,16 @@ r_functions <- data.frame(functions, purposes, arguments)
 colnames(r_functions) <- c("Function", "Purpose", "Arguments/inputs")
 ```
 
-```{r tab1, echo=FALSE}
+```{r tab_1, echo=FALSE}
 library(knitr)
 library(kableExtra)
 r_functions %>% 
   kbl() %>% 
   kable_styling()
 ```
-
+## 1. Prepare track and observation points (to be updated)
+## 2. Calculate distance (to be updated)
+## 3. Extract detection matrix for species (to be updated)
 
 
 

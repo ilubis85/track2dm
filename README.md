@@ -73,11 +73,18 @@ head(observation, 5)
 #> 5 Tanda Satwa
 ```
 
-This is the data look like when we plot them using tmap package. The
-data is used with permission from WCS Indonesia and the data has been
-published in journal of (TO BE UPDATED)!!.
+This figure below shows what the data look like when we plot them using
+tmap package. The data is used with permission from WCS Indonesia and
+the data has been published in journal of (TO BE UPDATED)!!.
 
-<img src="man/figures/README-elevation-1.png" width="100%" />
+<div class="figure" style="text-align: center">
+
+<img src="man/figures/README-fig_1-1.png" alt="Survey tracks and points with elevation information" width="100%" />
+<p class="caption">
+Survey tracks and points with elevation information
+</p>
+
+</div>
 
 So how the package works? Below is the list of functions currently
 developed to create detection matrix for a species.
@@ -165,3 +172,9 @@ speciesDF, speciesCol, species, extractVars
 </tr>
 </tbody>
 </table>
+
+## 1. Prepare track and observation points (to be updated)
+
+## 2. Calculate distance (to be updated)
+
+## 3. Extract detection matrix for species (to be updated)
