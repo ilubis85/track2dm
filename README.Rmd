@@ -160,6 +160,26 @@ head(transect_rep)
 ```
 
 ## 3. Extract detection matrix for species (to be updated)
+Finally, we can extract detection matrix from selected species.
+
+```{r }
+# Calculate 3D distance and matrix replicate
+transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, speciesCol = "Observation", species = "Tanda Satwa", extractVars = c("Age", "Type"))
+transect_dm
+
+```
+What we really need is the matrix consists of the replications and the species presence/absence for further occupancy analysis. This can be done using the following script.
+
+```{r }
+# transpose it and convert as dataframe 
+transect_dm_1 <- transect_dm %>% dplyr::select(Presence) %>% 
+  t() %>% as.data.frame()
+
+# Use the replicate as column names
+names(transect_dm_1) <- transect_dm$Replicate
+transect_dm_1
+```
+This is the final result where the presence absence of species is recorded for each track segment. This can be read as: from the first to fourth segment, no species were recorded. It was until the fifth segment that the species were recorded, and so on. The result would be different if we used different replicate length (*repLength*).
 
 
-
+**Next, how to do this for multiple tracks??**

@@ -296,3 +296,51 @@ head(transect_rep)
 ```
 
 ## 3. Extract detection matrix for species (to be updated)
+
+Finally, we can extract detection matrix from selected species.
+
+``` r
+# Calculate 3D distance and matrix replicate
+transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, speciesCol = "Observation", species = "Tanda Satwa", extractVars = c("Age", "Type"))
+transect_dm
+#> # A tibble: 36 x 7
+#>    Replicate DateTime                  X       Y Presence Age             Type  
+#>        <int> <dttm>                <dbl>   <dbl> <chr>    <chr>           <chr> 
+#>  1         1 2015-09-10 06:27:25 353215. 406684. 0        <NA>            <NA>  
+#>  2         2 2015-09-10 07:26:46 353751. 407263. 0        <NA>            <NA>  
+#>  3         3 2015-09-10 09:15:36 353802. 408026. 0        <NA>            <NA>  
+#>  4         4 2015-09-11 03:31:13 354691. 408109. 0        <NA>            <NA>  
+#>  5         5 2015-09-11 07:00:18 355565. 407989. 1        Cukup baru (1 ~ Cakar~
+#>  6         6 2015-09-12 03:28:20 356211. 408361. 0        <NA>            <NA>  
+#>  7         7 2015-09-12 07:14:15 356966. 408947. 1        Lama (2 - 4 mi~ Kotor~
+#>  8         8 2015-09-13 01:53:52 357584. 409366. 0        <NA>            <NA>  
+#>  9         9 2015-09-13 02:47:08 358202. 409888. 0        <NA>            <NA>  
+#> 10        10 2015-09-13 05:42:26 359118. 409932. 0        <NA>            <NA>  
+#> # ... with 26 more rows
+```
+
+What we really need is the matrix consists of the replications and the
+species presence/absence for further occupancy analysis. This can be
+done using the following script.
+
+``` r
+# transpose it and convert as dataframe 
+transect_dm_1 <- transect_dm %>% dplyr::select(Presence) %>% 
+  t() %>% as.data.frame()
+
+# Use the replicate as column names
+names(transect_dm_1) <- transect_dm$Replicate
+transect_dm_1
+#>          1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 17 18 19 20 21 22 23 24 25 26 27
+#> Presence 0 0 0 0 1 0 1 0 0  0  0  1  0  0  0  1  1  0  0  0  1  1  0  0  0  1
+#>          28 29 30 31 34 35 36 37 38 39
+#> Presence  1  0  0  0  1  1  1  0  0  0
+```
+
+This is the final result where the presence absence of species is
+recorded for each track segment. This can be read as: from the first to
+fourth segment, no species were recorded. It was until the fifth segment
+that the species were recorded, and so on. The result would be different
+if we used different replicate length (*repLength*).
+
+**Next, how to do this for multiple tracks??**
