@@ -295,7 +295,7 @@ Finally, we can extract detection matrix from selected species.
 
 ``` r
 # Calculate 3D distance and matrix replicate
-transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, speciesCol = "Observation", species = "Tanda Satwa", extractVars = c("Age", "Type"))
+transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, speciesCol = "Observation", species = "animal signs", extractVars = c("Age", "Type"))
 transect_dm
 #> # A tibble: 36 x 7
 #>    Replicate DateTime                  X       Y Presence Age   Type   
@@ -304,9 +304,9 @@ transect_dm
 #>  2         2 2015-09-10 07:26:46 353751. 407263. 0        <NA>  <NA>   
 #>  3         3 2015-09-10 09:15:36 353802. 408026. 0        <NA>  <NA>   
 #>  4         4 2015-09-11 03:31:13 354691. 408109. 0        <NA>  <NA>   
-#>  5         5 2015-09-11 07:00:18 355565. 407989. 0        New   Scratch
+#>  5         5 2015-09-11 07:00:18 355565. 407989. 1        New   Scratch
 #>  6         6 2015-09-12 03:28:20 356211. 408361. 0        <NA>  <NA>   
-#>  7         7 2015-09-12 07:14:15 356966. 408947. 0        Old   Scat   
+#>  7         7 2015-09-12 07:14:15 356966. 408947. 1        Old   Scat   
 #>  8         8 2015-09-13 01:53:52 357584. 409366. 0        <NA>  <NA>   
 #>  9         9 2015-09-13 02:47:08 358202. 409888. 0        <NA>  <NA>   
 #> 10        10 2015-09-13 05:42:26 359118. 409932. 0        <NA>  <NA>   
@@ -326,9 +326,9 @@ transect_dm_1 <- transect_dm %>% dplyr::select(Presence) %>%
 names(transect_dm_1) <- transect_dm$Replicate
 transect_dm_1
 #>          1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 17 18 19 20 21 22 23 24 25 26 27
-#> Presence 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+#> Presence 0 0 0 0 1 0 1 0 0  0  0  1  0  0  0  1  1  0  0  0  1  1  0  0  0  1
 #>          28 29 30 31 34 35 36 37 38 39
-#> Presence  0  0  0  0  0  0  0  0  0  0
+#> Presence  1  0  0  0  1  1  1  0  0  0
 ```
 
 This is the final result where the presence absence of species is

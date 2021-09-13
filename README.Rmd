@@ -164,7 +164,7 @@ Finally, we can extract detection matrix from selected species.
 
 ```{r }
 # Calculate 3D distance and matrix replicate
-transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, speciesCol = "Observation", species = "Tanda Satwa", extractVars = c("Age", "Type"))
+transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, speciesCol = "Observation", species = "animal signs", extractVars = c("Age", "Type"))
 transect_dm
 
 ```
