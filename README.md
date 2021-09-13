@@ -175,6 +175,124 @@ speciesDF, speciesCol, species, extractVars
 
 ## 1. Prepare track and observation points (to be updated)
 
+We need at least three information to be able to calculate distance;
+Date-Time, X and Y coordinates. Date and Time should be in as.POSIXct
+format, while X and Y in numeric or double format. However, sometime
+Date and Time format we got (from GPS) is in different format (mostly
+as.character). For this case we need to use **track2dm::timeFormat()**
+function. See codes below on how to use it and how it produces the right
+format. We do the same for observation data.
+
+``` r
+# Check the structure of the data
+track %>% str()
+#> 'data.frame':    4706 obs. of  4 variables:
+#>  $ DateTime: chr  "2015-09-10T06:27:25Z" "2015-09-10T06:27:31Z" "2015-09-10T06:27:37Z" "2015-09-10T06:27:42Z" ...
+#>  $ X       : num  353210 353199 353197 353197 353202 ...
+#>  $ Y       : num  406623 406636 406651 406673 406686 ...
+#>  $ Z       : num  628 631 635 638 642 ...
+observation %>%  str()
+#> 'data.frame':    17 obs. of  6 variables:
+#>  $ DateTime   : chr  "2015-09-11 14:33:52" "2015-09-12 14:34:55" "2015-09-13 14:45:52" "2015-09-13 15:27:25" ...
+#>  $ Type       : chr  "Cakaran" "Kotoran" "Kotoran" "Kotoran" ...
+#>  $ Age        : chr  "Cukup baru (1 - 2 minggu)" "Lama (2 - 4 minggu)" "Cukup baru (1 - 2 minggu)" "Cukup baru (1 - 2 minggu)" ...
+#>  $ X          : num  355976 357296 359839 360145 360633 ...
+#>  $ Y          : num  408028 409119 409959 410343 410947 ...
+#>  $ Observation: chr  "Tanda Satwa" "Tanda Satwa" "Tanda Satwa" "Tanda Satwa" ...
+
+# Change Date and Time format 
+library(stringr)
+track_1 <- track %>% 
+  dplyr::mutate(DateTime = track2dm::timeFormat(DateTime))
+
+# Add +7 hours since the time format is in UTC
+observation_1 <- observation %>%
+  dplyr::mutate(DateTime = track2dm::timeFormat(DateTime, addTime = "07"))
+
+# Check again the format
+track_1 %>% str()
+#> 'data.frame':    4706 obs. of  4 variables:
+#>  $ DateTime: POSIXct, format: "2015-09-10 06:27:25" "2015-09-10 06:27:31" ...
+#>  $ X       : num  353210 353199 353197 353197 353202 ...
+#>  $ Y       : num  406623 406636 406651 406673 406686 ...
+#>  $ Z       : num  628 631 635 638 642 ...
+observation_1 %>% str()
+#> 'data.frame':    17 obs. of  6 variables:
+#>  $ DateTime   : POSIXct, format: "2015-09-11 21:33:52" "2015-09-12 21:34:55" ...
+#>  $ Type       : chr  "Cakaran" "Kotoran" "Kotoran" "Kotoran" ...
+#>  $ Age        : chr  "Cukup baru (1 - 2 minggu)" "Lama (2 - 4 minggu)" "Cukup baru (1 - 2 minggu)" "Cukup baru (1 - 2 minggu)" ...
+#>  $ X          : num  355976 357296 359839 360145 360633 ...
+#>  $ Y          : num  408028 409119 409959 410343 410947 ...
+#>  $ Observation: chr  "Tanda Satwa" "Tanda Satwa" "Tanda Satwa" "Tanda Satwa" ...
+```
+
+In high altitudes area like in Sumatra, GPS signals may be obstructed by
+the altitude differences or simply canopy cover and thus produces less
+precise points of location. This could be a huge problem because it will
+calculate a bias length of distance, especially when we want to
+calculate research or patrol effort (in terms of length of transect
+surveys). To deal with this, functions called **track2dm::meanPoint**
+or/and **track2dm::clearPoint** will be used to remove the bias either
+by take means from a number of subsequent points (*meanPoint*) or clear
+a certain number of points between points based on a predefined distance
+(*clearPoint*). For example we used **meanPoint** for track\_1 data.
+
+``` r
+# Take means from every 10 coordinates (nPoint = 10)
+track_2 <- track2dm::meanPoint(dataFrame = track_1, nPoint = 10)
+```
+
+<div class="figure" style="text-align: center">
+
+<img src="man/figures/README-fig_2-1.png" alt="Reducing number of points by taking the means for every 10 subsequent points (showing the first 500 points)" width="75%" />
+<p class="caption">
+Reducing number of points by taking the means for every 10 subsequent
+points (showing the first 500 points)
+</p>
+
+</div>
+
+Now we can combine the cleaned track and observation into one
+data-frame.
+
+``` r
+# Combine both track and observation
+transect <- dplyr::full_join(track_2, observation_1, by = c("DateTime", "X", "Y")) %>%
+  dplyr::arrange(DateTime, X, Y)
+head(transect)
+#> # A tibble: 6 x 8
+#>      ID DateTime                  X       Y     Z Type  Age   Observation
+#>   <dbl> <dttm>                <dbl>   <dbl> <dbl> <chr> <chr> <chr>      
+#> 1     1 2015-09-10 06:27:25 353215. 406684.  643. <NA>  <NA>  <NA>       
+#> 2     2 2015-09-10 06:28:17 353309. 406764.  670. <NA>  <NA>  <NA>       
+#> 3     3 2015-09-10 06:29:36 353303. 406824.  686. <NA>  <NA>  <NA>       
+#> 4     4 2015-09-10 06:30:50 353238. 406942.  705. <NA>  <NA>  <NA>       
+#> 5     5 2015-09-10 06:32:09 353270. 407080.  726. <NA>  <NA>  <NA>       
+#> 6     6 2015-09-10 07:09:04 353361. 407093.  738. <NA>  <NA>  <NA>
+```
+
 ## 2. Calculate distance (to be updated)
+
+After that we can calculate the distances in three dimension (X, Y, and
+Z). In order to do it, we need Z information and we can get it from
+elevation data in raster format downloaded from USGS website
+(<https://earthexplorer.usgs.gov>). We nead to load the elevation data
+first (as we did in the beginning).
+
+``` r
+# Calculate 3D distance and matrix replicate
+transect_rep <- track2dm::dist3D(dataFrame = transect, elevData = elevation,  repLength = 1000)
+head(transect_rep)
+#> # A tibble: 6 x 10
+#>      ID DateTime                  X       Y     Z Type  Age   Observation  Dist
+#>   <dbl> <dttm>                <dbl>   <dbl> <dbl> <chr> <chr> <chr>       <dbl>
+#> 1     1 2015-09-10 06:27:25 353215. 406684.   673 <NA>  <NA>  <NA>           0 
+#> 2     2 2015-09-10 06:28:17 353309. 406764.   693 <NA>  <NA>  <NA>         125.
+#> 3     3 2015-09-10 06:29:36 353303. 406824.   708 <NA>  <NA>  <NA>         187.
+#> 4     4 2015-09-10 06:30:50 353238. 406942.   719 <NA>  <NA>  <NA>         322.
+#> 5     5 2015-09-10 06:32:09 353270. 407080.   725 <NA>  <NA>  <NA>         463.
+#> 6     6 2015-09-10 07:09:04 353361. 407093.   736 <NA>  <NA>  <NA>         555.
+#> # ... with 1 more variable: Replicate <int>
+```
 
 ## 3. Extract detection matrix for species (to be updated)
