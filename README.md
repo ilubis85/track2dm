@@ -6,10 +6,10 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of track2dm is to create detection matrix from transect lines
-that account for topography variability. The detection matrix is usually
-used for hierarchical modelling of species occupancy and distribution
-(see MacKenzie et al., 2004 about occupancy modelling).
+The goal of **track2dm** is to create detection matrix from transect
+lines that account for topography variability. The detection matrix is
+usually used for hierarchical modelling of species occupancy and
+distribution (see MacKenzie et al., 2004 about occupancy modelling).
 
 ## Installation
 
@@ -59,18 +59,12 @@ head(track, 5)
 #> 4 2015-09-10T06:27:42Z 353197.3 406672.5 638.45
 #> 5 2015-09-10T06:27:47Z 353202.3 406685.7 642.30
 head(observation, 5)
-#>              DateTime    Type                       Age      X      Y
-#> 1 2015-09-11 14:33:52 Cakaran Cukup baru (1 - 2 minggu) 355976 408028
-#> 2 2015-09-12 14:34:55 Kotoran       Lama (2 - 4 minggu) 357296 409119
-#> 3 2015-09-13 14:45:52 Kotoran Cukup baru (1 - 2 minggu) 359839 409959
-#> 4 2015-09-13 15:27:25 Kotoran Cukup baru (1 - 2 minggu) 360145 410343
-#> 5 2015-09-14 09:18:16 Kotoran Cukup baru (1 - 2 minggu) 360633 410947
-#>   Observation
-#> 1 Tanda Satwa
-#> 2 Tanda Satwa
-#> 3 Tanda Satwa
-#> 4 Tanda Satwa
-#> 5 Tanda Satwa
+#>              DateTime    Type Age      X      Y  Observation
+#> 1 2015-09-11 14:33:52 Scratch New 355976 408028 animal signs
+#> 2 2015-09-12 14:34:55    Scat Old 357296 409119 animal signs
+#> 3 2015-09-13 14:45:52    Scat New 359839 409959 animal signs
+#> 4 2015-09-13 15:27:25    Scat New 360145 410343 animal signs
+#> 5 2015-09-14 09:18:16    Scat New 360633 410947 animal signs
 ```
 
 This figure below shows what the data look like when we plot them using
@@ -194,11 +188,11 @@ track %>% str()
 observation %>%  str()
 #> 'data.frame':    17 obs. of  6 variables:
 #>  $ DateTime   : chr  "2015-09-11 14:33:52" "2015-09-12 14:34:55" "2015-09-13 14:45:52" "2015-09-13 15:27:25" ...
-#>  $ Type       : chr  "Cakaran" "Kotoran" "Kotoran" "Kotoran" ...
-#>  $ Age        : chr  "Cukup baru (1 - 2 minggu)" "Lama (2 - 4 minggu)" "Cukup baru (1 - 2 minggu)" "Cukup baru (1 - 2 minggu)" ...
+#>  $ Type       : chr  "Scratch" "Scat" "Scat" "Scat" ...
+#>  $ Age        : chr  "New" "Old" "New" "New" ...
 #>  $ X          : num  355976 357296 359839 360145 360633 ...
 #>  $ Y          : num  408028 409119 409959 410343 410947 ...
-#>  $ Observation: chr  "Tanda Satwa" "Tanda Satwa" "Tanda Satwa" "Tanda Satwa" ...
+#>  $ Observation: chr  "animal signs" "animal signs" "animal signs" "animal signs" ...
 
 # Change Date and Time format 
 library(stringr)
@@ -219,11 +213,11 @@ track_1 %>% str()
 observation_1 %>% str()
 #> 'data.frame':    17 obs. of  6 variables:
 #>  $ DateTime   : POSIXct, format: "2015-09-11 21:33:52" "2015-09-12 21:34:55" ...
-#>  $ Type       : chr  "Cakaran" "Kotoran" "Kotoran" "Kotoran" ...
-#>  $ Age        : chr  "Cukup baru (1 - 2 minggu)" "Lama (2 - 4 minggu)" "Cukup baru (1 - 2 minggu)" "Cukup baru (1 - 2 minggu)" ...
+#>  $ Type       : chr  "Scratch" "Scat" "Scat" "Scat" ...
+#>  $ Age        : chr  "New" "Old" "New" "New" ...
 #>  $ X          : num  355976 357296 359839 360145 360633 ...
 #>  $ Y          : num  408028 409119 409959 410343 410947 ...
-#>  $ Observation: chr  "Tanda Satwa" "Tanda Satwa" "Tanda Satwa" "Tanda Satwa" ...
+#>  $ Observation: chr  "animal signs" "animal signs" "animal signs" "animal signs" ...
 ```
 
 In high altitudes area like in Sumatra, GPS signals may be obstructed by
@@ -304,18 +298,18 @@ Finally, we can extract detection matrix from selected species.
 transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, speciesCol = "Observation", species = "Tanda Satwa", extractVars = c("Age", "Type"))
 transect_dm
 #> # A tibble: 36 x 7
-#>    Replicate DateTime                  X       Y Presence Age             Type  
-#>        <int> <dttm>                <dbl>   <dbl> <chr>    <chr>           <chr> 
-#>  1         1 2015-09-10 06:27:25 353215. 406684. 0        <NA>            <NA>  
-#>  2         2 2015-09-10 07:26:46 353751. 407263. 0        <NA>            <NA>  
-#>  3         3 2015-09-10 09:15:36 353802. 408026. 0        <NA>            <NA>  
-#>  4         4 2015-09-11 03:31:13 354691. 408109. 0        <NA>            <NA>  
-#>  5         5 2015-09-11 07:00:18 355565. 407989. 1        Cukup baru (1 ~ Cakar~
-#>  6         6 2015-09-12 03:28:20 356211. 408361. 0        <NA>            <NA>  
-#>  7         7 2015-09-12 07:14:15 356966. 408947. 1        Lama (2 - 4 mi~ Kotor~
-#>  8         8 2015-09-13 01:53:52 357584. 409366. 0        <NA>            <NA>  
-#>  9         9 2015-09-13 02:47:08 358202. 409888. 0        <NA>            <NA>  
-#> 10        10 2015-09-13 05:42:26 359118. 409932. 0        <NA>            <NA>  
+#>    Replicate DateTime                  X       Y Presence Age   Type   
+#>        <int> <dttm>                <dbl>   <dbl> <chr>    <chr> <chr>  
+#>  1         1 2015-09-10 06:27:25 353215. 406684. 0        <NA>  <NA>   
+#>  2         2 2015-09-10 07:26:46 353751. 407263. 0        <NA>  <NA>   
+#>  3         3 2015-09-10 09:15:36 353802. 408026. 0        <NA>  <NA>   
+#>  4         4 2015-09-11 03:31:13 354691. 408109. 0        <NA>  <NA>   
+#>  5         5 2015-09-11 07:00:18 355565. 407989. 0        New   Scratch
+#>  6         6 2015-09-12 03:28:20 356211. 408361. 0        <NA>  <NA>   
+#>  7         7 2015-09-12 07:14:15 356966. 408947. 0        Old   Scat   
+#>  8         8 2015-09-13 01:53:52 357584. 409366. 0        <NA>  <NA>   
+#>  9         9 2015-09-13 02:47:08 358202. 409888. 0        <NA>  <NA>   
+#> 10        10 2015-09-13 05:42:26 359118. 409932. 0        <NA>  <NA>   
 #> # ... with 26 more rows
 ```
 
@@ -332,9 +326,9 @@ transect_dm_1 <- transect_dm %>% dplyr::select(Presence) %>%
 names(transect_dm_1) <- transect_dm$Replicate
 transect_dm_1
 #>          1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 17 18 19 20 21 22 23 24 25 26 27
-#> Presence 0 0 0 0 1 0 1 0 0  0  0  1  0  0  0  1  1  0  0  0  1  1  0  0  0  1
+#> Presence 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
 #>          28 29 30 31 34 35 36 37 38 39
-#> Presence  1  0  0  0  1  1  1  0  0  0
+#> Presence  0  0  0  0  0  0  0  0  0  0
 ```
 
 This is the final result where the presence absence of species is

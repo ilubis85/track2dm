@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of track2dm is to create detection matrix from transect lines that account for topography variability. The detection matrix is usually used for hierarchical modelling of species occupancy and distribution (see MacKenzie et al., 2004 about occupancy modelling).
+The goal of **track2dm** is to create detection matrix from transect lines that account for topography variability. The detection matrix is usually used for hierarchical modelling of species occupancy and distribution (see MacKenzie et al., 2004 about occupancy modelling).
 
 ## Installation
 
