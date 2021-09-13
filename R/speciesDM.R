@@ -31,8 +31,8 @@ speciesDM <-  function(speciesDF, speciesCol, species, extractVars){
   spOccur <- speciesDF %>%
     dplyr::group_by(Replicate) %>%
     # Take summary of the species for each replicate
-    dplyr::summarise(DateTime = first(DateTime), X= first(X), Y = first(Y),
-                     Presence = max(Presence))
+    dplyr::summarise(DateTime = dplyr::first(DateTime), X = dplyr::first(X), Y = dplyr::first(Y),
+                     Presence = base::max(Presence))
 
   # Then take summary for each variables
   # The output should be extracted automatically and the result would be based on data type
