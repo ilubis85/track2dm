@@ -14,10 +14,11 @@
 meanPoint <- function(dataFrame, nPoint){
   dataFrame_average <- dataFrame %>%
     # Add ID, the same ID for nPoint consecutive rows
-    dplyr::group_by(ID = ceiling(row_number()/nPoint)) %>%
+    dplyr::group_by(ID = ceiling(dplyr::row_number()/nPoint)) %>%
 
     # Calculate the mean of X, Y, and Z. Use the first row of DateTime
-    dplyr::summarise(DateTime = first(DateTime),X = mean(X), Y= mean(Y), Z= mean(Z))
+    dplyr::summarise(DateTime = dplyr::first(DateTime), X = base::mean(X),
+                     Y = base::mean(Y), Z = base::mean(Z))
 
   return(dataFrame_average)
 }
