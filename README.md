@@ -21,7 +21,7 @@ version from [GitHub](https://github.com/) with:
 devtools::install_github("ilubis85/track2dm")
 ```
 
-## Example
+## How does it work?
 
 We have provided some dataset to play with to understand how the package
 works. Three types of data are needed, the track where the survey is

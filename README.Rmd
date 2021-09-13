@@ -29,7 +29,7 @@ You can install the released version of track2dm and the development version fro
 # install.packages("devtools")
 devtools::install_github("ilubis85/track2dm")
 ```
-## Example
+## How does it work?
 
 We have provided some dataset to play with to understand how the package works. Three types of data are needed, the track where the survey is recorded spatially, the observation along the tracks and elevation as raster data downloaded from USGS website.
 
