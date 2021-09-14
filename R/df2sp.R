@@ -2,16 +2,19 @@
 #'
 #' @description A function to convert data-frame to spatial object data-frame.
 #'
-#' @param dataFrame A data-frame contains at least "X" and "Y" and other columns to be converted to spatial object dataframe.
+#' @param dataFrame A data-frame contains to be converted to spatial object data-frame.
+#' @param X_col A quoted name of column that consists X coordinates.
+#' @param Y_col A quoted name of column that consists Y coordinates.
 #' @param  UTMZone A UTM projection of the target.
 #'
-#' @return Spatial object dataframe.
+#' @return Spatial object data-frame.
 #'
 #' @export
-df2sp <- function(dataFrame, UTMZone){
-  dataFrame_sp <- sp::SpatialPointsDataFrame(coords = dataFrame[,c("X","Y")],
-                                             data = dataFrame,
-                                             proj4string = sp::CRS(UTMZone))
+# Convert to spatial data
+df2sp <- function(dataFrame, X_col, Y_col, UTMZone){
+  dataFrame_sp <- sp::SpatialPointsDataFrame(
+    coords = dataFrame[,c(X_col, Y_col)],
+    data = dataFrame,
+    proj4string = sp::CRS(UTMZone))
   return(dataFrame_sp)
 }
-
