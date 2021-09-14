@@ -15,12 +15,12 @@ timeFormat <- function(myString, addTime = "00"){
   justNo <- gsub("[^0-9]", "", myString)
 
   # Then split based on position (year-month-date-hour-min-sec)
-  year <- str_sub(justNo, start = 1, end = 4)
-  month <- str_sub(justNo, start = 5, end = 6)
-  date <- str_sub(justNo, start = 7, end = 8)
-  hour <- str_sub(justNo, start = 9, end = 10)
-  min <- str_sub(justNo, start = 11, end = 12)
-  sec <- str_sub(justNo, start = 13, end = 14)
+  year <- stringr::str_sub(justNo, start = 1, end = 4)
+  month <- stringr::str_sub(justNo, start = 5, end = 6)
+  date <- stringr::str_sub(justNo, start = 7, end = 8)
+  hour <- stringr::str_sub(justNo, start = 9, end = 10)
+  min <- stringr::str_sub(justNo, start = 11, end = 12)
+  sec <- stringr::str_sub(justNo, start = 13, end = 14)
 
   # Combine as Date and Time as POSIXct
   Date <- paste(year, month, date, sep = "-")
