@@ -4,10 +4,16 @@
 \alias{meanPoint}
 \title{Take a mean value from a set of coordinates in sequence}
 \usage{
-meanPoint(dataFrame, nPoint)
+meanPoint(dataFrame, datetime_col, X_col, Y_col, nPoint)
 }
 \arguments{
 \item{dataFrame}{A spatial points data-frame.}
+
+\item{datetime_col}{A quoted name of column that consists date and time object (as.POSIXct.}
+
+\item{X_col}{A quoted name of column that consists X coordinates.}
+
+\item{Y_col}{A quoted name of column that consists Y coordinates.}
 
 \item{nPoint}{A number of point to average.}
 }
