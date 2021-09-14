@@ -3,15 +3,23 @@
 #' @description A function to create detection matrix for selected species.
 #'
 #' @param speciesDF A matrix contains Replicate column resulted from swts::dist3D() function.
+#' @param datetime_col A quoted name of column that consists date and time object (as.POSIXct).
+#' @param X_col A quoted name of column that consists X coordinates.
+#' @param Y_col A quoted name of column that consists Y coordinates.
 #' @param speciesCol The column that contain the selected species name.
 #' @param species The name of the species within the "speciesCol" column.
 #' @param extractVars The variables (columns) to be extracted for each replicate. It will take the mean if the data type is numeric, and take the predefine modus function for charachter data type.
 #'
-#' @return A dataframe contains detection matrix for selected species along with its geographic coordinates and sampling covariates.
+#' @return A data-frame contains detection matrix for selected species along with its geographic coordinates and sampling covariates.
 #'
 #'
 #' @export
-speciesDM <-  function(speciesDF, speciesCol, species, extractVars){
+#' @importFrom  magrittr %>%
+#'
+speciesDM <-  function(speciesDF, datetime_col, X_col, Y_col, speciesCol, species, extractVars){
+  # Surpress warning
+  options(warn = -1)
+
   # Function to calculate Modus
   modus <- function(myVector){
     # Sort myVector
@@ -27,11 +35,20 @@ speciesDM <-  function(speciesDF, speciesCol, species, extractVars){
     speciesDF[i, "Presence"] <- ifelse(grepl(species, speciesDF[i,speciesCol]), "1", "0")
   }
 
+  # Define some columns
+  Replicate <- speciesDF[,"Replicate"] # Generated from above line
+  Presence <- speciesDF[,"Presence"]
+  DateTime <- speciesDF[, datetime_col] # User defined column
+  X <- speciesDF[, X_col] # User defined column
+  Y <- speciesDF[, Y_col] # User defined column
+
   # Then take summary for each replicate
   spOccur <- speciesDF %>%
     dplyr::group_by(Replicate) %>%
     # Take summary of the species for each replicate
-    dplyr::summarise(DateTime = dplyr::first(DateTime), X = dplyr::first(X), Y = dplyr::first(Y),
+    dplyr::summarise(DateTime = dplyr::first(datetime_col),
+                     X = dplyr::first(X),
+                     Y = dplyr::first(Y),
                      Presence = base::max(Presence))
 
   # Then take summary for each variables
@@ -40,17 +57,17 @@ speciesDM <-  function(speciesDF, speciesCol, species, extractVars){
   # FOr character variables
   varChar <- speciesDF %>% dplyr::select(Replicate, extractVars) %>%
     dplyr::group_by(Replicate) %>%
-    dplyr::summarise(across(where(is.character), modus))
+    dplyr::summarise(dplyr::across(where(is.character), modus))
 
   # For Numeric variables
   varNum <- speciesDF %>% dplyr::select(Replicate, extractVars) %>%
     dplyr::group_by(Replicate) %>%
-    dplyr::summarise(across(where(is.numeric), mean))
+    dplyr::summarise(dplyr::across(where(is.numeric), mean))
 
   # Combine all
-  matrictDM <- dplyr::left_join(spOccur, varChar, by = "Replicate") %>%
-    dplyr::left_join(., varNum, by = "Replicate")
+  matrictDM1 <- dplyr::left_join(spOccur, varChar, by = "Replicate")
+  matrictDM2 <- dplyr::left_join(matrictDM1, varNum, by = "Replicate")
 
-  return(matrictDM)
+  return(matrictDM2)
 }
 
