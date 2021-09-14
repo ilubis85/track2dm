@@ -45,8 +45,8 @@ data("track")
 data("observation")
 
 # Convert dataframe (track and observation to spatial points data-frame)
-track_pt <- track2dm::df2sp(track, UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
-observation_pt <- track2dm::df2sp(observation, UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
+track_pt <- track2dm::df2sp(track, X_col = "X", Y_col = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
+observation_pt <- track2dm::df2sp(observation, X_col = "X", Y_col = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
 
 ```
 
@@ -164,7 +164,9 @@ Finally, we can extract detection matrix from selected species.
 
 ```{r }
 # Calculate 3D distance and matrix replicate
-transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, speciesCol = "Observation", species = "animal signs", extractVars = c("Age", "Type"))
+transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, datetime_col = "DateTime", 
+                                   X_col = "X", Y_col = "Y", speciesCol = "Observation", 
+                                   species = "animal signs", extractVars = c("Age", "Type"))
 transect_dm
 
 ```

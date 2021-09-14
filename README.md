@@ -40,8 +40,8 @@ data("track")
 data("observation")
 
 # Convert dataframe (track and observation to spatial points data-frame)
-track_pt <- track2dm::df2sp(track, UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
-observation_pt <- track2dm::df2sp(observation, UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
+track_pt <- track2dm::df2sp(track, X_col = "X", Y_col = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
+observation_pt <- track2dm::df2sp(observation, X_col = "X", Y_col = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
 ```
 
 Track is a dataframe contains date and time, X, Y and usually Z
@@ -254,15 +254,15 @@ data-frame.
 transect <- dplyr::full_join(track_2, observation_1, by = c("DateTime", "X", "Y")) %>%
   dplyr::arrange(DateTime, X, Y)
 head(transect)
-#> # A tibble: 6 x 8
-#>      ID DateTime                  X       Y     Z Type  Age   Observation
-#>   <dbl> <dttm>                <dbl>   <dbl> <dbl> <chr> <chr> <chr>      
-#> 1     1 2015-09-10 06:27:25 353215. 406684.  643. <NA>  <NA>  <NA>       
-#> 2     2 2015-09-10 06:28:17 353309. 406764.  670. <NA>  <NA>  <NA>       
-#> 3     3 2015-09-10 06:29:36 353303. 406824.  686. <NA>  <NA>  <NA>       
-#> 4     4 2015-09-10 06:30:50 353238. 406942.  705. <NA>  <NA>  <NA>       
-#> 5     5 2015-09-10 06:32:09 353270. 407080.  726. <NA>  <NA>  <NA>       
-#> 6     6 2015-09-10 07:09:04 353361. 407093.  738. <NA>  <NA>  <NA>
+#> # A tibble: 6 x 7
+#>      ID DateTime                  X       Y Type  Age   Observation
+#>   <dbl> <dttm>                <dbl>   <dbl> <chr> <chr> <chr>      
+#> 1     1 2015-09-10 06:27:25 353215. 406684. <NA>  <NA>  <NA>       
+#> 2     2 2015-09-10 06:28:17 353309. 406764. <NA>  <NA>  <NA>       
+#> 3     3 2015-09-10 06:29:36 353303. 406824. <NA>  <NA>  <NA>       
+#> 4     4 2015-09-10 06:30:50 353238. 406942. <NA>  <NA>  <NA>       
+#> 5     5 2015-09-10 06:32:09 353270. 407080. <NA>  <NA>  <NA>       
+#> 6     6 2015-09-10 07:09:04 353361. 407093. <NA>  <NA>  <NA>
 ```
 
 ## 2. Calculate distance (to be updated)
@@ -278,14 +278,14 @@ first (as we did in the beginning).
 transect_rep <- track2dm::dist3D(dataFrame = transect, elevData = elevation,  repLength = 1000)
 head(transect_rep)
 #> # A tibble: 6 x 10
-#>      ID DateTime                  X       Y     Z Type  Age   Observation  Dist
-#>   <dbl> <dttm>                <dbl>   <dbl> <dbl> <chr> <chr> <chr>       <dbl>
-#> 1     1 2015-09-10 06:27:25 353215. 406684.   673 <NA>  <NA>  <NA>           0 
-#> 2     2 2015-09-10 06:28:17 353309. 406764.   693 <NA>  <NA>  <NA>         125.
-#> 3     3 2015-09-10 06:29:36 353303. 406824.   708 <NA>  <NA>  <NA>         187.
-#> 4     4 2015-09-10 06:30:50 353238. 406942.   719 <NA>  <NA>  <NA>         322.
-#> 5     5 2015-09-10 06:32:09 353270. 407080.   725 <NA>  <NA>  <NA>         463.
-#> 6     6 2015-09-10 07:09:04 353361. 407093.   736 <NA>  <NA>  <NA>         555.
+#>      ID DateTime                  X       Y Type  Age   Observation     Z  Dist
+#>   <dbl> <dttm>                <dbl>   <dbl> <chr> <chr> <chr>       <dbl> <dbl>
+#> 1     1 2015-09-10 06:27:25 353215. 406684. <NA>  <NA>  <NA>          673    0 
+#> 2     2 2015-09-10 06:28:17 353309. 406764. <NA>  <NA>  <NA>          693  125.
+#> 3     3 2015-09-10 06:29:36 353303. 406824. <NA>  <NA>  <NA>          708  187.
+#> 4     4 2015-09-10 06:30:50 353238. 406942. <NA>  <NA>  <NA>          719  322.
+#> 5     5 2015-09-10 06:32:09 353270. 407080. <NA>  <NA>  <NA>          725  463.
+#> 6     6 2015-09-10 07:09:04 353361. 407093. <NA>  <NA>  <NA>          736  555.
 #> # ... with 1 more variable: Replicate <int>
 ```
 
@@ -295,21 +295,23 @@ Finally, we can extract detection matrix from selected species.
 
 ``` r
 # Calculate 3D distance and matrix replicate
-transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, speciesCol = "Observation", species = "animal signs", extractVars = c("Age", "Type"))
+transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, datetime_col = "DateTime", 
+                                   X_col = "X", Y_col = "Y", speciesCol = "Observation", 
+                                   species = "animal signs", extractVars = c("Age", "Type"))
 transect_dm
 #> # A tibble: 36 x 7
-#>    Replicate DateTime                  X       Y Presence Age   Type   
-#>        <int> <dttm>                <dbl>   <dbl> <chr>    <chr> <chr>  
-#>  1         1 2015-09-10 06:27:25 353215. 406684. 0        <NA>  <NA>   
-#>  2         2 2015-09-10 07:26:46 353751. 407263. 0        <NA>  <NA>   
-#>  3         3 2015-09-10 09:15:36 353802. 408026. 0        <NA>  <NA>   
-#>  4         4 2015-09-11 03:31:13 354691. 408109. 0        <NA>  <NA>   
-#>  5         5 2015-09-11 07:00:18 355565. 407989. 1        New   Scratch
-#>  6         6 2015-09-12 03:28:20 356211. 408361. 0        <NA>  <NA>   
-#>  7         7 2015-09-12 07:14:15 356966. 408947. 1        Old   Scat   
-#>  8         8 2015-09-13 01:53:52 357584. 409366. 0        <NA>  <NA>   
-#>  9         9 2015-09-13 02:47:08 358202. 409888. 0        <NA>  <NA>   
-#> 10        10 2015-09-13 05:42:26 359118. 409932. 0        <NA>  <NA>   
+#>    Replicate DateTime       X       Y Presence Age   Type   
+#>        <int> <chr>      <dbl>   <dbl> <chr>    <chr> <chr>  
+#>  1         1 DateTime 353215. 406684. 0        <NA>  <NA>   
+#>  2         2 DateTime 353751. 407263. 0        <NA>  <NA>   
+#>  3         3 DateTime 353802. 408026. 0        <NA>  <NA>   
+#>  4         4 DateTime 354691. 408109. 0        <NA>  <NA>   
+#>  5         5 DateTime 355565. 407989. 1        New   Scratch
+#>  6         6 DateTime 356211. 408361. 0        <NA>  <NA>   
+#>  7         7 DateTime 356966. 408947. 1        Old   Scat   
+#>  8         8 DateTime 357584. 409366. 0        <NA>  <NA>   
+#>  9         9 DateTime 358202. 409888. 0        <NA>  <NA>   
+#> 10        10 DateTime 359118. 409932. 0        <NA>  <NA>   
 #> # ... with 26 more rows
 ```
 
