@@ -3,18 +3,18 @@
 #' @description A function to remove points within a distance.
 #'
 #' @param dataFrame A data-frame contains at least "X" and "Y" in UTM projection.
-#' @param X_col A quoted name of column that consists X coordinates.
-#' @param Y_col A quoted name of column that consists Y coordinates.
+#' @param Xcol A quoted name of column that consists X coordinates.
+#' @param Ycol A quoted name of column that consists Y coordinates.
 #' @param UTMZone A UTM projection of the target file.
 #' @param distLength A numeric value of a distance
 #'
 #' @return Spatial object data-frame.
 #'
 #' @export
-clearPoint <- function(dataFrame, X_col, Y_col, UTMZone, distLength){
+clearPoint <- function(dataFrame, Xcol, Ycol, UTMZone, distLength){
 
   # Specify the coordinate X and Y from a data-frame
-  points <- dataFrame[, c(X_col, Y_col)]
+  points <- dataFrame[, c(Xcol, Ycol)]
 
   # Convert to spatial points
   points_sp <- sp::SpatialPoints(points, proj4string = sp::CRS(as.character(UTMZone)))

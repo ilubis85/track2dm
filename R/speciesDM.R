@@ -3,9 +3,9 @@
 #' @description A function to create detection matrix for selected species.
 #'
 #' @param speciesDF A matrix contains Replicate column resulted from swts::dist3D() function.
-#' @param datetime_col A quoted name of column that consists date and time object (as.POSIXct).
-#' @param X_col A quoted name of column that consists X coordinates.
-#' @param Y_col A quoted name of column that consists Y coordinates.
+#' @param datetimeCol A quoted name of column that consists date and time object (as.POSIXct).
+#' @param Xcol A quoted name of column that consists X coordinates.
+#' @param Ycol A quoted name of column that consists Y coordinates.
 #' @param speciesCol The column that contain the selected species name.
 #' @param species The name of the species within the "speciesCol" column.
 #' @param extractVars The variables (columns) to be extracted for each replicate. It will take the mean if the data type is numeric, and take the predefine modus function for charachter data type.
@@ -16,7 +16,7 @@
 #' @export
 #' @importFrom  magrittr %>%
 #'
-speciesDM <-  function(speciesDF, datetime_col, X_col, Y_col, speciesCol, species, extractVars){
+speciesDM <-  function(speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars){
   # Surpress warning
   options(warn = -1)
 
@@ -38,15 +38,15 @@ speciesDM <-  function(speciesDF, datetime_col, X_col, Y_col, speciesCol, specie
   # Define some columns
   Replicate <- speciesDF[,"Replicate"] # Generated from above line
   Presence <- speciesDF[,"Presence"]
-  DateTime <- speciesDF[, datetime_col] # User defined column
-  X <- speciesDF[, X_col] # User defined column
-  Y <- speciesDF[, Y_col] # User defined column
+  DateTime <- speciesDF[, datetimeCol] # User defined column
+  X <- speciesDF[, Xcol] # User defined column
+  Y <- speciesDF[, Ycol] # User defined column
 
   # Then take summary for each replicate
   spOccur <- speciesDF %>%
     dplyr::group_by(Replicate) %>%
     # Take summary of the species for each replicate
-    dplyr::summarise(DateTime = dplyr::first(datetime_col),
+    dplyr::summarise(DateTime = dplyr::first(datetimeCol),
                      X = dplyr::first(X),
                      Y = dplyr::first(Y),
                      Presence = base::max(Presence))

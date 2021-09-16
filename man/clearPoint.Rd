@@ -4,14 +4,14 @@
 \alias{clearPoint}
 \title{Remove nearby points within specific distance in meters}
 \usage{
-clearPoint(dataFrame, X_col, Y_col, UTMZone, distLength)
+clearPoint(dataFrame, Xcol, Ycol, UTMZone, distLength)
 }
 \arguments{
 \item{dataFrame}{A data-frame contains at least "X" and "Y" in UTM projection.}
 
-\item{X_col}{A quoted name of column that consists X coordinates.}
+\item{Xcol}{A quoted name of column that consists X coordinates.}
 
-\item{Y_col}{A quoted name of column that consists Y coordinates.}
+\item{Ycol}{A quoted name of column that consists Y coordinates.}
 
 \item{UTMZone}{A UTM projection of the target file.}
 

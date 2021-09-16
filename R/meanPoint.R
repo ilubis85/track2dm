@@ -3,9 +3,9 @@
 #' @description A function clear multi-points downloaded from GPS (Global Positioning System).
 #'
 #' @param dataFrame A spatial points data-frame.
-#' @param datetime_col A quoted name of column that consists date and time object (as.POSIXct.
-#' @param X_col A quoted name of column that consists X coordinates.
-#' @param Y_col A quoted name of column that consists Y coordinates.
+#' @param datetimeCol A quoted name of column that consists date and time object (as.POSIXct.
+#' @param Xcol A quoted name of column that consists X coordinates.
+#' @param Ycol A quoted name of column that consists Y coordinates.
 #' @param nPoint A number of point to average.
 #'
 #' @return A data-frame contains the remainder and the division value.
@@ -15,12 +15,12 @@
 #' @importFrom  magrittr %>%
 
 # Create a function to calculate the mean of X and Y from a consecutive points
-meanPoint <- function(dataFrame, datetime_col, X_col, Y_col, nPoint){
+meanPoint <- function(dataFrame, datetimeCol, Xcol, Ycol, nPoint){
 
   # Specify columns
-  DateTime = dataFrame[,datetime_col]
-  X = dataFrame[,X_col]
-  Y = dataFrame[,Y_col]
+  DateTime = dataFrame[,datetimeCol]
+  X = dataFrame[,Xcol]
+  Y = dataFrame[,Ycol]
 
   # Add ID column
   dataFrame_average <- dataFrame %>%

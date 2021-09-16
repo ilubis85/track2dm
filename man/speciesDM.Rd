@@ -4,24 +4,16 @@
 \alias{speciesDM}
 \title{speciesDM}
 \usage{
-speciesDM(
-  speciesDF,
-  datetime_col,
-  X_col,
-  Y_col,
-  speciesCol,
-  species,
-  extractVars
-)
+speciesDM(speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars)
 }
 \arguments{
 \item{speciesDF}{A matrix contains Replicate column resulted from swts::dist3D() function.}
 
-\item{datetime_col}{A quoted name of column that consists date and time object (as.POSIXct).}
+\item{datetimeCol}{A quoted name of column that consists date and time object (as.POSIXct).}
 
-\item{X_col}{A quoted name of column that consists X coordinates.}
+\item{Xcol}{A quoted name of column that consists X coordinates.}
 
-\item{Y_col}{A quoted name of column that consists Y coordinates.}
+\item{Ycol}{A quoted name of column that consists Y coordinates.}
 
 \item{speciesCol}{The column that contain the selected species name.}
 

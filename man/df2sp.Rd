@@ -4,14 +4,14 @@
 \alias{df2sp}
 \title{df2sp}
 \usage{
-df2sp(dataFrame, X_col, Y_col, UTMZone)
+df2sp(dataFrame, Xcol, Ycol, UTMZone)
 }
 \arguments{
 \item{dataFrame}{A data-frame contains to be converted to spatial object data-frame.}
 
-\item{X_col}{A quoted name of column that consists X coordinates.}
+\item{Xcol}{A quoted name of column that consists X coordinates.}
 
-\item{Y_col}{A quoted name of column that consists Y coordinates.}
+\item{Ycol}{A quoted name of column that consists Y coordinates.}
 
 \item{UTMZone}{A UTM projection of the target.}
 }
