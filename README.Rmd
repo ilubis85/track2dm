@@ -45,8 +45,8 @@ data("track")
 data("observation")
 
 # Convert dataframe (track and observation to spatial points data-frame)
-track_pt <- track2dm::df2sp(track, X_col = "X", Y_col = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
-observation_pt <- track2dm::df2sp(observation, X_col = "X", Y_col = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
+track_pt <- track2dm::df2sp(track, Xcol = "X", Ycol = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
+observation_pt <- track2dm::df2sp(observation, Xcol = "X", Ycol = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
 
 ```
 
@@ -63,14 +63,14 @@ This figure below shows what the data look like when we plot them using tmap pac
 library(tmap)
 tm_shape(elevation) +
   tm_raster(style = "cont") +
-  tm_shape(track_pt) + tm_dots(col = "grey", shape=20, size=0.5) +
-  tm_shape(observation_pt) + tm_dots(col = "red", shape=16, size=0.6)
+  tm_shape(track_pt) + tm_dots(col = "grey", shape=20, size=0.3) +
+  tm_shape(observation_pt) + tm_dots(col = "red", shape=16, size=0.2)
 ```
 
 So how the package works? Below is the list of functions currently developed to create detection matrix for a species. 
 
 ```{r echo=FALSE}
-functions <- c("timeFormat()", "df2Spatial()", "meanPoint()", "clearPoint()","dist3D()", "speciesDM()")
+functions <- c("timeFormat()", "df2sp()", "meanPoint()", "clearPoint()","dist3D()", "speciesDM()")
 
 purposes <- c("reformat time",
               "Convert dataframe to spatial object dataframe",
@@ -80,11 +80,11 @@ purposes <- c("reformat time",
               "Extract detection matrix from the species observation")
 
 arguments <- c("myString, addTime", 
-               "dataFrame, UTMZone", 
-               "dataFrame, nPoint", 
-               "dataFrame, UTMZone, distLength", 
+               "dataFrame, Xcol, Ycol, UTMZone", 
+               "dataFrame, datetimeCol, Xcol, Ycol, nPoint", 
+               "dataFrame, Xcol, Ycol, UTMZone, distLength", 
                "dataFrame, elevData, repLength",
-               "speciesDF, speciesCol, species, extractVars")
+               "speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars")
 
 r_functions <- data.frame(functions, purposes, arguments)
 colnames(r_functions) <- c("Function", "Purpose", "Arguments/inputs")
@@ -164,8 +164,8 @@ Finally, we can extract detection matrix from selected species.
 
 ```{r }
 # Calculate 3D distance and matrix replicate
-transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, datetime_col = "DateTime", 
-                                   X_col = "X", Y_col = "Y", speciesCol = "Observation", 
+transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
+                                   Xcol = "X", Ycol = "Y", speciesCol = "Observation", 
                                    species = "animal signs", extractVars = c("Age", "Type"))
 transect_dm
 

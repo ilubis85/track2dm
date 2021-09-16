@@ -40,8 +40,8 @@ data("track")
 data("observation")
 
 # Convert dataframe (track and observation to spatial points data-frame)
-track_pt <- track2dm::df2sp(track, X_col = "X", Y_col = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
-observation_pt <- track2dm::df2sp(observation, X_col = "X", Y_col = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
+track_pt <- track2dm::df2sp(track, Xcol = "X", Ycol = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
+observation_pt <- track2dm::df2sp(observation, Xcol = "X", Ycol = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
 ```
 
 Track is a dataframe contains date and time, X, Y and usually Z
@@ -111,13 +111,13 @@ myString, addTime
 </tr>
 <tr>
 <td style="text-align:left;">
-df2Spatial()
+df2sp()
 </td>
 <td style="text-align:left;">
 Convert dataframe to spatial object dataframe
 </td>
 <td style="text-align:left;">
-dataFrame, UTMZone
+dataFrame, Xcol, Ycol, UTMZone
 </td>
 </tr>
 <tr>
@@ -128,7 +128,7 @@ meanPoint()
 Calculate the means of points
 </td>
 <td style="text-align:left;">
-dataFrame, nPoint
+dataFrame, datetimeCol, Xcol, Ycol, nPoint
 </td>
 </tr>
 <tr>
@@ -139,7 +139,7 @@ clearPoint()
 Clear the points from points
 </td>
 <td style="text-align:left;">
-dataFrame, UTMZone, distLength
+dataFrame, Xcol, Ycol, UTMZone, distLength
 </td>
 </tr>
 <tr>
@@ -161,7 +161,7 @@ speciesDM()
 Extract detection matrix from the species observation
 </td>
 <td style="text-align:left;">
-speciesDF, speciesCol, species, extractVars
+speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars
 </td>
 </tr>
 </tbody>
@@ -295,8 +295,8 @@ Finally, we can extract detection matrix from selected species.
 
 ``` r
 # Calculate 3D distance and matrix replicate
-transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, datetime_col = "DateTime", 
-                                   X_col = "X", Y_col = "Y", speciesCol = "Observation", 
+transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
+                                   Xcol = "X", Ycol = "Y", speciesCol = "Observation", 
                                    species = "animal signs", extractVars = c("Age", "Type"))
 transect_dm
 #> # A tibble: 36 x 7
