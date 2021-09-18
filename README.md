@@ -1,17 +1,60 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# track2dm
+# track2dm : Create detection matrix from transect surveys
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of **track2dm** is to create detection matrix from transect
-lines that account for topography variability. The detection matrix is
-usually used for hierarchical modelling of species occupancy and
-distribution (see MacKenzie et al., 2004 about occupancy modelling).
+## What is it?
 
-## Installation
+One of the questions which frequently addresses by wildlife scientists
+is about where a species occurs in the landscape. This question is
+hampered by the fact that most of wildlife species cannot be perfectly
+detected due to several conditions such as the weather conditions,
+landscape characteristics, the observer experience, or the ecology of
+the species. For these reasons, the animals may present in the site, but
+the observer failed to detect it (**False Absence**) or the species was
+truly absent (**True Absence**). However, failing to detect species will
+underestimate the true occupancy of the species in the study areas. The
+management actions taken from incorrect estimation of species occurrence
+will have negative impact to the species, especially when occupied
+habitat is cleared for other purposes.
+
+In 2002, a statistical model by MacKenzie et al.
+([2002](#ref-MacKenzie2002)) is introduced which can estimate both
+probability of occurrence (known as **psi**) as well as the probability
+of detection (known as **p**) to account for detectability of the
+animals. The detectability can be estimated from repeated observations
+for each unit/site ([Bailey and Adams 2005](#ref-Bailey2005)). The
+replication can be in the form of temporal or spatial replications.
+*Temporal replications* are when a number of sites (units) are visited
+several times. Whilst *spatial replications* are when the survey efforts
+are splitted into several equal parts. For instance, a sampling unit was
+observed by using 5 km transect, each km will be served as a replicate,
+so there will be five replicates in this sampling unit. This *track2dm*
+package is developed to deal with the spatial replication.
+
+Most of wildlife surveys are done using transect based method to look
+for the presence or absence of the animals in the study area. This is
+usually done by randomly select transects and the species is observed
+along the tracks. The length of transects should be sufficient to be
+able to calculate both the detection and occurrence of the species. In
+this kind of study, the transect should be divided into equal lenghth
+and each lengt will be used as a replicate. However, splitting the
+transects into equal length can be very tedious especially when we want
+to incorporate the altitudinal differences to avoid bias in measuring
+the survey efforts. Currently there is no applications that provide such
+tools, except the one that split lines into equal areas in ArcGIS or
+other GIS software.
+
+In this study, we developed an R package which we called *track2dm* that
+can be used to create detection matrix from transect lines which account
+for altitudinal differences. The main purpose of this document is to
+elaborate how the package works in converting the field survey data into
+detection matrix to be used for hierarchical occupancy modelling.
+
+## How to install?
 
 You can install the released version of track2dm and the development
 version from [GitHub](https://github.com/) with:
@@ -23,10 +66,12 @@ devtools::install_github("ilubis85/track2dm")
 
 ## How does it work?
 
-We have provided some dataset to play with to understand how the package
+We have provided some data for simulation to understand how the package
 works. Three types of data are needed, the track where the survey is
-recorded, the observation along the track and digital elevation model
-(DEM) as raster data.
+recorded (usually downloaded from Global Positioning System (GPS), the
+observation along the track (usually written in excel format) and
+digital elevation model (DEM) in raster format. The data can be loaded
+after the package is called.
 
 ``` r
 # LOAD ALL DATA
@@ -44,11 +89,11 @@ track_pt <- track2dm::df2sp(track, Xcol = "X", Ycol = "Y", UTMZone = "+proj=utm 
 observation_pt <- track2dm::df2sp(observation, Xcol = "X", Ycol = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
 ```
 
-Track is a dataframe contains date and time, X, Y and usually Z
-information downloaded from GPS. Whilst observation is a dataframe
-contains any information about the observed species. The elevation is
-needed to extract Z values to calculate distance in three dimension
-(3D).
+In this example, the track is a data-frame that contains date and time,
+X, Y and usually Z information (elevation) downloaded from GPS. Whilst
+observation is a data-frame that contains any information about the
+observed species. The elevation is needed to extract Z values to
+calculate distance in three dimension (3D).
 
 ``` r
 head(track, 5)
@@ -69,13 +114,13 @@ head(observation, 5)
 
 This figure below shows what the data look like when we plot them using
 tmap package. The data is used with permission from WCS Indonesia and
-the data has been published in journal of (TO BE UPDATED)!!.
+the data has been published in journal of (In preparation)!!.
 
-<div class="figure" style="text-align: center">
+<div class="figure" style="text-align: centre">
 
-<img src="man/figures/README-fig_1-1.png" alt="Survey tracks and points with elevation information" width="100%" />
+<img src="man/figures/README-fig_1-1.png" alt="Survey tracks and several animal waypoints with elevation information" width="100%" />
 <p class="caption">
-Survey tracks and points with elevation information
+Survey tracks and several animal waypoints with elevation information
 </p>
 
 </div>
@@ -167,7 +212,16 @@ speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars
 </tbody>
 </table>
 
-## 1. Prepare track and observation points (to be updated)
+There are at least *three steps* required to convert survey data into
+detection matrix. The first is preparing both tracks and observation.
+Two problems should be dealt with in this step; correcting the time
+format and cleaning the funny shape tracks (tangled lines). Then the
+cleaned tracks and observation are combined and then the survey effort
+(in km) can be calculated by using the X-Y-Z information from each
+points. The last is to compute the detection matrix (usually shown as
+present and absent as 1 and 0) for a selected species.
+
+## 1. Prepare track and observation points
 
 We need at least three information to be able to calculate distance;
 Date-Time, X and Y coordinates. Date and Time should be in as.POSIXct
@@ -178,6 +232,9 @@ function. See codes below on how to use it and how it produces the right
 format. We do the same for observation data.
 
 ``` r
+# Load library
+library(tidyverse)
+
 # Check the structure of the data
 track %>% str()
 #> 'data.frame':    4706 obs. of  4 variables:
@@ -220,15 +277,14 @@ observation_1 %>% str()
 #>  $ Observation: chr  "animal signs" "animal signs" "animal signs" "animal signs" ...
 ```
 
-In high altitudes area like in Sumatra, GPS signals may be obstructed by
-the altitude differences or simply canopy cover and thus produces less
-precise points of location. This could be a huge problem because it will
-calculate a bias length of distance, especially when we want to
-calculate research or patrol effort (in terms of length of transect
-surveys). To deal with this, functions called **track2dm::meanPoint**
-or/and **track2dm::clearPoint** will be used to remove the bias either
-by take means from a number of subsequent points (*meanPoint*) or clear
-a certain number of points between points based on a predefined distance
+In high altitude areas like in Western part of Sumatra, GPS signals may
+be obstructed by the altitudinal differences or thick canopy cover which
+produces inaccurate geo-locations which will lead to bias in calculating
+the survey efforts (in terms of length of transect surveys). To deal
+with this, functions called **track2dm::meanPoint** or/and
+**track2dm::clearPoint** will be used to remove the bias either by take
+means from a number of subsequent points (*meanPoint*) or clear a
+certain number of points between points based on a predefined distance
 (*clearPoint*). For example we used **meanPoint** for track\_1 data.
 
 ``` r
@@ -265,13 +321,13 @@ head(transect)
 #> 6     6 2015-09-10 07:09:04 353361. 407093. <NA>  <NA>  <NA>
 ```
 
-## 2. Calculate distance (to be updated)
+## 2. Calculate distance in three dimention (X-Y-Z)
 
 After that we can calculate the distances in three dimension (X, Y, and
 Z). In order to do it, we need Z information and we can get it from
-elevation data in raster format downloaded from USGS website
-(<https://earthexplorer.usgs.gov>). We nead to load the elevation data
-first (as we did in the beginning).
+elevation data in raster format downloaded from [USGS
+website](https://earthexplorer.usgs.gov). We need to load the elevation
+data first (as we did in the beginning).
 
 ``` r
 # Calculate 3D distance and matrix replicate
@@ -289,7 +345,7 @@ head(transect_rep)
 #> # ... with 1 more variable: Replicate <int>
 ```
 
-## 3. Extract detection matrix for species (to be updated)
+## 3. Extract detection matrix for a species
 
 Finally, we can extract detection matrix from selected species.
 
@@ -315,9 +371,9 @@ transect_dm
 #> # ... with 26 more rows
 ```
 
-What we really need is the matrix consists of the replications and the
-species presence/absence for further occupancy analysis. This can be
-done using the following script.
+What we really need is the matrix consists of species
+detection/non-detection information for each replicate from a sampling
+unit. This could be done using the following script.
 
 ``` r
 # transpose it and convert as dataframe 
@@ -336,7 +392,32 @@ transect_dm_1
 This is the final result where the presence absence of species is
 recorded for each track segment. This can be read as: from the first to
 fourth segment, no species were recorded. It was until the fifth segment
-that the species were recorded, and so on. The result would be different
+that the species were present, and so on. The result would be different
 if we used different replicate length (*repLength*).
 
 **Next, how to do this for multiple tracks??**
+
+### References
+
+<div id="refs" class="references csl-bib-body hanging-indent">
+
+<div id="ref-Bailey2005" class="csl-entry">
+
+Bailey, Larissa, and Michael Adams. 2005. “<span
+class="nocase">Occupancy models to study wildlife</span>.” *US
+Geological Survey*, no. September: 6.
+<https://doi.org/10.1177/0269881115570085>.
+
+</div>
+
+<div id="ref-MacKenzie2002" class="csl-entry">
+
+MacKenzie, Darryl I., James D. Nichols, Gideon B. Lachman, Sam Droege,
+Andrew A. Royle, and Catherine A. Langtimm. 2002. “<span
+class="nocase">Estimating site occupancy rates when detection
+probabilities are less than one</span>.” *Ecology* 83 (8): 2248–55.
+[https://doi.org/10.1890/0012-9658(2002)083\[2248:ESORWD\]2.0.CO;2](https://doi.org/10.1890/0012-9658(2002)083[2248:ESORWD]2.0.CO;2).
+
+</div>
+
+</div>
