@@ -347,14 +347,38 @@ head(transect_rep)
 
 ## 3. Extract detection matrix for a species
 
-Finally, we can extract detection matrix from selected species.
+Finally, we can extract detection matrix from selected species. As
+default, **track2dm::speciesDM** only compute the detection matrix. But
+if we also want to compute the survey covariates (the variables for each
+replicate), we need to specify that in **extraVars** argument, see
+below.
 
 ``` r
-# Calculate 3D distance and matrix replicate
-transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
+# Compute only detection matrix
+transect_dm_1 <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
+                                   Xcol = "X", Ycol = "Y", speciesCol = "Observation", 
+                                   species = "animal signs")
+transect_dm_1
+#> # A tibble: 36 x 5
+#>    Replicate DateTime       X       Y Presence
+#>        <int> <chr>      <dbl>   <dbl> <chr>   
+#>  1         1 DateTime 353215. 406684. 0       
+#>  2         2 DateTime 353751. 407263. 0       
+#>  3         3 DateTime 353802. 408026. 0       
+#>  4         4 DateTime 354691. 408109. 0       
+#>  5         5 DateTime 355565. 407989. 1       
+#>  6         6 DateTime 356211. 408361. 0       
+#>  7         7 DateTime 356966. 408947. 1       
+#>  8         8 DateTime 357584. 409366. 0       
+#>  9         9 DateTime 358202. 409888. 0       
+#> 10        10 DateTime 359118. 409932. 0       
+#> # ... with 26 more rows
+
+# Compute detection matrix along with survey covariates for each replicate
+transect_dm_2 <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
                                    Xcol = "X", Ycol = "Y", speciesCol = "Observation", 
                                    species = "animal signs", extractVars = c("Age", "Type"))
-transect_dm
+transect_dm_2
 #> # A tibble: 36 x 7
 #>    Replicate DateTime       X       Y Presence Age   Type   
 #>        <int> <chr>      <dbl>   <dbl> <chr>    <chr> <chr>  
@@ -373,27 +397,34 @@ transect_dm
 
 What we really need is the matrix consists of species
 detection/non-detection information for each replicate from a sampling
-unit. This could be done using the following script.
+unit, and also the survey covariates. This could be done using the
+following script.
 
 ``` r
-# transpose it and convert as dataframe 
-transect_dm_1 <- transect_dm %>% dplyr::select(Presence) %>% 
+# Extract detection matrix
+spDM <- transect_dm_2 %>% dplyr::select(Presence) %>% 
   t() %>% as.data.frame()
 
-# Use the replicate as column names
-names(transect_dm_1) <- transect_dm$Replicate
-transect_dm_1
-#>          1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 17 18 19 20 21 22 23 24 25 26 27
-#> Presence 0 0 0 0 1 0 1 0 0  0  0  1  0  0  0  1  1  0  0  0  1  1  0  0  0  1
-#>          28 29 30 31 34 35 36 37 38 39
-#> Presence  1  0  0  0  1  1  1  0  0  0
+# Extract survey covariates
+spCov <- transect_dm_2 %>% dplyr::select(Age, Type) %>% 
+  t() %>% as.data.frame()
+
+# Show the first five elements/replicates
+spDM[1:5]
+#>          V1 V2 V3 V4 V5
+#> Presence  0  0  0  0  1
+spCov[1:5]
+#>        V1   V2   V3   V4      V5
+#> Age  <NA> <NA> <NA> <NA>     New
+#> Type <NA> <NA> <NA> <NA> Scratch
 ```
 
 This is the final result where the presence absence of species is
 recorded for each track segment. This can be read as: from the first to
 fourth segment, no species were recorded. It was until the fifth segment
-that the species were present, and so on. The result would be different
-if we used different replicate length (*repLength*).
+that the species were present in a **type** of **scratch** and it looks
+like **new** (approx. 1-2 weeks old). The result would be different if
+we used different replicate length (*repLength*).
 
 **Next, how to do this for multiple tracks??**
 

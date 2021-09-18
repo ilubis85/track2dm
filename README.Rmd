@@ -176,28 +176,38 @@ head(transect_rep)
 ```
 
 ## 3. Extract detection matrix for a species
-Finally, we can extract detection matrix from selected species.
+Finally, we can extract detection matrix from selected species. As default, **track2dm::speciesDM** only compute the detection matrix. But if we also want to compute the survey covariates (the variables for each replicate), we need to specify that in **extraVars** argument, see below.
 
 ```{r }
-# Calculate 3D distance and matrix replicate
-transect_dm <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
+# Compute only detection matrix
+transect_dm_1 <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
+                                   Xcol = "X", Ycol = "Y", speciesCol = "Observation", 
+                                   species = "animal signs")
+transect_dm_1
+
+# Compute detection matrix along with survey covariates for each replicate
+transect_dm_2 <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
                                    Xcol = "X", Ycol = "Y", speciesCol = "Observation", 
                                    species = "animal signs", extractVars = c("Age", "Type"))
-transect_dm
+transect_dm_2
 
 ```
-What we really need is the matrix consists of species detection/non-detection information for each replicate from a sampling unit. This could be done using the following script.
+What we really need is the matrix consists of species detection/non-detection information for each replicate from a sampling unit, and also the survey covariates. This could be done using the following script.
 
 ```{r }
-# transpose it and convert as dataframe 
-transect_dm_1 <- transect_dm %>% dplyr::select(Presence) %>% 
+# Extract detection matrix
+spDM <- transect_dm_2 %>% dplyr::select(Presence) %>% 
   t() %>% as.data.frame()
 
-# Use the replicate as column names
-names(transect_dm_1) <- transect_dm$Replicate
-transect_dm_1
+# Extract survey covariates
+spCov <- transect_dm_2 %>% dplyr::select(Age, Type) %>% 
+  t() %>% as.data.frame()
+
+# Show the first five elements/replicates
+spDM[1:5]
+spCov[1:5]
 ```
-This is the final result where the presence absence of species is recorded for each track segment. This can be read as: from the first to fourth segment, no species were recorded. It was until the fifth segment that the species were present, and so on. The result would be different if we used different replicate length (*repLength*).
+This is the final result where the presence absence of species is recorded for each track segment. This can be read as: from the first to fourth segment, no species were recorded. It was until the fifth segment that the species were present in a **type** of **scratch** and it looks like **new** (approx. 1-2 weeks old). The result would be different if we used different replicate length (*repLength*).
 
 
 **Next, how to do this for multiple tracks??**
