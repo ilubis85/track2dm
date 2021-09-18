@@ -8,7 +8,7 @@
 #' @param Ycol A quoted name of column that consists Y coordinates.
 #' @param speciesCol The column that contain the selected species name.
 #' @param species The name of the species within the "speciesCol" column.
-#' @param extractVars The variables (columns) to be extracted for each replicate. It will take the mean if the data type is numeric, and take the predefine modus function for charachter data type.
+#' @param extractVars The variables (columns) to be extracted for each replicate. It will take the mean if the data type is numeric, and take the predefine modus function for character data type. Default is FALSE.
 #'
 #' @return A data-frame contains detection matrix for selected species along with its geographic coordinates and sampling covariates.
 #'
@@ -16,7 +16,7 @@
 #' @export
 #' @importFrom  magrittr %>%
 #'
-speciesDM <-  function(speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars){
+speciesDM <-  function(speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars = FALSE){
   # Surpress warning
   options(warn = -1)
 
@@ -50,24 +50,29 @@ speciesDM <-  function(speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, 
                      X = dplyr::first(X),
                      Y = dplyr::first(Y),
                      Presence = base::max(Presence))
+  # If extractVars = FALSE, only return detection matrix
+  if (extractVars == FALSE) {
+    matrictDM2 <- spOccur
+  } else {
+    # If extractVars != FALSE, return both detection matrix and site covariates
+    # Take summary for each variables
+    # The output should be extracted automatically and the result would be based on data type
+    # If, numeric, take the mean, If character, take the modus using predefined function
+    # For character variables
+    varChar <- speciesDF %>% dplyr::select(Replicate, extractVars) %>%
+      dplyr::group_by(Replicate) %>%
+      dplyr::summarise(dplyr::across(where(is.character), modus))
 
-  # Then take summary for each variables
-  # The output should be extracted automatically and the result would be based on data type
-  # If, numeric, take the mean, If character, take the modus
-  # FOr character variables
-  varChar <- speciesDF %>% dplyr::select(Replicate, extractVars) %>%
-    dplyr::group_by(Replicate) %>%
-    dplyr::summarise(dplyr::across(where(is.character), modus))
+    # For Numeric variables
+    varNum <- speciesDF %>% dplyr::select(Replicate, extractVars) %>%
+      dplyr::group_by(Replicate) %>%
+      dplyr::summarise(dplyr::across(where(is.numeric), mean))
 
-  # For Numeric variables
-  varNum <- speciesDF %>% dplyr::select(Replicate, extractVars) %>%
-    dplyr::group_by(Replicate) %>%
-    dplyr::summarise(dplyr::across(where(is.numeric), mean))
-
-  # Combine all
-  matrictDM1 <- dplyr::left_join(spOccur, varChar, by = "Replicate")
-  matrictDM2 <- dplyr::left_join(matrictDM1, varNum, by = "Replicate")
-
+    # Combine all
+    matrictDM1 <- dplyr::left_join(spOccur, varChar, by = "Replicate")
+    matrictDM2 <- dplyr::left_join(matrictDM1, varNum, by = "Replicate")
+  }
+  # Return the result
   return(matrictDM2)
 }
 

@@ -4,7 +4,15 @@
 \alias{speciesDM}
 \title{speciesDM}
 \usage{
-speciesDM(speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars)
+speciesDM(
+  speciesDF,
+  datetimeCol,
+  Xcol,
+  Ycol,
+  speciesCol,
+  species,
+  extractVars = FALSE
+)
 }
 \arguments{
 \item{speciesDF}{A matrix contains Replicate column resulted from swts::dist3D() function.}
@@ -19,7 +27,7 @@ speciesDM(speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars)
 
 \item{species}{The name of the species within the "speciesCol" column.}
 
-\item{extractVars}{The variables (columns) to be extracted for each replicate. It will take the mean if the data type is numeric, and take the predefine modus function for charachter data type.}
+\item{extractVars}{The variables (columns) to be extracted for each replicate. It will take the mean if the data type is numeric, and take the predefine modus function for character data type. Default is FALSE.}
 }
 \value{
 A data-frame contains detection matrix for selected species along with its geographic coordinates and sampling covariates.
