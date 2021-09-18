@@ -423,8 +423,8 @@ This is the final result where the presence absence of species is
 recorded for each track segment. This can be read as: from the first to
 fourth segment, no species were recorded. It was until the fifth segment
 that the species were present in a **type** of **scratch** and it looks
-like **new** (approx. 1-2 weeks old). The result would be different if
-we used different replicate length (*repLength*).
+like **new** (approx. 1-2 weeks old). This data is ready for occupancy
+modelling analysis :)
 
 **Next, how to do this for multiple tracks??**
 
