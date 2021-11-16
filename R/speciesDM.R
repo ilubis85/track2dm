@@ -46,7 +46,7 @@ speciesDM <-  function(speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, 
   spOccur <- speciesDF %>%
     dplyr::group_by(Replicate) %>%
     # Take summary of the species for each replicate
-    dplyr::summarise(DateTime = dplyr::first(datetimeCol),
+    dplyr::summarise(DateTime = dplyr::first(DateTime),
                      X = dplyr::first(X),
                      Y = dplyr::first(Y),
                      Presence = base::max(Presence))
