@@ -1,7 +1,7 @@
 Package: track2dm
 Type: Package
 Title: Create detection matrix from tracks and waypoints to be used for occupancy modelling
-Version: 0.1.2
+Version: 0.1.3
 Date: 2021-09-10
 Author: Muhammad I. Lubis
 Maintainer: Muhammad I. Lubis <ilubis85@gmail.com>
