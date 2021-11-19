@@ -4,7 +4,7 @@
 \alias{clearPoint}
 \title{Remove nearby points within specific distance in meters}
 \usage{
-clearPoint(dataFrame, Xcol, Ycol, UTMZone, distLength)
+clearPoint(dataFrame, Xcol, Ycol, UTMZone, distLength, nPart = 1000)
 }
 \arguments{
 \item{dataFrame}{A data-frame contains at least "X" and "Y" in UTM projection.}
@@ -16,6 +16,8 @@ clearPoint(dataFrame, Xcol, Ycol, UTMZone, distLength)
 \item{UTMZone}{A UTM projection of the target file.}
 
 \item{distLength}{A numeric value of a distance}
+
+\item{nPart}{split the dataframe into equal parts based on number of rows defined by user (default nPart = 1000)}
 }
 \value{
 Spatial object data-frame.

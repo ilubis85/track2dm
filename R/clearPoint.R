@@ -7,32 +7,45 @@
 #' @param Ycol A quoted name of column that consists Y coordinates.
 #' @param UTMZone A UTM projection of the target file.
 #' @param distLength A numeric value of a distance
+#' @param nPart split the dataframe into equal parts based on number of rows defined by user (default nPart = 1000)
 #'
 #' @return Spatial object data-frame.
 #'
 #' @export
-clearPoint <- function(dataFrame, Xcol, Ycol, UTMZone, distLength){
+clearPoint <- function(dataFrame, Xcol, Ycol, UTMZone, distLength, nPart = 1000){
 
-  # Specify the coordinate X and Y from a data-frame
-  points <- dataFrame[, c(Xcol, Ycol)]
+  # Split data frame for every 1000 or user defined number of rows
+  splitDF <- split(dataFrame, rep(1:ceiling(nrow(dataFrame)/nPart),
+                                  each=nPart, length.out=nrow(dataFrame)))
 
-  # Convert to spatial points
-  points_sp <- sp::SpatialPoints(points, proj4string = sp::CRS(as.character(UTMZone)))
+  # Then run the codes for each part
+  # Create output first
+  outlist <- list()
+  for (i in 1:length(splitDF)) {
 
-  # Create distance matrix between points
-  points_sp_dist <- rgeos::gDistance(points_sp, byid = T)
+    # Specify the coordinate X and Y from each data-frame
+    points <- splitDF[[i]][, c(Xcol, Ycol)]
 
-  # Define the distance threshold
-  points_sp_dist_mtr <- rgeos::gWithinDistance(points_sp, byid = TRUE, dist=distLength)
+    # Convert to spatial points
+    points_sp <- sp::SpatialPoints(points, proj4string = sp::CRS(as.character(UTMZone)))
 
-  # Use only diagonal-up
-  points_sp_dist_mtr[lower.tri(points_sp_dist_mtr, diag = TRUE)]<- NA
+    # Create distance matrix between points
+    points_sp_dist <- rgeos::gDistance(points_sp, byid = T)
 
-  # Create T/F, True if distance > threshold km, False if else
-  points_sp_dist_mtr_cr <- colSums(points_sp_dist_mtr, na.rm=TRUE) == 0
+    # Define the distance threshold
+    points_sp_dist_mtr <- rgeos::gWithinDistance(points_sp, byid = TRUE, dist=distLength)
 
-  # Remove points within distance based on threshold (drop out FALSE criteria)
-  points_dist_final <- dataFrame[points_sp_dist_mtr_cr,]
+    # Use only diagonal-up
+    points_sp_dist_mtr[lower.tri(points_sp_dist_mtr, diag = TRUE)]<- NA
+
+    # Create T/F, True if distance > threshold km, False if else
+    points_sp_dist_mtr_cr <- colSums(points_sp_dist_mtr, na.rm=TRUE) == 0
+
+    # Remove points within distance based on threshold (drop out FALSE criteria)
+    outlist[[i]] <- splitDF[[i]][points_sp_dist_mtr_cr,]
+  }
+  # Combine all parts
+  points_dist_final <- do.call(rbind, outlist)
 
   return(points_dist_final)
 }
