@@ -14,9 +14,12 @@
 #' @export
 clearPoint <- function(dataFrame, Xcol, Ycol, UTMZone, distLength, nPart = 1000){
 
+  # Remove dupicate based on X and Y
+  dataFrame_re <- dataFrame[!duplicated(dataFrame[c(Xcol, Ycol)]),]
+
   # Split data frame for every 1000 or user defined number of rows
-  splitDF <- split(dataFrame, rep(1:ceiling(nrow(dataFrame)/nPart),
-                                  each=nPart, length.out=nrow(dataFrame)))
+  splitDF <- split(dataFrame_re, rep(1:ceiling(nrow(dataFrame_re)/nPart),
+                                     each=nPart, length.out=nrow(dataFrame_re)))
 
   # Then run the codes for each part
   # Create output first
@@ -49,3 +52,4 @@ clearPoint <- function(dataFrame, Xcol, Ycol, UTMZone, distLength, nPart = 1000)
 
   return(points_dist_final)
 }
+

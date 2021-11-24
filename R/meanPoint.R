@@ -17,13 +17,16 @@
 # Create a function to calculate the mean of X and Y from a consecutive points
 meanPoint <- function(dataFrame, datetimeCol, Xcol, Ycol, nPoint){
 
+  # Remove dupicate based on X and Y
+  dataFrame_re <- dataFrame[!duplicated(dataFrame[c(Xcol, Ycol)]),]
+
   # Specify columns
-  DateTime = dataFrame[,datetimeCol]
-  X = dataFrame[,Xcol]
-  Y = dataFrame[,Ycol]
+  DateTime = dataFrame_re[,datetimeCol]
+  X = dataFrame_re[,Xcol]
+  Y = dataFrame_re[,Ycol]
 
   # Add ID column
-  dataFrame_average <- dataFrame %>%
+  dataFrame_average <- dataFrame_re %>%
     # Add ID, the same ID for nPoint consecutive rows
     dplyr::group_by(ID = ceiling(dplyr::row_number()/nPoint)) %>%
 
