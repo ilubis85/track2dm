@@ -4,12 +4,14 @@
 \alias{nearID}
 \title{nearID}
 \usage{
-nearID(wayPoints, trackPoints)
+nearID(points1, points2, joinAtr)
 }
 \arguments{
-\item{wayPoints}{Spatial points dataframe of waypoints.}
+\item{points1}{Spatial points dataframe consist of X and Y that needs attribute from points2.}
 
-\item{trackPoints}{Spatial points dataframe of track points (usually generated from GPX).}
+\item{points2}{Spatial points dataframe where the attributes available to be copied.}
+
+\item{joinAtr}{A vector of attribute (columns) to be copied.}
 }
 \value{
 Similar data with wayPoints with additional Id copied from nearby track points.

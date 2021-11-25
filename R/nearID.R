@@ -2,8 +2,9 @@
 #'
 #' @description A function to copy IDs from other nearby track points.
 #'
-#' @param wayPoints Spatial points dataframe of waypoints.
-#' @param trackPoints Spatial points dataframe of track points (usually generated from GPX).
+#' @param points1 Spatial points dataframe consist of X and Y that needs attribute from points2.
+#' @param points2 Spatial points dataframe where the attributes available to be copied.
+#' @param joinAtr A vector of attribute (columns) to be copied.
 #'
 #' @return Similar data with wayPoints with additional Id copied from nearby track points.
 #'
@@ -12,38 +13,22 @@
 #' @export
 # Create a function that copy the ID from nearby track points to a waypoint
 # Both data are spatial points dataframe in UTM projection
-nearID <- function(wayPoints, trackPoints){
-  # Surpress warning
-  options(warn = -1)
+nearID <- function(points1, points2, joinAtr){
 
-  # Calculate distance between waypoints and track points
-  distan <- rgeos::gDistance(wayPoints, trackPoints, byid = T)
+  # First calculate distance between two datasets
+  pointdist <- raster::pointDistance(points1[,c("X", "Y")], points2[,c("X", "Y")],  lonlat = FALSE)
 
-  # Get minimum distance in meter from each wp as a vector
-  # Get the minimum number for each column, round it and add 1 and as vector
-  mindist <- as.vector(ceiling(apply(distan, 2, FUN = min)))+2
+  # Get the minimum distance between points1 and points2, return the index value
+  mindist <- apply(pointdist, 1, which.min)
 
-  # Create a buffer for each waypoint in which the width gets from the minimum distant (mindist)
-  # Output as a list
-  outlist <- list()
-  for (x in 1:nrow(wayPoints)) {
-    # Select a point
-    wp_x <- wayPoints[x,]
-    # Create buffer
-    outlist[[x]] <- rgeos::gBuffer(wp_x, width = mindist[x], byid = T)
+  # Copy the attribute from points2 to points1 using iteration
+  # Get the attribute ID from nearby points
+  for (i in 1:nrow(points1)) {
+    for (j in 1:length(joinAtr)) {
+      # For each row of track points, get the attribte data from waypoint
+      points1[i, joinAtr[j]] <- points2[mindist[i],joinAtr[j]]
+    }
   }
-  # Union all buffer
-  wp_buffer <- do.call(rbind, outlist)
-
-  # Take the ID of track point that fell into within the buffer
-  track_wp_buffer <- sp::over(wp_buffer, trackPoints[,"Id"])
-
-  # Convert as vector
-  track_wp_buffer <- track_wp_buffer[['Id']] # As vector
-
-  # Then put the ID to the waypoint ID
-  wayPoints@data <- wayPoints@data %>% dplyr::mutate(Id = track_wp_buffer)
-
-  # Return waypoint with new ID gathered from nearby track points
-  return(wayPoints)
+  # Return the result
+  return(points1)
 }
