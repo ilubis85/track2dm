@@ -1,0 +1,30 @@
+#' @title joinPoint
+#'
+#' @description A function to combine and rearrange waypoints and trackpoints.
+#'
+#' @param waypointDF A dataframe of waypoints.
+#' @param trackDF A dataframe of trackpoints.
+#'
+#' @return A dataframe of waypoints and tracks and reordered by "Id".
+#'
+#'
+#'
+#' @export
+# Combine both waypoint and trackpoint using a function
+joinPoint <- function(waypointDF, trackDF){
+
+  # Join the table
+  jointable <- dplyr::full_join(waypointDF, trackDF, by = c("Id", "X", "Y")) %>%
+    # Arrange by Id
+    dplyr::arrange(Id)
+
+  # Create a vector to check if the Id from consecutive rows is similar, if so, put "yes"
+  jointable[,"duplicate"] <- dplyr::if_else(jointable["Id"] == dplyr::lag(jointable["Id"]), "Yes", "No")
+
+  # Then remove the track that has similar Id with waypoint
+  jointable <- subset(jointable, duplicate != "Yes") %>%
+    # Remove duplicate columns
+    dplyr::select(-duplicate)
+
+  return(jointable)
+}
