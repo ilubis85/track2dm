@@ -46,33 +46,54 @@ speciesDM <-  function(speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, 
   spOccur <- speciesDF %>%
     dplyr::group_by(Replicate) %>%
     # Take summary of the species for each replicate
-    dplyr::summarise(DateTime = dplyr::first(DateTime),
+    dplyr::summarise(DateTime = dplyr::first(na.omit(DateTime)),
                      X = dplyr::first(X),
                      Y = dplyr::first(Y),
                      Presence = base::max(Presence))
   # If extractVars = FALSE, only return detection matrix
   if (extractVars == FALSE) {
-    matrictDM2 <- spOccur
+    matrictDM <- spOccur
   } else {
     # If extractVars != FALSE, return both detection matrix and site covariates
     # Take summary for each variables
-    # The output should be extracted automatically and the result would be based on data type
-    # If, numeric, take the mean, If character, take the modus using predefined function
+
+
     # For character variables
-    varChar <- speciesDF %>% dplyr::select(Replicate, extractVars) %>%
-      dplyr::group_by(Replicate) %>%
-      dplyr::summarise(dplyr::across(where(is.character), modus))
+    # Create output
+    my_vars <- list()
 
-    # For Numeric variables
-    varNum <- speciesDF %>% dplyr::select(Replicate, extractVars) %>%
-      dplyr::group_by(Replicate) %>%
-      dplyr::summarise(dplyr::across(where(is.numeric), mean))
+    # Compute summary for each column using iteration
+    # The output should be extracted automatically and the result would be based on data type
+    for (r in 1:length(extractVars)){
+      # If character, take the modus using predefined function
+      my_vars[[r]] <- if(is.character(extractVars[r]) == TRUE){
+        speciesDF %>% dplyr::select(Replicate, extractVars[r]) %>%
+          gather(variable, value, -Replicate) %>%
+          group_by(Replicate) %>% dplyr::group_by(Replicate) %>%
+          dplyr::summarise(modus = modus(value))%>%
+          dplyr::select(-Replicate)
+      } else if (
+        # If numeric, take the mean values
+        is.numeric(extractVars[r]) == TRUE) {
+        speciesDF %>% dplyr::select(Replicate, extractVars[r]) %>%
+          gather(variable, value, -Replicate) %>%
+          group_by(Replicate) %>% dplyr::group_by(Replicate) %>%
+          dplyr::summarise(mean = mean(value))%>%
+          dplyr::select(-Replicate)
+      } else {
+        # If unknown, print unknown data type
+        print("Unknown data type")}
+    }
+    # Combine list with cbind
+    outPut <- do.call('cbind', my_vars)
 
-    # Combine all
-    matrictDM1 <- dplyr::left_join(spOccur, varChar, by = "Replicate")
-    matrictDM2 <- dplyr::left_join(matrictDM1, varNum, by = "Replicate")
+    # Renames the output
+    names(outPut) <- colnames(speciesDF %>% dplyr::select(extractVars))
+
+    # Combine detection matrix with sampling covariates all
+    matrictDM <- data.frame(spOccur, outPut)
   }
   # Return the result
-  return(matrictDM2)
+  return(matrictDM)
 }
 
