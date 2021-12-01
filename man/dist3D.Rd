@@ -4,10 +4,14 @@
 \alias{dist3D}
 \title{dist3D}
 \usage{
-dist3D(dataFrame, elevData, repLength)
+dist3D(dataFrame, Xcol, Ycol, elevData, repLength)
 }
 \arguments{
-\item{dataFrame}{A dataframe contains at least "X", "Y" and "Z" in order to calculate distance using Eulidean distance formula.}
+\item{dataFrame}{A dataframe contains pairs of coordinate in UTM projection to calculate distance using Euclidean distance formula.}
+
+\item{Xcol}{A quoted name of column that consists X coordinates.}
+
+\item{Ycol}{A quoted name of column that consists Y coordinates.}
 
 \item{elevData}{A raster layer contains elevation data in meter to calculate altitude (Z).}
 
@@ -17,5 +21,5 @@ dist3D(dataFrame, elevData, repLength)
 New columns that specify distance and what replicates that the observations are belong to.
 }
 \description{
-A function to calculate 3D distance and then categorise the observations based on a predefine replication length.
+A function to calculate 3D distance and then categories the observations based on a predefine replication length.
 }
