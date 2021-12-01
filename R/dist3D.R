@@ -1,8 +1,10 @@
 #' @title dist3D
 #'
-#' @description A function to calculate 3D distance and then categorise the observations based on a predefine replication length.
+#' @description A function to calculate 3D distance and then categories the observations based on a predefine replication length.
 #'
-#' @param dataFrame A dataframe contains at least "X", "Y" and "Z" in order to calculate distance using Eulidean distance formula.
+#' @param dataFrame A dataframe contains pairs of coordinate in UTM projection to calculate distance using Euclidean distance formula.
+#' @param Xcol A quoted name of column that consists X coordinates.
+#' @param Ycol A quoted name of column that consists Y coordinates.
 #' @param elevData A raster layer contains elevation data in meter to calculate altitude (Z).
 #' @param repLength An information about a desired length of each spatial replicate.
 #'
@@ -11,9 +13,9 @@
 #'
 #'
 #' @export
-dist3D <- function(dataFrame, elevData, repLength){
+dist3D <- function(dataFrame, Xcol, Ycol, elevData, repLength){
   # Add elevation data from DEM that has been provided
-  dataFrame$Z <- raster::extract(elevData, dataFrame[,c("X","Y")])
+  dataFrame$Z <- raster::extract(elevData, dataFrame[,c(Xcol, Ycol)])
 
   # Add new column of distance to the track dataframe
   dataFrame$Dist <- as.numeric("")
@@ -25,8 +27,8 @@ dist3D <- function(dataFrame, elevData, repLength){
   for (i in 2:nrow(dataFrame)) {
     options(warn=-1) # Suppress Warning messages
     dataFrame[i,"Dist"] <- dataFrame[i-1,"Dist"] +
-      sqrt((dataFrame[i-1,"X"]-dataFrame[i,"X"])^2 +
-             (dataFrame[i-1,"Y"]-dataFrame[i,"Y"])^2 +
+      sqrt((dataFrame[i-1,Xcol]-dataFrame[i,Xcol])^2 +
+             (dataFrame[i-1,Ycol]-dataFrame[i,Ycol])^2 +
              (dataFrame[i-1,"Z"]-dataFrame[i,"Z"])^2)
   }
   # Create a sequence number based on distance interval
