@@ -22,7 +22,7 @@ joinPoint <- function(waypointDF, trackDF, IDcol, Xcol, Ycol){
     dplyr::arrange(.[,IDcol])
 
   # Create a vector to check if the Id from consecutive rows is similar, if so, put "yes"
-  jointable[,"duplicate"] <- dplyr::if_else(jointable["Id"] == dplyr::lag(jointable["Id"]), "Yes", "No")
+  jointable[,"duplicate"] <- dplyr::if_else(jointable[IDcol] == dplyr::lag(jointable[IDcol]), "Yes", "No")
 
   # Then remove the track that has similar Id with waypoint
   jointable <- subset(jointable, duplicate != "Yes")
