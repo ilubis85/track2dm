@@ -17,23 +17,50 @@
 # Create a function to calculate the mean of X and Y from a consecutive points
 meanPoint <- function(dataFrame, datetimeCol, Xcol, Ycol, nPoint){
 
-  # Remove dupicate based on X and Y
+  # Remove duplicate based on X and Y
   dataFrame_re <- dataFrame[!duplicated(dataFrame[c(Xcol, Ycol)]),]
 
-  # Specify columns
+  # Specify columns based on user defined columns
   DateTime = dataFrame_re[,datetimeCol]
   X = dataFrame_re[,Xcol]
   Y = dataFrame_re[,Ycol]
 
-  # Add ID column
-  dataFrame_average <- dataFrame_re %>%
-    # Add ID, the same ID for nPoint consecutive rows
-    dplyr::group_by(ID = ceiling(dplyr::row_number()/nPoint)) %>%
+  # Add Day, Hour, and Minute columns
+  dataFrame_re[,"Day"] <- lubridate::day(dataFrame_re[,"DateTime"])
+  dataFrame_re[,"Hour"] <- lubridate::hour(dataFrame_re[,"DateTime"])
+  dataFrame_re[,"Min"] <- lubridate::minute(dataFrame_re[,"DateTime"])
 
-    # Calculate the mean of X, Y, and Z. Use the first row of DateTime
-    dplyr::summarise(DateTime = dplyr::first(DateTime),
-                     X = base::mean(X),
-                     Y = base::mean(Y))
+  # Then split the dataframe into groups by Day, Hour, and Minute
+  dataFrame_split <- split(dataFrame_re, dataFrame_re[, c("Day", "Hour", "Min")])
 
-  return(dataFrame_average)
+  # Create output
+  dataFrame_average <- list()
+
+  # For each group, take the average for each nPoint
+  for (i in seq_along(dataFrame_split)) {
+
+    # If no observation, skip
+    if (nrow(dataFrame_split[[i]]) == 0) next
+
+    # If any observation, calculate the average
+    else {
+      # Calculate the average for each group
+      dataFrame_average[[i]] <- dataFrame_split[[i]] %>%
+
+        # Add ID, the same ID for nPoint consecutive rows
+        dplyr::group_by(ID = ceiling(dplyr::row_number()/nPoint)) %>%
+
+        # Calculate the mean of X, Y, and Z. Use the first row of DateTime
+        dplyr::summarise(DateTime = dplyr::first(na.omit(DateTime)),
+                         X = base::mean(na.omit(X)),
+                         Y = base::mean(na.omit(Y)), .groups = 'drop')
+    }
+    dataFrame_average
+  }
+  # Combine as one table
+  dataFrame_com <- do.call(rbind, dataFrame_average) %>%
+    # Remove new columns
+    dplyr::select(DateTime, X, Y)
+
+  return(dataFrame_com)
 }
