@@ -25,7 +25,8 @@ meanPoint <- function(dataFrame, datetimeCol, Xcol, Ycol, nPoint){
   X = dataFrame_re[,Xcol]
   Y = dataFrame_re[,Ycol]
 
-  # Add Day, Hour, and Minute columns
+  # Add ID, Day, Hour, and Minute columns
+  dataFrame_re[,"newID"] <- 1:nrow(dataFrame_re)
   dataFrame_re[,"Day"] <- lubridate::day(dataFrame_re[,"DateTime"])
   dataFrame_re[,"Hour"] <- lubridate::hour(dataFrame_re[,"DateTime"])
   dataFrame_re[,"Min"] <- lubridate::minute(dataFrame_re[,"DateTime"])
@@ -51,16 +52,20 @@ meanPoint <- function(dataFrame, datetimeCol, Xcol, Ycol, nPoint){
         dplyr::group_by(ID = ceiling(dplyr::row_number()/nPoint)) %>%
 
         # Calculate the mean of X, Y, and Z. Use the first row of DateTime
-        dplyr::summarise(DateTime = dplyr::first(na.omit(DateTime)),
-                         X = base::mean(na.omit(X)),
-                         Y = base::mean(na.omit(Y)), .groups = 'drop')
+        dplyr::summarise(newID = dplyr::first(stats::na.omit(newID)),
+                         DateTime = dplyr::first(stats::na.omit(DateTime)),
+                         X = base::mean(stats::na.omit(X)),
+                         Y = base::mean(stats::na.omit(Y)), .groups = 'drop')
     }
     dataFrame_average
   }
   # Combine as one table
   dataFrame_com <- do.call(rbind, dataFrame_average) %>%
+    # Reorder by newID
+    dplyr::arrange(newID) %>%
     # Remove new columns
     dplyr::select(DateTime, X, Y)
+
 
   return(dataFrame_com)
 }
