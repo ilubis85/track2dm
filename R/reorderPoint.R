@@ -17,7 +17,7 @@ reorderPoint <- function(pointsDF, startPoint, groupID){
 
   ########################## PART 1 ####################################
   # Create a vector of group from the smallest of WP_ID to the largest
-  Vec_ID <- pointsDF[, groupID] %>% sort() %>% unique()
+  Vec_ID <- pointsDF[, groupID] %>% unique()
 
   # Add a new variable of Dist, then split dataframe based on Vec_ID
   group_ID_split <- pointsDF %>% dplyr::mutate(Dist = as.numeric(NA))
