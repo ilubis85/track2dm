@@ -45,9 +45,9 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
                                        elevData = elevData,  repLength = repLength)
 
       # Create detection matrix for selected species
-      subgrid_i_DM <- track2dm::speciesDM(speciesDF = subgrid_i_3d, datetimeCol = sortID,
-                                          speciesCol = whichCol, Xcol = Xcol, Ycol = Ycol,
-                                          species = whichSp)
+      subgrid_i_DM <- track2dm::speciesDM(speciesDF = subgrid_i_3d, sortID = sortID,
+                                          whichCol = whichCol, Xcol = Xcol, Ycol = Ycol,
+                                          whichSp = whichSp)
     }
     # Extract only presence-absence of the species and covariates (if asked)
     dm_species[[i]] <- subgrid_i_DM %>%

@@ -3,11 +3,11 @@
 #' @description A function to create detection matrix for selected species.
 #'
 #' @param speciesDF A matrix contains Replicate column resulted from swts::dist3D() function.
-#' @param datetimeCol A quoted name of column that consists date and time object (as.POSIXct).
+#' @param sortID A name of column that used to order the point based on a sequence (time based or ID based).
 #' @param Xcol A quoted name of column that consists X coordinates.
 #' @param Ycol A quoted name of column that consists Y coordinates.
-#' @param speciesCol The column that contain the selected species name.
-#' @param species The name of the species within the "speciesCol" column.
+#' @param whichCol A column that contains all the species occurrence.
+#' @param whichSp A selected species name within the "whichCol" column to be extracted.
 #' @param extractVars The variables (columns) to be extracted for each replicate. It will take the mean if the data type is numeric, and take the predefine modus function for character data type. Default is FALSE.
 #'
 #' @return A data-frame contains detection matrix for selected species along with its geographic coordinates and sampling covariates.
@@ -16,7 +16,7 @@
 #' @export
 #' @importFrom  magrittr %>%
 #'
-speciesDM <-  function(speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars = FALSE){
+speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, extractVars = FALSE){
   # Surpress warning
   options(warn = -1)
 
@@ -32,13 +32,13 @@ speciesDM <-  function(speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, 
 
   # Create a Presence/Absence (0/1) column based on the species occurrence
   for (i in 1:nrow(speciesDF)) {
-    speciesDF[i, "Presence"] <- ifelse(grepl(species, speciesDF[i,speciesCol]), "1", "0")
+    speciesDF[i, "Presence"] <- ifelse(grepl(whichSp, speciesDF[i,whichCol]), "1", "0")
   }
 
   # Define some columns
   Replicate <- speciesDF[,"Replicate"] # Generated from above line
   Presence <- speciesDF[,"Presence"]
-  DateTime <- speciesDF[, datetimeCol] # User defined column
+  sortid <- speciesDF[, sortID] # User defined column
   X <- speciesDF[, Xcol] # User defined column
   Y <- speciesDF[, Ycol] # User defined column
 

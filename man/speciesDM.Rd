@@ -6,26 +6,26 @@
 \usage{
 speciesDM(
   speciesDF,
-  datetimeCol,
+  sortID,
   Xcol,
   Ycol,
-  speciesCol,
-  species,
+  whichCol,
+  whichSp,
   extractVars = FALSE
 )
 }
 \arguments{
 \item{speciesDF}{A matrix contains Replicate column resulted from swts::dist3D() function.}
 
-\item{datetimeCol}{A quoted name of column that consists date and time object (as.POSIXct).}
+\item{sortID}{A name of column that used to order the point based on a sequence (time based or ID based).}
 
 \item{Xcol}{A quoted name of column that consists X coordinates.}
 
 \item{Ycol}{A quoted name of column that consists Y coordinates.}
 
-\item{speciesCol}{The column that contain the selected species name.}
+\item{whichCol}{A column that contains all the species occurrence.}
 
-\item{species}{The name of the species within the "speciesCol" column.}
+\item{whichSp}{A selected species name within the "whichCol" column to be extracted.}
 
 \item{extractVars}{The variables (columns) to be extracted for each replicate. It will take the mean if the data type is numeric, and take the predefine modus function for character data type. Default is FALSE.}
 }
