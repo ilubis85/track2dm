@@ -27,7 +27,7 @@ speciesDM(
 
 \item{whichSp}{A selected species name within the "whichCol" column to be extracted.}
 
-\item{extractVars}{The variables (columns) to be extracted for each replicate. It will take the mean if the data type is numeric, and take the predefine modus function for character data type. Default is FALSE.}
+\item{extractVars}{The variables (columns) to be extracted for each replicate.}
 }
 \value{
 A data-frame contains detection matrix for selected species along with its geographic coordinates and sampling covariates.

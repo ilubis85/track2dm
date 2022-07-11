@@ -8,7 +8,7 @@
 #' @param Ycol A quoted name of column that consists Y coordinates.
 #' @param whichCol A column that contains all the species occurrence.
 #' @param whichSp A selected species name within the "whichCol" column to be extracted.
-#' @param extractVars The variables (columns) to be extracted for each replicate. It will take the mean if the data type is numeric, and take the predefine modus function for character data type. Default is FALSE.
+#' @param extractVars The variables (columns) to be extracted for each replicate.
 #'
 #' @return A data-frame contains detection matrix for selected species along with its geographic coordinates and sampling covariates.
 #'
@@ -17,83 +17,100 @@
 #' @importFrom  magrittr %>%
 #'
 speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, extractVars = FALSE){
-  # Surpress warning
-  options(warn = -1)
-
-  # Function to calculate Modus
-  modus <- function(myVector){
-    # Sort myVector
-    myVector <- sort(myVector, na.last = TRUE)
-    # If modus is NA, return NA, else return the MODUS
-    if (is.na(myVector) == TRUE){outPut <- NA
-    } else {outPut <- names(sort(-table(myVector)))[1]}
-    return(outPut)
-  }
 
   # Create a Presence/Absence (0/1) column based on the species occurrence
   for (i in 1:nrow(speciesDF)) {
     speciesDF[i, "Presence"] <- ifelse(grepl(whichSp, speciesDF[i,whichCol]), "1", "0")
   }
 
-  # Define some columns
-  Replicate <- speciesDF[,"Replicate"] # Generated from above line
-  Presence <- speciesDF[,"Presence"]
-  sortid <- speciesDF[, sortID] # User defined column
-  X <- speciesDF[, Xcol] # User defined column
-  Y <- speciesDF[, Ycol] # User defined column
+  # Then for each replicate, extract the species information
+  # Create list of replicates
+  rep_list <- base::unique(speciesDF$Replicate)
 
-  # Then take summary for each replicate
-  spOccur <- speciesDF %>%
-    dplyr::group_by(Replicate) %>%
-    # Take summary of the species for each replicate
-    dplyr::summarise(DateTime = dplyr::first(stats::na.omit(DateTime)),
-                     X = dplyr::first(X),
-                     Y = dplyr::first(Y),
-                     Presence = base::max(Presence))
-  # If extractVars = FALSE, only return detection matrix
-  if (extractVars == FALSE) {
-    matrictDM <- spOccur
-  } else {
-    # If extractVars != FALSE, return both detection matrix and site covariates
-    # Take summary for each variables
+  # Create a list for the output
+  species_result <- list()
 
+  for (j in 1:length(rep_list)) {
 
-    # For character variables
-    # Create output
-    my_vars <- list()
+    # Select the data based on selected replicate
+    speciesDF_rep_r <- speciesDF %>% dplyr::filter(Replicate == rep_list[[j]])
 
-    # Compute summary for each column using iteration
-    # The output should be extracted automatically and the result would be based on data type
-    for (r in 1:length(extractVars)){
-      # If character, take the modus using predefined function
-      my_vars[[r]] <- if(is.character(extractVars[r]) == TRUE){
-        speciesDF %>% dplyr::select(Replicate, extractVars[r]) %>%
-          gather(variable, value, -Replicate) %>%
-          group_by(Replicate) %>% dplyr::group_by(Replicate) %>%
-          dplyr::summarise(modus = modus(value))%>%
-          dplyr::select(-Replicate)
-      } else if (
-        # If numeric, take the mean values
-        is.numeric(extractVars[r]) == TRUE) {
-        speciesDF %>% dplyr::select(Replicate, extractVars[r]) %>%
-          gather(variable, value, -Replicate) %>%
-          group_by(Replicate) %>% dplyr::group_by(Replicate) %>%
-          dplyr::summarise(mean = mean(value))%>%
-          dplyr::select(-Replicate)
-      } else {
-        # If unknown, print unknown data type
-        print("Unknown data type")}
+    # If the species is found more than once in each replicate, select the first
+    if (sum(as.numeric(speciesDF_rep_r$Presence)) > 1) {
+      # Select the first row where the species is found
+      species_occured <- speciesDF_rep_r %>% dplyr::filter(Presence == 1) %>% dplyr::filter(row_number() == 1)
+      species_info <- data.frame("Replicate" = species_occured$Replicate,
+                                 "Presence" = species_occured$Presence,
+                                 "X" = species_occured$X, "Y" = species_occured$Y,
+                                 "Species" = species_occured$Species)
+      # Extract extraVars
+      # If extraVar is FALSE, extract only species info
+      if (extractVars == FALSE) {
+        sp_result <- species_info
+
+      } else { # extract the variables
+        species_var <- species_occured %>% dplyr::filter(Presence == 1) %>%
+          dplyr::select(extractVars)
+
+        # Combine both
+        sp_result <- data.frame(species_info, species_var)
+      }
+      sp_result
     }
-    # Combine list with cbind
-    outPut <- do.call('cbind', my_vars)
 
-    # Renames the output
-    names(outPut) <- colnames(speciesDF %>% dplyr::select(extractVars))
+    # If the species is present once, extract the exact values where the species is found
+    else if (sum(as.numeric(speciesDF_rep_r$Presence)) == 1) {
+      # Select the row where the species is found
+      species_occured <- speciesDF_rep_r %>% dplyr::filter(Presence == 1)
+      species_info <- data.frame("Replicate" = species_occured$Replicate,
+                                 "Presence" = species_occured$Presence,
+                                 "X" = species_occured$X, "Y" = species_occured$Y,
+                                 "Species" = species_occured$Species)
+      # Extract extraVars
+      # If extraVar is FALSE, extract only species info
+      if (extractVars == FALSE) {
+        sp_result <- species_info
 
-    # Combine detection matrix with sampling covariates all
-    matrictDM <- data.frame(spOccur, outPut)
+      } else { # extract the variables
+        species_var <- species_occured %>% dplyr::filter(Presence == 1) %>%
+          dplyr::select(extractVars)
+
+        # Combine both
+        sp_result <- data.frame(species_info, species_var)
+      }
+      sp_result
+
+    }
+    # Then when the species is absence, just extract the first row
+    else {
+      # Select the row where the species is found
+      species_occured <- speciesDF_rep_r %>% dplyr::filter(row_number() == 1)
+      species_info <- data.frame("Replicate" = species_occured$Replicate,
+                                 "Presence" = species_occured$Presence,
+                                 "X" = species_occured$X, "Y" = species_occured$Y,
+                                 "Species" = "NA")
+      # Extract extraVars
+      # If extraVar is FALSE, extract only species info
+      if (extractVars == FALSE) {
+        sp_result <- species_info
+
+      } else { # extract the variables from the first row
+        species_var <- species_occured %>% dplyr::filter(row_number() == 1) %>%
+          dplyr::select(extractVars)
+
+        # Combine both
+        sp_result <-  data.frame(species_info, species_var)
+      }
+      sp_result
+    }
+    species_result[[j]] <- sp_result
   }
+
+  # Combine the result
+  matrixDM <- do.call(rbind, species_result)
+
   # Return the result
-  return(matrictDM)
+  return(matrixDM)
 }
+
 
