@@ -14,7 +14,8 @@ speciesDM_grid(
   whichCol,
   whichSp,
   Xcol,
-  Ycol
+  Ycol,
+  extractVars = FALSE
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ speciesDM_grid(
 \item{Xcol}{A column that consists X coordinates.}
 
 \item{Ycol}{A column that consists Y coordinates.}
+
+\item{extractVars}{The variables (columns) to be extracted for each replicate. Default is FALSE}
 }
 \value{
 A dataframe contain detection matrices from all gridcell.
