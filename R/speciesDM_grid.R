@@ -26,42 +26,49 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
   # Create list of Subgrid_ID
   subgrid_list <- occ_clip@data[, subgridCol] %>% unique()
 
-  # Create lists of output for DM and Covariate
+  # SEARCH AND REMOVE if data contain < 2 rows (occasions)
+  # Compute number of row (nrow) for each subgrid in a new dataframe
+  nrow_subgrid <- data.frame(Subgrid_ID = occ_clip@data[, subgridCol]) %>% group_by(Subgrid_ID) %>%
+    dplyr::summarise(nrow=n())
+
+  # Join table
+  occ_clip_clean <- dplyr::left_join(occ_clip@data, nrow_subgrid, by = "Subgrid_ID") %>%
+    # Filter out if it contains , 2 rows
+    dplyr::filter(nrow >= 3)
+
+  # Create new list of Subgrid_ID
+  new_subgrid_list <- occ_clip_clean[, subgridCol] %>% unique()
+
+  # Create lists of output for DM and Covariate for each occasion
   dm_species <- list()
   dm_covar <- list()
 
   # Then for each subgrid id, extract DM using for loop (iteration)
-  for (i in 1:length(subgrid_list)) {
+  for (i in 1:length(new_subgrid_list)) {
 
     # Select each subgrids
-    subgrid_i <- subset(occ_clip, occ_clip@data[, subgridCol] == subgrid_list[i]) %>%
-      as.data.frame() # Convert to dataframe
+    subgrid_i <- subset(occ_clip_clean, occ_clip_clean[, subgridCol] == new_subgrid_list[i])
 
-    # put NAs If data has only one row for in a subgrid
-    if (nrow(subgrid_i)==1){
-      subgrid_i_DM <- data.frame(Replicate = NA, Presence = NA, X = NA, Y = NA, Species = NA)
-    }
-    else { # If data has more than 1 row
-      # Calculate 3D distance
-      subgrid_i_3d <- track2dm::dist3D(dataFrame = subgrid_i, Xcol = Xcol, Ycol = Ycol,
-                                       elevData = elevData,  repLength = repLength)
+    # Calculate 3D distance
+    subgrid_i_3d <- track2dm::dist3D(dataFrame = subgrid_i, Xcol = Xcol, Ycol = Ycol,
+                                     elevData = elevData,  repLength = repLength)
 
-      # Create detection matrix for selected species
-      subgrid_i_DM <- track2dm::speciesDM(speciesDF = subgrid_i_3d, sortID = sortID,
-                                          whichCol = whichCol, Xcol = Xcol, Ycol = Ycol,
-                                          whichSp = whichSp, extractVars = extractVars)
-    }
+    # Create detection matrix for selected species
+    subgrid_i_DM <- track2dm::speciesDM(speciesDF = subgrid_i_3d, sortID = sortID,
+                                        whichCol = whichCol, Xcol = Xcol, Ycol = Ycol,
+                                        whichSp = whichSp, extractVars = extractVars)
+
     # Extract only presence-absence of the species and covariates (if asked)
     dm_species[[i]] <- subgrid_i_DM %>%
       dplyr::select(Presence) %>% t() %>% as.data.frame()
 
-    # Whether to add site covariates (extraVars)
+    # Whether to add sampling covariates (extraVars)
     if (extractVars == FALSE){
       dm_covar[[i]] <- "NO"
 
-    } else { # If yes, extract site covariates from each replicate
+    } else { # If yes, extract sampling covariates from each replicate
       # Combine extravars
-      site_com <- extractVars %>%  paste(collapse  = ",") %>% gsub('[\"]', '', .)
+      site_com <- all_of(extractVars) %>%  paste(collapse  = ",") %>% gsub('[\"]', '', .)
 
       dm_covar[[i]] <- subgrid_i_DM %>%
         dplyr::select(extractVars) %>%
@@ -73,10 +80,9 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
   # Combine the results as dataframes
   species_dm_df <- dplyr::bind_rows(dm_species)
 
-  # If extraVars is FALSE, put NA
+  # Combine sampling covariates
   if (extractVars == FALSE){
     covar_dm_df <- do.call(rbind, dm_covar)%>% as.data.frame()
-
   } else { # If TRUE, bind it into a dataframe
     covar_dm_df <- dplyr::bind_rows(dm_covar)
   }
@@ -87,21 +93,23 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
 
   # Add subgrid name
   species_dm_df <- species_dm_df %>%
-    dplyr::mutate(subgrid_id = subgrid_list) %>% as.data.frame()
+    dplyr::mutate(subgrid_id = new_subgrid_list) %>% as.data.frame()
 
-  # If extraVars is FALSE, name the columsn as "Site-Cov."
+  # If extraVars is FALSE, name the columsn as "Sampling-Cov."
   if(extractVars == FALSE) {
-    colnames(covar_dm_df) <- "Site-Cov."
+    colnames(covar_dm_df) <- "Sampling-Cov."
     row.names(covar_dm_df) <- 1:nrow(covar_dm_df)
 
   } else { # if TRUE, add colum names
-    # Rename site covariates columns
+    # Rename sampling covariates columns
     colnames(covar_dm_df) <- paste(paste(extractVars, collapse  = "_"),
                                    1:ncol(covar_dm_df), sep = "_")
     row.names(covar_dm_df) <- 1:nrow(covar_dm_df)
   }
 
-  # Add subgrid info
+  # Combine data in the final result
   final_result <- do.call(cbind, list(species_dm_df, covar_dm_df)) %>% as.data.frame()
+
+  # Return the result
   return(final_result)
 }
