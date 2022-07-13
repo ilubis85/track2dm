@@ -32,8 +32,23 @@ dist3D <- function(dataFrame, Xcol, Ycol, elevData, repLength){
              (dataFrame[i-1,"Z"]-dataFrame[i,"Z"])^2)
   }
   # Create a sequence number based on distance interval
-  levels <- seq(from=0, to=max(dataFrame$Dist), by=as.numeric(repLength))
+  # If Z contain NA values, use the max non-NA values in Z
+  # But give warning if this problem occurs
+  if (anyNA(dataFrame$Z) == TRUE){
 
+    # Find which row?
+    whichGrid <- dataFrame[1,1]
+
+    # Put into a message
+    message(paste("Elevation (z) data contains NA values",whichGrid, sep=" in "))
+
+    # Remove any rows contain NA value
+    dataFrame <- na.omit(dataFrame)
+    levels <- seq(from=0, to=max(dataFrame$Dist), by=as.numeric(repLength))
+
+  } else {
+    levels <- seq(from=0, to=max(dataFrame$Dist), by=as.numeric(repLength))
+  }
   # Create a new column that specify the length of replicates (spatial replicates in meters)
   dataFrame$Replicate <- findInterval(dataFrame$Dist, levels)
   return(dataFrame)
