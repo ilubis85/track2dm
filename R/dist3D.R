@@ -43,7 +43,7 @@ dist3D <- function(dataFrame, Xcol, Ycol, elevData, repLength){
     message(paste("Elevation (z) data contains NA values",whichGrid, sep=" in "))
 
     # Remove any rows contain NA value
-    dataFrame <- na.omit(dataFrame)
+    dataFrame <- stats::na.omit(dataFrame)
     levels <- seq(from=0, to=max(dataFrame$Dist), by=as.numeric(repLength))
 
   } else {
