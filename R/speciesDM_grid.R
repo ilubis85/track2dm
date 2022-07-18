@@ -10,7 +10,7 @@
 #' @param repLength An information about a desired length of each spatial replicate.
 #' @param whichCol A column that contains all the species occurrence
 #' @param whichSp A selected species name within the "whichCol" column to be extracted
-#' @param extractVars The variables (columns) to be extracted for each replicate. Default is FALSE
+#' @param samplingCov Sampling covariates to be extracted (default is FALSE)from each replicate.
 #' @param Xcol A column that consists X coordinates.
 #' @param Ycol A column that consists Y coordinates.
 #'
@@ -18,7 +18,7 @@
 #'
 #' @export
 speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elevData,
-                            whichCol, whichSp, Xcol, Ycol, extractVars = FALSE) {
+                            whichCol, whichSp, Xcol, Ycol, samplingCov = FALSE) {
 
   # Intersect occ data with gridcell
   occ_clip <- raster::intersect(spData, gridCell)
@@ -56,22 +56,22 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
     # Create detection matrix for selected species
     subgrid_i_DM <- track2dm::speciesDM(speciesDF = subgrid_i_3d, sortID = sortID,
                                         whichCol = whichCol, Xcol = Xcol, Ycol = Ycol,
-                                        whichSp = whichSp, extractVars = extractVars)
+                                        whichSp = whichSp, samplingCov = samplingCov)
 
     # Extract only presence-absence of the species and covariates (if asked)
     dm_species[[i]] <- subgrid_i_DM %>%
       dplyr::select(Presence) %>% t() %>% as.data.frame()
 
     # Whether to add sampling covariates (extraVars)
-    if (extractVars == FALSE){
+    if (samplingCov == FALSE){
       dm_covar[[i]] <- "NO"
 
     } else { # If yes, extract sampling covariates from each replicate
-      # Combine extravars
-      site_com <- all_of(extractVars) %>%  paste(collapse  = ",") %>% gsub('[\"]', '', .)
+      # Combine sampling covariates
+      site_com <- all_of(samplingCov) %>%  paste(collapse  = ",") %>% gsub('[\"]', '', .)
 
       dm_covar[[i]] <- subgrid_i_DM %>%
-        dplyr::select(extractVars) %>%
+        dplyr::select(samplingCov) %>%
         tidyr::unite(., col = site_com, sep = "_") %>%
         t() %>% as.data.frame()
     }
@@ -81,7 +81,7 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
   species_dm_df <- dplyr::bind_rows(dm_species)
 
   # Combine sampling covariates
-  if (extractVars == FALSE){
+  if (samplingCov == FALSE){
     covar_dm_df <- do.call(rbind, dm_covar)%>% as.data.frame()
   } else { # If TRUE, bind it into a dataframe
     covar_dm_df <- dplyr::bind_rows(dm_covar)
@@ -95,14 +95,14 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
   species_dm_df <- species_dm_df %>%
     dplyr::mutate(subgrid_id = new_subgrid_list) %>% as.data.frame()
 
-  # If extraVars is FALSE, name the columsn as "Sampling-Cov."
-  if(extractVars == FALSE) {
+  # If samplingCov is FALSE, name the columsn as "Sampling-Cov."
+  if(samplingCov == FALSE) {
     colnames(covar_dm_df) <- "Sampling-Cov."
     row.names(covar_dm_df) <- 1:nrow(covar_dm_df)
 
   } else { # if TRUE, add colum names
     # Rename sampling covariates columns
-    colnames(covar_dm_df) <- paste(paste(extractVars, collapse  = "_"),
+    colnames(covar_dm_df) <- paste(paste(samplingCov, collapse  = "_"),
                                    1:ncol(covar_dm_df), sep = "_")
     row.names(covar_dm_df) <- 1:nrow(covar_dm_df)
   }

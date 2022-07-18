@@ -8,7 +8,7 @@
 #' @param Ycol A quoted name of column that consists Y coordinates.
 #' @param whichCol A column that contains all the species occurrence.
 #' @param whichSp A selected species name within the "whichCol" column to be extracted.
-#' @param extractVars The variables (columns) to be extracted for each replicate.
+#' @param samplingCov Sampling covariates to be extracted (default is FALSE)from each replicate.
 #'
 #' @return A data-frame contains detection matrix for selected species along with its geographic coordinates and sampling covariates.
 #'
@@ -16,7 +16,7 @@
 #' @export
 #' @importFrom  magrittr %>%
 #'
-speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, extractVars = FALSE){
+speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, samplingCov = FALSE){
 
   # Create a Presence/Absence (0/1) column based on the species occurrence
   for (i in 1:nrow(speciesDF)) {
@@ -43,14 +43,14 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, extract
                                  "Presence" = species_occured$Presence,
                                  "X" = species_occured$X, "Y" = species_occured$Y,
                                  "Species" = species_occured$Species)
-      # Extract extraVars
-      # If extraVar is FALSE, extract only species info
-      if (extractVars == FALSE) {
+      # Extract sampling covariates
+      # If samplingCov is FALSE, extract only species info
+      if (samplingCov == FALSE) {
         sp_result <- species_info
 
-      } else { # extract the variables
+      } else { # extract sampling covariates
         species_var <- species_occured %>% dplyr::filter(Presence == 1) %>%
-          dplyr::select(extractVars)
+          dplyr::select(all_of(samplingCov))
 
         # Combine both
         sp_result <- data.frame(species_info, species_var)
@@ -66,14 +66,14 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, extract
                                  "Presence" = species_occured$Presence,
                                  "X" = species_occured$X, "Y" = species_occured$Y,
                                  "Species" = species_occured$Species)
-      # Extract extraVars
-      # If extraVar is FALSE, extract only species info
-      if (extractVars == FALSE) {
+      # Extract samplingCov
+      # If samplingCov is FALSE, extract only species info
+      if (samplingCov == FALSE) {
         sp_result <- species_info
 
       } else { # extract the variables
         species_var <- species_occured %>% dplyr::filter(Presence == 1) %>%
-          dplyr::select(extractVars)
+          dplyr::select(all_of(samplingCov))
 
         # Combine both
         sp_result <- data.frame(species_info, species_var)
@@ -89,14 +89,14 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, extract
                                  "Presence" = species_occured$Presence,
                                  "X" = species_occured$X, "Y" = species_occured$Y,
                                  "Species" = "NA")
-      # Extract extraVars
-      # If extraVar is FALSE, extract only species info
-      if (extractVars == FALSE) {
+      # Extract samplingCov
+      # If samplingCov is FALSE, extract only species info
+      if (samplingCov == FALSE) {
         sp_result <- species_info
 
       } else { # extract the variables from the first row
         species_var <- species_occured %>% dplyr::filter(row_number() == 1) %>%
-          dplyr::select(extractVars)
+          dplyr::select(all_of(samplingCov))
 
         # Combine both
         sp_result <-  data.frame(species_info, species_var)
