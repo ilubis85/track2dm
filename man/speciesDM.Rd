@@ -11,7 +11,8 @@ speciesDM(
   Ycol,
   whichCol,
   whichSp,
-  extractVars = FALSE
+  samplingCov = NULL,
+  samplingFun = NULL
 )
 }
 \arguments{
@@ -27,7 +28,9 @@ speciesDM(
 
 \item{whichSp}{A selected species name within the "whichCol" column to be extracted.}
 
-\item{extractVars}{The variables (columns) to be extracted for each replicate.}
+\item{samplingCov}{Sampling covariates to be extracted (default is FALSE)from each replicate.}
+
+\item{samplingFun}{A list of method to deal with samplingCov (only modal (for character), mean (for numeric), and canopy (to calculate canopy closure) functions that are currently available.}
 }
 \value{
 A data-frame contains detection matrix for selected species along with its geographic coordinates and sampling covariates.

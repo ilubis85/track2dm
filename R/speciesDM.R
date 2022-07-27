@@ -9,6 +9,7 @@
 #' @param whichCol A column that contains all the species occurrence.
 #' @param whichSp A selected species name within the "whichCol" column to be extracted.
 #' @param samplingCov Sampling covariates to be extracted (default is FALSE)from each replicate.
+#' @param samplingFun A list of method to deal with samplingCov (only modal (for character), mean (for numeric), and canopy (to calculate canopy closure) functions that are currently available.
 #'
 #' @return A data-frame contains detection matrix for selected species along with its geographic coordinates and sampling covariates.
 #'
@@ -16,7 +17,9 @@
 #' @export
 #' @importFrom  magrittr %>%
 #'
-speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, samplingCov = FALSE){
+# Modify the speciesDM to calculate the sampling covariates
+speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
+                        samplingCov = NULL, samplingFun = NULL){
 
   # Create a Presence/Absence (0/1) column based on the species occurrence
   for (i in 1:nrow(speciesDF)) {
@@ -30,7 +33,7 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, samplin
   # Create a list for the output
   species_result <- list()
 
-  for (j in 1:length(rep_list)) {
+  for (j in seq_along(rep_list)) {
 
     # Select the data based on selected replicate
     speciesDF_rep_r <- speciesDF %>% dplyr::filter(Replicate == rep_list[[j]])
@@ -43,22 +46,27 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, samplin
                                  "Presence" = species_occured$Presence,
                                  "X" = species_occured$X, "Y" = species_occured$Y,
                                  "Species" = species_occured$Species)
+
       # Extract sampling covariates
-      # If samplingCov is FALSE, extract only species info
-      if (samplingCov == FALSE) {
-        sp_result <- species_info
+      # If sampling covariates are more than one, use iteration
+      if (length(samplingCov) >= 2 ) {
+        for (k in seq_along(samplingCov)) {
+          species_info[,samplingCov[k]] <- speciesDF_rep_r[,samplingCov[k]] %>%
+            samplingFun[[k]]()
+        }
+        species_info
 
-      } else { # extract sampling covariates
-        species_var <- species_occured %>% dplyr::filter(Presence == 1) %>%
-          dplyr::select(all_of(samplingCov))
+      } # If sampling covariates is 1, extract directly
+      else if (length(samplingCov) == 1) {
+        species_info[, samplingCov] <- samplingFun(speciesDF_rep_r[, samplingCov])
 
-        # Combine both
-        sp_result <- data.frame(species_info, species_var)
-      }
-      sp_result
-    }
+      }# if samplingCov is not specified, put NA
+      else {species_info[, samplingCov] <- NA  }
 
-    # If the species is present once, extract the exact values where the species is found
+      # Return result
+      sp_result <- species_info
+
+    } # If the species is present once, extract the exact values where the species is found
     else if (sum(as.numeric(speciesDF_rep_r$Presence)) == 1) {
       # Select the row where the species is found
       species_occured <- speciesDF_rep_r %>% dplyr::filter(Presence == 1)
@@ -67,20 +75,26 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, samplin
                                  "X" = species_occured$X, "Y" = species_occured$Y,
                                  "Species" = species_occured$Species)
       # Extract samplingCov
-      # If samplingCov is FALSE, extract only species info
-      if (samplingCov == FALSE) {
-        sp_result <- species_info
+      # If sampling covariates are more than one, use iteration
+      if (length(samplingCov) >= 2 ) {
+        for (k in seq_along(samplingCov)) {
+          species_info[,samplingCov[k]] <- speciesDF_rep_r[,samplingCov[k]] %>%
+            samplingFun[[k]]()
+        }
+        species_info
 
-      } else { # extract the variables
-        species_var <- species_occured %>% dplyr::filter(Presence == 1) %>%
-          dplyr::select(all_of(samplingCov))
+      } # If sampling covariates is 1, extract directly
+      else if (length(samplingCov) == 1) {
+        species_info[, samplingCov] <- samplingFun(speciesDF_rep_r[, samplingCov])
 
-        # Combine both
-        sp_result <- data.frame(species_info, species_var)
-      }
-      sp_result
+      }# if samplingCov is not specified, put NA
 
+      else {species_info[, samplingCov] <- NA  }
+
+      # Return result
+      sp_result <- species_info
     }
+
     # Then when the species is absence, just extract the first row
     else {
       # Select the row where the species is found
@@ -90,19 +104,27 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp, samplin
                                  "X" = species_occured$X, "Y" = species_occured$Y,
                                  "Species" = "NA")
       # Extract samplingCov
-      # If samplingCov is FALSE, extract only species info
-      if (samplingCov == FALSE) {
-        sp_result <- species_info
+      # If sampling covariates are more than one, use iteration
+      if (length(samplingCov) >= 2 ) {
+        for (k in seq_along(samplingCov)) {
+          species_info[,samplingCov[k]] <- speciesDF_rep_r[,samplingCov[k]] %>%
+            samplingFun[[k]]()
+        }
+        species_info
 
-      } else { # extract the variables from the first row
-        species_var <- species_occured %>% dplyr::filter(row_number() == 1) %>%
-          dplyr::select(all_of(samplingCov))
+      } # If sampling covariates is 1, extract directly
+      else if (length(samplingCov) == 1) {
+        species_info[, samplingCov] <- samplingFun(speciesDF_rep_r[, samplingCov])
 
-        # Combine both
-        sp_result <-  data.frame(species_info, species_var)
-      }
-      sp_result
+      }# if samplingCov is not specified, put NA
+
+      else {species_info[, samplingCov] <- NA  }
+
+      # Return result
+      sp_result <- species_info
     }
+
+    # Return result
     species_result[[j]] <- sp_result
   }
 
