@@ -15,7 +15,8 @@ speciesDM_grid(
   whichSp,
   Xcol,
   Ycol,
-  extractVars = FALSE
+  samplingCov = FALSE,
+  samplingFun = FALSE
 )
 }
 \arguments{
@@ -39,7 +40,9 @@ speciesDM_grid(
 
 \item{Ycol}{A column that consists Y coordinates.}
 
-\item{extractVars}{The variables (columns) to be extracted for each replicate. Default is FALSE}
+\item{samplingCov}{Sampling covariates to be extracted (default is FALSE)from each replicate.}
+
+\item{samplingFun}{A list of method to deal with samplingCov (only modal (for character), mean (for numeric), and canopy (to calculate canopy closure) functions that are currently available.}
 }
 \value{
 A dataframe contain detection matrices from all gridcell.

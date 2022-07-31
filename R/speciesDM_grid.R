@@ -11,6 +11,7 @@
 #' @param whichCol A column that contains all the species occurrence
 #' @param whichSp A selected species name within the "whichCol" column to be extracted
 #' @param samplingCov Sampling covariates to be extracted (default is FALSE)from each replicate.
+#' @param samplingFun A list of method to deal with samplingCov (only modal (for character), mean (for numeric), and canopy (to calculate canopy closure) functions that are currently available.
 #' @param Xcol A column that consists X coordinates.
 #' @param Ycol A column that consists Y coordinates.
 #'
@@ -18,30 +19,45 @@
 #'
 #' @export
 speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elevData,
-                            whichCol, whichSp, Xcol, Ycol, samplingCov = FALSE) {
+                            whichCol, whichSp, Xcol, Ycol, samplingCov = FALSE, samplingFun = FALSE) {
 
-  # Intersect occ data with gridcell
+  # Intersect spData data with gridCell
   occ_clip <- raster::intersect(spData, gridCell)
 
-  # Create list of Subgrid_ID
+  # Create list of subgridCol
   subgrid_list <- occ_clip@data[, subgridCol] %>% unique()
 
-  # SEARCH AND REMOVE if data contain < 2 rows (occasions)
+  # Remove quote from the column names of the grid cell
+  subgridCol_id <- noquote(subgridCol)
+
   # Compute number of row (nrow) for each subgrid in a new dataframe
-  nrow_subgrid <- data.frame(Subgrid_ID = occ_clip@data[, subgridCol]) %>% group_by(Subgrid_ID) %>%
-    dplyr::summarise(nrow=n())
+  new_df <- data.frame(subgridCol = occ_clip@data[, subgridCol])
 
-  # Join table
-  occ_clip_clean <- dplyr::left_join(occ_clip@data, nrow_subgrid, by = "Subgrid_ID") %>%
-    # Filter out if it contains , 2 rows
-    dplyr::filter(nrow >= 3)
+  # Specify the subgridCol names
+  names(new_df)[names(new_df) == "subgridCol"] <- subgridCol_id
 
-  # Create new list of Subgrid_ID
+  # Compute number of row
+  new_df <- new_df %>% dplyr::group_by_at(1) %>% dplyr::summarise(nrow=n())
+
+  # SEARCH AND REMOVE if data contain < 2 rows (occasions)
+  # STOP!!! IF THERE ARE DUPLICATED COLUMN NAMES!!!
+  if (sum(duplicated(colnames(occ_clip@data)))== 0){
+    # Join table
+    occ_clip_clean <- dplyr::left_join(occ_clip@data, new_df, by = subgridCol) %>%
+      # Filter out if it contains , 2 rows
+      dplyr::filter(nrow >= 3)
+
+  } else {stop(message("Some column names are duplicated"))}
+
+  # Create new list of subgridCol
   new_subgrid_list <- occ_clip_clean[, subgridCol] %>% unique()
 
-  # Create lists of output for DM and Covariate for each occasion
+  # Create lists of output for species and sampling covariate for each occasion
   dm_species <- list()
   dm_covar <- list()
+
+  ##############################################################################
+  # EXTRACT DETECTION MATRIX USING ITERATION
 
   # Then for each subgrid id, extract DM using for loop (iteration)
   for (i in 1:length(new_subgrid_list)) {
@@ -56,56 +72,104 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
     # Create detection matrix for selected species
     subgrid_i_DM <- track2dm::speciesDM(speciesDF = subgrid_i_3d, sortID = sortID,
                                         whichCol = whichCol, Xcol = Xcol, Ycol = Ycol,
-                                        whichSp = whichSp, samplingCov = samplingCov)
+                                        whichSp = whichSp, samplingCov = samplingCov,
+                                        samplingFun = samplingFun)
 
-    # Extract only presence-absence of the species and covariates (if asked)
-    dm_species[[i]] <- subgrid_i_DM %>%
-      dplyr::select(Presence) %>% t() %>% as.data.frame()
+    # Extract only presence-absence of the species and covariates
+    dm_species[[i]] <- subgrid_i_DM[, "Presence"] %>% t() %>% as.data.frame()
 
-    # Whether to add sampling covariates (extraVars)
-    if (samplingCov == FALSE){
-      dm_covar[[i]] <- "NO"
-
-    } else { # If yes, extract sampling covariates from each replicate
-      # Combine sampling covariates
-      site_com <- all_of(samplingCov) %>%  paste(collapse  = ",") %>% gsub('[\"]', '', .)
-
-      dm_covar[[i]] <- subgrid_i_DM %>%
-        dplyr::select(samplingCov) %>%
-        tidyr::unite(., col = site_com, sep = "_") %>%
-        t() %>% as.data.frame()
+    # Add sampling covariates (samplingCov)
+    # If samplingCov is FALSE, Type "None"
+    if (sum(samplingCov == FALSE) >= 1){
+      dm_covar[[i]] <- "None"
     }
+
+    # If sampling covariates are more than one, use iteration
+    else if (length(samplingCov) >= 2 ) {
+
+      # Create a list
+      covars <- list()
+
+      for (j in seq_along(samplingCov)) {
+        covars[[j]] <- subgrid_i_DM[,samplingCov[j]] %>% t() %>% as.data.frame() %>%
+          # Convert to character so it can be combined
+          dplyr::mutate_if(is.numeric, as.character)
+      }
+
+      # Combine as new column
+      dm_covar[[i]] <- do.call(bind_rows, covars)
+
+    } # If sampling covariates is 1, extract it directly
+    else {
+      dm_covar[[i]] <-  subgrid_i_DM[,samplingCov] %>%
+        t() %>% as.data.frame()
+
+    }
+    # Return result
+    dm_species
+    dm_covar
   }
+
+  ##############################################################################
+  # COMPILING THE RESULT
 
   # Combine the results as dataframes
   species_dm_df <- dplyr::bind_rows(dm_species)
-
-  # Combine sampling covariates
-  if (samplingCov == FALSE){
-    covar_dm_df <- do.call(rbind, dm_covar)%>% as.data.frame()
-  } else { # If TRUE, bind it into a dataframe
-    covar_dm_df <- dplyr::bind_rows(dm_covar)
-  }
 
   # Rename species columns
   colnames(species_dm_df) <- paste("R", 1:ncol(species_dm_df), sep = "")
   row.names(species_dm_df) <- 1:nrow(species_dm_df)
 
+  # Combine sampling covariates as dataframe/s
+  # If samplingCov is FALSE, combine dm_covar as rows
+  if (sum(samplingCov == FALSE) >= 1){
+    covar_dm_com <- do.call(rbind, dm_covar) %>% as.data.frame()
+  }
+
+  # Else, bind dm_covar rows
+  else {
+    covar_dm_com <- dplyr::bind_rows(dm_covar)
+  }
+
+  # Split based on sampling covariates
+  # If samplingCov is FALSE, ot is equal to covar_dm_com
+  if (sum(samplingCov == FALSE) >= 1){
+    covar_dm_df <- covar_dm_com
+
+    # Add col names
+    colnames(covar_dm_df) <- "samplingCov"
+  }
+
+  # If sampling covariates more than one, use iteration
+  else if (length(samplingCov) >= 1 ) {
+
+    # Add output list
+    covar_dm_df <- list()
+
+    for (k in seq_along(samplingCov)) {
+      covar_dm_df[[k]] <- slice(covar_dm_com, seq(k, nrow(covar_dm_com), length(samplingCov)))
+    }
+
+    # Add col names
+    for (l in seq_along(samplingCov)) {
+      colnames(covar_dm_df[[l]]) <- paste(paste(samplingCov[[l]], collapse  = "_"),
+                                          1:ncol(covar_dm_df[[l]]), sep = "_")
+    }
+    # Combine as one dataframe
+    covar_dm_df <- do.call(cbind, covar_dm_df)
+
+  }# if samplingCov is one, put covar_dm_com
+  else {
+    covar_dm_df <- covar_dm_com
+
+    # Add colum names
+    colnames(covar_dm_df) <- paste(paste(samplingCov, collapse  = "_"),
+                                   1:ncol(covar_dm_df), sep = "_")
+  }
+
   # Add subgrid name
   species_dm_df <- species_dm_df %>%
     dplyr::mutate(subgrid_id = new_subgrid_list) %>% as.data.frame()
-
-  # If samplingCov is FALSE, name the columsn as "Sampling-Cov."
-  if(samplingCov == FALSE) {
-    colnames(covar_dm_df) <- "Sampling-Cov."
-    row.names(covar_dm_df) <- 1:nrow(covar_dm_df)
-
-  } else { # if TRUE, add colum names
-    # Rename sampling covariates columns
-    colnames(covar_dm_df) <- paste(paste(samplingCov, collapse  = "_"),
-                                   1:ncol(covar_dm_df), sep = "_")
-    row.names(covar_dm_df) <- 1:nrow(covar_dm_df)
-  }
 
   # Combine data in the final result
   final_result <- do.call(cbind, list(species_dm_df, covar_dm_df)) %>% as.data.frame()

@@ -19,7 +19,7 @@
 #'
 # Modify the speciesDM to calculate the sampling covariates
 speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
-                        samplingCov = NULL, samplingFun = NULL){
+                         samplingCov = FALSE, samplingFun = FALSE){
 
   # Create a Presence/Absence (0/1) column based on the species occurrence
   for (i in 1:nrow(speciesDF)) {
@@ -48,8 +48,13 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
                                  "Species" = species_occured$Species)
 
       # Extract sampling covariates
+      # If samplingCov is FALSE, type "None"
+      if (sum(samplingCov == FALSE) >= 1){
+        species_info[, "samplingCov"] <- "None"
+      }
+
       # If sampling covariates are more than one, use iteration
-      if (length(samplingCov) >= 2 ) {
+      else if (length(samplingCov) >= 2 ) {
         for (k in seq_along(samplingCov)) {
           species_info[,samplingCov[k]] <- speciesDF_rep_r[,samplingCov[k]] %>%
             samplingFun[[k]]()
@@ -57,11 +62,9 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
         species_info
 
       } # If sampling covariates is 1, extract directly
-      else if (length(samplingCov) == 1) {
+      else {
         species_info[, samplingCov] <- samplingFun(speciesDF_rep_r[, samplingCov])
-
-      }# if samplingCov is not specified, put NA
-      else {species_info[, samplingCov] <- NA  }
+      }
 
       # Return result
       sp_result <- species_info
@@ -75,8 +78,13 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
                                  "X" = species_occured$X, "Y" = species_occured$Y,
                                  "Species" = species_occured$Species)
       # Extract samplingCov
+      # If samplingCov is FALSE, type "None"
+      if (sum(samplingCov == FALSE) >= 1){
+        species_info[, "samplingCov"] <- "None"
+      }
+
       # If sampling covariates are more than one, use iteration
-      if (length(samplingCov) >= 2 ) {
+      else if (length(samplingCov) >= 2 ) {
         for (k in seq_along(samplingCov)) {
           species_info[,samplingCov[k]] <- speciesDF_rep_r[,samplingCov[k]] %>%
             samplingFun[[k]]()
@@ -84,12 +92,9 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
         species_info
 
       } # If sampling covariates is 1, extract directly
-      else if (length(samplingCov) == 1) {
+      else {
         species_info[, samplingCov] <- samplingFun(speciesDF_rep_r[, samplingCov])
-
-      }# if samplingCov is not specified, put NA
-
-      else {species_info[, samplingCov] <- NA  }
+      }
 
       # Return result
       sp_result <- species_info
@@ -104,8 +109,13 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
                                  "X" = species_occured$X, "Y" = species_occured$Y,
                                  "Species" = "NA")
       # Extract samplingCov
+      # If samplingCov is FALSE, type "None"
+      if (sum(samplingCov == FALSE) >= 1){
+        species_info[, "samplingCov"] <- "None"
+      }
+
       # If sampling covariates are more than one, use iteration
-      if (length(samplingCov) >= 2 ) {
+      else if (length(samplingCov) >= 2 ) {
         for (k in seq_along(samplingCov)) {
           species_info[,samplingCov[k]] <- speciesDF_rep_r[,samplingCov[k]] %>%
             samplingFun[[k]]()
@@ -113,12 +123,9 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
         species_info
 
       } # If sampling covariates is 1, extract directly
-      else if (length(samplingCov) == 1) {
+      else {
         species_info[, samplingCov] <- samplingFun(speciesDF_rep_r[, samplingCov])
-
-      }# if samplingCov is not specified, put NA
-
-      else {species_info[, samplingCov] <- NA  }
+      }
 
       # Return result
       sp_result <- species_info

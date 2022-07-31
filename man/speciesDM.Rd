@@ -11,8 +11,8 @@ speciesDM(
   Ycol,
   whichCol,
   whichSp,
-  samplingCov = NULL,
-  samplingFun = NULL
+  samplingCov = FALSE,
+  samplingFun = FALSE
 )
 }
 \arguments{
