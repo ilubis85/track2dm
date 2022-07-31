@@ -12,7 +12,7 @@ modal <- function(myVector){
 
   # Replace NA with "-"
   if (sum(is.na(myVector)) >= TRUE){
-    myVector <- tidyr::replace_na(myVector, replace = "-")
+    myVector <- tidyr::replace_na(myVector, replace = "NA")
 
   } else {myVector <- myVector}
 
