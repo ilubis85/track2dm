@@ -17,9 +17,8 @@
 #' @export
 #' @importFrom  magrittr %>%
 #'
-# Modify the speciesDM to calculate the sampling covariates
 speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
-                         samplingCov = FALSE, samplingFun = FALSE){
+                       samplingCov = FALSE, samplingFun = FALSE){
 
   # Create a Presence/Absence (0/1) column based on the species occurrence
   for (i in 1:nrow(speciesDF)) {
@@ -41,11 +40,20 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
     # If the species is found more than once in each replicate, select the first
     if (sum(as.numeric(speciesDF_rep_r$Presence)) > 1) {
       # Select the first row where the species is found
-      species_occured <- speciesDF_rep_r %>% dplyr::filter(Presence == 1) %>% dplyr::filter(row_number() == 1)
-      species_info <- data.frame("Replicate" = species_occured$Replicate,
-                                 "Presence" = species_occured$Presence,
-                                 "X" = species_occured$X, "Y" = species_occured$Y,
-                                 "Species" = species_occured$Species)
+      species_occured <- speciesDF_rep_r %>% dplyr::filter(Presence == 1) %>%
+        dplyr::filter(row_number() == 1)
+      species_info <- data.frame("Replicate" = species_occured[,"Replicate"],
+                                 "Presence" = species_occured[,"Presence"],
+                                 "X" = species_occured[,"X"],
+                                 "Y" = species_occured[,"Y"],
+                                 whichCol = species_occured[,whichCol])
+
+      # Rename the species colum names
+      # Put the quote on the whichCol
+      whichCol_0 <- paste(whichCol)
+
+      # Specify the subgridCol names
+      names(species_info)[names(species_info) == "whichCol"] <- whichCol_0
 
       # Extract sampling covariates
       # If samplingCov is FALSE, type "None"
@@ -73,10 +81,19 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
     else if (sum(as.numeric(speciesDF_rep_r$Presence)) == 1) {
       # Select the row where the species is found
       species_occured <- speciesDF_rep_r %>% dplyr::filter(Presence == 1)
-      species_info <- data.frame("Replicate" = species_occured$Replicate,
-                                 "Presence" = species_occured$Presence,
-                                 "X" = species_occured$X, "Y" = species_occured$Y,
-                                 "Species" = species_occured$Species)
+      species_info <- data.frame("Replicate" = species_occured[,"Replicate"],
+                                 "Presence" = species_occured[,"Presence"],
+                                 "X" = species_occured[,"X"],
+                                 "Y" = species_occured[,"Y"],
+                                 whichCol = species_occured[,whichCol])
+
+      # Rename the species colum names
+      # Put the quote on the whichCol
+      whichCol_0 <- paste(whichCol)
+
+      # Specify the subgridCol names
+      names(species_info)[names(species_info) == "whichCol"] <- whichCol_0
+
       # Extract samplingCov
       # If samplingCov is FALSE, type "None"
       if (sum(samplingCov == FALSE) >= 1){
@@ -104,10 +121,21 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
     else {
       # Select the row where the species is found
       species_occured <- speciesDF_rep_r %>% dplyr::filter(row_number() == 1)
-      species_info <- data.frame("Replicate" = species_occured$Replicate,
-                                 "Presence" = species_occured$Presence,
-                                 "X" = species_occured$X, "Y" = species_occured$Y,
-                                 "Species" = "NA")
+
+      # Extract species info
+      species_info <- data.frame("Replicate" = species_occured[,"Replicate"],
+                                 "Presence" = species_occured[,"Presence"],
+                                 "X" = species_occured[,"X"],
+                                 "Y" = species_occured[,"Y"],
+                                 whichCol = "NA")
+
+      # Rename the species colum names
+      # Put the quote on the whichCol
+      whichCol_0 <- paste(whichCol)
+
+      # Specify the subgridCol names
+      names(species_info)[names(species_info) == "whichCol"] <- whichCol_0
+
       # Extract samplingCov
       # If samplingCov is FALSE, type "None"
       if (sum(samplingCov == FALSE) >= 1){
