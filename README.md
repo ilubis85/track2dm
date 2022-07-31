@@ -116,14 +116,7 @@ This figure below shows what the data look like when we plot them using
 tmap package. The data is used with permission from WCS Indonesia and
 the data has been published in journal of (In preparation)!!.
 
-<div class="figure" style="text-align: centre">
-
-<img src="man/figures/README-fig_1-1.png" alt="Survey tracks and several animal waypoints with elevation information" width="100%" />
-<p class="caption">
-Survey tracks and several animal waypoints with elevation information
-</p>
-
-</div>
+<img src="man/figures/README-fig_1-1.png" title="Survey tracks and several animal waypoints with elevation information" alt="Survey tracks and several animal waypoints with elevation information" width="100%" />
 
 So how the package works? Below is the list of functions currently
 developed to create detection matrix for a species.
@@ -206,7 +199,8 @@ speciesDM()
 Extract detection matrix from the species observation
 </td>
 <td style="text-align:left;">
-speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars
+speciesDF, SortID, Xcol, Ycol, whichCol, whichSp, samplingCov,
+samplingFun
 </td>
 </tr>
 </tbody>
@@ -232,6 +226,7 @@ function. See codes below on how to use it and how it produces the right
 format. We do the same for observation data.
 
 ``` r
+
 # Load library
 library(tidyverse)
 
@@ -285,22 +280,14 @@ with this, functions called **track2dm::meanPoint** or/and
 **track2dm::clearPoint** will be used to remove the bias either by take
 means from a number of subsequent points (*meanPoint*) or clear a
 certain number of points between points based on a predefined distance
-(*clearPoint*). For example we used **meanPoint** for track\_1 data.
+(*clearPoint*). For example we used **meanPoint** for track_1 data.
 
 ``` r
 # Take means from every 10 coordinates (nPoint = 10)
-track_2 <- track2dm::meanPoint(dataFrame = track_1, nPoint = 10)
+track_2 <- track2dm::meanPoint(dataFrame = track_1, datetimeCol = "DateTime", nPoint = 10, Xcol = "X", Ycol = "Y")
 ```
 
-<div class="figure" style="text-align: center">
-
-<img src="man/figures/README-fig_2-1.png" alt="Reducing number of points by taking the means for every 10 subsequent points (showing the first 500 points)" width="75%" />
-<p class="caption">
-Reducing number of points by taking the means for every 10 subsequent
-points (showing the first 500 points)
-</p>
-
-</div>
+<img src="man/figures/README-fig_2-1.png" title="Reducing number of points by taking the means for every 10 subsequent points (showing the first 500 points)" alt="Reducing number of points by taking the means for every 10 subsequent points (showing the first 500 points)" width="75%" style="display: block; margin: auto;" />
 
 Now we can combine the cleaned track and observation into one
 data-frame.
@@ -310,15 +297,15 @@ data-frame.
 transect <- dplyr::full_join(track_2, observation_1, by = c("DateTime", "X", "Y")) %>%
   dplyr::arrange(DateTime, X, Y)
 head(transect)
-#> # A tibble: 6 x 7
-#>      ID DateTime                  X       Y Type  Age   Observation
-#>   <dbl> <dttm>                <dbl>   <dbl> <chr> <chr> <chr>      
-#> 1     1 2015-09-10 06:27:25 353215. 406684. <NA>  <NA>  <NA>       
-#> 2     2 2015-09-10 06:28:17 353309. 406764. <NA>  <NA>  <NA>       
-#> 3     3 2015-09-10 06:29:36 353303. 406824. <NA>  <NA>  <NA>       
-#> 4     4 2015-09-10 06:30:50 353238. 406942. <NA>  <NA>  <NA>       
-#> 5     5 2015-09-10 06:32:09 353270. 407080. <NA>  <NA>  <NA>       
-#> 6     6 2015-09-10 07:09:04 353361. 407093. <NA>  <NA>  <NA>
+#> # A tibble: 6 × 6
+#>   DateTime                  X       Y Type  Age   Observation
+#>   <dttm>                <dbl>   <dbl> <chr> <chr> <chr>      
+#> 1 2015-09-10 06:27:25 353204. 406668. <NA>  <NA>  <NA>       
+#> 2 2015-09-10 06:28:04 353278. 406744. <NA>  <NA>  <NA>       
+#> 3 2015-09-10 06:29:02 353331. 406792. <NA>  <NA>  <NA>       
+#> 4 2015-09-10 06:29:59 353300. 406826. <NA>  <NA>  <NA>       
+#> 5 2015-09-10 06:30:12 353242. 406881. <NA>  <NA>  <NA>       
+#> 6 2015-09-10 06:31:04 353238. 406953. <NA>  <NA>  <NA>
 ```
 
 ## 2. Calculate distance in three dimention (X-Y-Z)
@@ -331,18 +318,19 @@ data first (as we did in the beginning).
 
 ``` r
 # Calculate 3D distance and matrix replicate
-transect_rep <- track2dm::dist3D(dataFrame = transect, elevData = elevation,  repLength = 1000)
+transect_rep <- track2dm::dist3D(dataFrame = transect, elevData = elevation,  repLength = 1000,
+                                 Xcol = "X", Ycol = "Y")
 head(transect_rep)
-#> # A tibble: 6 x 10
-#>      ID DateTime                  X       Y Type  Age   Observation     Z  Dist
-#>   <dbl> <dttm>                <dbl>   <dbl> <chr> <chr> <chr>       <dbl> <dbl>
-#> 1     1 2015-09-10 06:27:25 353215. 406684. <NA>  <NA>  <NA>          673    0 
-#> 2     2 2015-09-10 06:28:17 353309. 406764. <NA>  <NA>  <NA>          693  125.
-#> 3     3 2015-09-10 06:29:36 353303. 406824. <NA>  <NA>  <NA>          708  187.
-#> 4     4 2015-09-10 06:30:50 353238. 406942. <NA>  <NA>  <NA>          719  322.
-#> 5     5 2015-09-10 06:32:09 353270. 407080. <NA>  <NA>  <NA>          725  463.
-#> 6     6 2015-09-10 07:09:04 353361. 407093. <NA>  <NA>  <NA>          736  555.
-#> # ... with 1 more variable: Replicate <int>
+#> # A tibble: 6 × 9
+#>   DateTime                  X       Y Type  Age   Observat…¹     Z  Dist Repli…²
+#>   <dttm>                <dbl>   <dbl> <chr> <chr> <chr>      <dbl> <dbl>   <int>
+#> 1 2015-09-10 06:27:25 353204. 406668. <NA>  <NA>  <NA>         667    0        1
+#> 2 2015-09-10 06:28:04 353278. 406744. <NA>  <NA>  <NA>         692  109.       1
+#> 3 2015-09-10 06:29:02 353331. 406792. <NA>  <NA>  <NA>         701  181.       1
+#> 4 2015-09-10 06:29:59 353300. 406826. <NA>  <NA>  <NA>         708  227.       1
+#> 5 2015-09-10 06:30:12 353242. 406881. <NA>  <NA>  <NA>         705  307.       1
+#> 6 2015-09-10 06:31:04 353238. 406953. <NA>  <NA>  <NA>         719  381.       1
+#> # … with abbreviated variable names ¹​Observation, ²​Replicate
 ```
 
 ## 3. Extract detection matrix for a species
@@ -350,49 +338,106 @@ head(transect_rep)
 Finally, we can extract detection matrix from selected species. As
 default, **track2dm::speciesDM** only compute the detection matrix. But
 if we also want to compute the survey covariates (the variables for each
-replicate), we need to specify that in **extraVars** argument, see
-below.
+replicate or sampling covariates), we need to specify that in
+**samplingCov** argument and define a function/s on how to extract the
+information from each replicate using **samplingFun**. A *modal* is a
+predefinned function from track2dm package which is used to compute the
+mode or the most common character value in each replicate.
 
 ``` r
 # Compute only detection matrix
-transect_dm_1 <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
-                                   Xcol = "X", Ycol = "Y", speciesCol = "Observation", 
-                                   species = "animal signs")
+transect_dm_1 <- track2dm::speciesDM(speciesDF = transect_rep, sortID = "DateTime",
+                                     Xcol = "X", Ycol = "Y", whichCol  = "Observation",
+                                     whichSp = "animal signs", samplingCov = FALSE,
+                                     samplingFun = FALSE)
 transect_dm_1
-#> # A tibble: 36 x 5
-#>    Replicate DateTime       X       Y Presence
-#>        <int> <chr>      <dbl>   <dbl> <chr>   
-#>  1         1 DateTime 353215. 406684. 0       
-#>  2         2 DateTime 353751. 407263. 0       
-#>  3         3 DateTime 353802. 408026. 0       
-#>  4         4 DateTime 354691. 408109. 0       
-#>  5         5 DateTime 355565. 407989. 1       
-#>  6         6 DateTime 356211. 408361. 0       
-#>  7         7 DateTime 356966. 408947. 1       
-#>  8         8 DateTime 357584. 409366. 0       
-#>  9         9 DateTime 358202. 409888. 0       
-#> 10        10 DateTime 359118. 409932. 0       
-#> # ... with 26 more rows
+#>    Replicate Presence        X        Y  Observation samplingCov
+#> 1          1        0 353203.9 406667.9           NA        None
+#> 2          2        0 353672.5 407231.3           NA        None
+#> 3          3        0 353732.8 407778.2           NA        None
+#> 4          4        0 354244.9 408234.0           NA        None
+#> 5          5        0 355050.7 408086.0           NA        None
+#> 6          6        1 355976.0 408028.0 animal signs        None
+#> 7          7        0 356298.1 408527.5           NA        None
+#> 8          8        1 357296.0 409119.0 animal signs        None
+#> 9          9        0 357629.8 409452.0           NA        None
+#> 10        10        0 358226.2 409934.4           NA        None
+#> 11        11        0 359085.0 409940.9           NA        None
+#> 12        12        0 359779.7 409966.7           NA        None
+#> 13        13        1 359839.0 409959.0 animal signs        None
+#> 14        14        0 360366.6 410427.0           NA        None
+#> 15        15        0 360759.6 411202.6           NA        None
+#> 16        16        0 360825.6 411928.7           NA        None
+#> 17        17        0 361507.4 412270.4           NA        None
+#> 18        19        1 360633.0 410947.0 animal signs        None
+#> 19        20        0 361547.5 412398.9           NA        None
+#> 20        21        0 361503.6 412525.0           NA        None
+#> 21        22        0 361373.7 413363.3           NA        None
+#> 22        24        1 361449.0 412628.0 animal signs        None
+#> 23        25        1 361217.0 413758.0 animal signs        None
+#> 24        26        0 360682.7 413856.5           NA        None
+#> 25        27        0 359856.5 414031.5           NA        None
+#> 26        28        0 359048.3 414345.2           NA        None
+#> 27        29        1 360089.0 413942.0 animal signs        None
+#> 28        30        1 359349.0 414234.0 animal signs        None
+#> 29        31        0 358706.7 414575.5           NA        None
+#> 30        32        0 357783.3 414693.3           NA        None
+#> 31        33        0 357095.5 415203.3           NA        None
+#> 32        34        0 356896.4 415842.0           NA        None
+#> 33        36        1 358844.0 414466.0 animal signs        None
+#> 34        37        1 357480.0 414874.0 animal signs        None
+#> 35        38        1 357054.0 415417.0 animal signs        None
+#> 36        39        0 356871.8 415803.7           NA        None
+#> 37        40        0 356356.3 415749.7           NA        None
+#> 38        41        0 356146.6 416308.5           NA        None
+#> 39        42        0 355428.2 416327.9           NA        None
 
 # Compute detection matrix along with survey covariates for each replicate
-transect_dm_2 <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
-                                   Xcol = "X", Ycol = "Y", speciesCol = "Observation", 
-                                   species = "animal signs", extractVars = c("Age", "Type"))
+transect_dm_2 <- track2dm::speciesDM(speciesDF = transect_rep, sortID = "DateTime",
+                                     Xcol = "X", Ycol = "Y", whichCol  = "Observation",
+                                     whichSp = "animal signs", samplingCov = c("Age", "Type"),
+                                     samplingFun = c(track2dm::modal, track2dm::modal))
 transect_dm_2
-#> # A tibble: 36 x 7
-#>    Replicate DateTime       X       Y Presence Age   Type   
-#>        <int> <chr>      <dbl>   <dbl> <chr>    <chr> <chr>  
-#>  1         1 DateTime 353215. 406684. 0        <NA>  <NA>   
-#>  2         2 DateTime 353751. 407263. 0        <NA>  <NA>   
-#>  3         3 DateTime 353802. 408026. 0        <NA>  <NA>   
-#>  4         4 DateTime 354691. 408109. 0        <NA>  <NA>   
-#>  5         5 DateTime 355565. 407989. 1        New   Scratch
-#>  6         6 DateTime 356211. 408361. 0        <NA>  <NA>   
-#>  7         7 DateTime 356966. 408947. 1        Old   Scat   
-#>  8         8 DateTime 357584. 409366. 0        <NA>  <NA>   
-#>  9         9 DateTime 358202. 409888. 0        <NA>  <NA>   
-#> 10        10 DateTime 359118. 409932. 0        <NA>  <NA>   
-#> # ... with 26 more rows
+#>    Replicate Presence        X        Y  Observation Age Type
+#> 1          1        0 353203.9 406667.9           NA  NA   NA
+#> 2          2        0 353672.5 407231.3           NA  NA   NA
+#> 3          3        0 353732.8 407778.2           NA  NA   NA
+#> 4          4        0 354244.9 408234.0           NA  NA   NA
+#> 5          5        0 355050.7 408086.0           NA  NA   NA
+#> 6          6        1 355976.0 408028.0 animal signs  NA   NA
+#> 7          7        0 356298.1 408527.5           NA  NA   NA
+#> 8          8        1 357296.0 409119.0 animal signs  NA   NA
+#> 9          9        0 357629.8 409452.0           NA  NA   NA
+#> 10        10        0 358226.2 409934.4           NA  NA   NA
+#> 11        11        0 359085.0 409940.9           NA  NA   NA
+#> 12        12        0 359779.7 409966.7           NA  NA   NA
+#> 13        13        1 359839.0 409959.0 animal signs  NA   NA
+#> 14        14        0 360366.6 410427.0           NA  NA   NA
+#> 15        15        0 360759.6 411202.6           NA  NA   NA
+#> 16        16        0 360825.6 411928.7           NA  NA   NA
+#> 17        17        0 361507.4 412270.4           NA  NA   NA
+#> 18        19        1 360633.0 410947.0 animal signs New Scat
+#> 19        20        0 361547.5 412398.9           NA  NA   NA
+#> 20        21        0 361503.6 412525.0           NA  NA   NA
+#> 21        22        0 361373.7 413363.3           NA  NA   NA
+#> 22        24        1 361449.0 412628.0 animal signs New Scat
+#> 23        25        1 361217.0 413758.0 animal signs  NA   NA
+#> 24        26        0 360682.7 413856.5           NA  NA   NA
+#> 25        27        0 359856.5 414031.5           NA  NA   NA
+#> 26        28        0 359048.3 414345.2           NA  NA   NA
+#> 27        29        1 360089.0 413942.0 animal signs New Scat
+#> 28        30        1 359349.0 414234.0 animal signs  NA   NA
+#> 29        31        0 358706.7 414575.5           NA  NA   NA
+#> 30        32        0 357783.3 414693.3           NA  NA   NA
+#> 31        33        0 357095.5 415203.3           NA  NA   NA
+#> 32        34        0 356896.4 415842.0           NA  NA   NA
+#> 33        36        1 358844.0 414466.0 animal signs Old Scat
+#> 34        37        1 357480.0 414874.0 animal signs New Scat
+#> 35        38        1 357054.0 415417.0 animal signs New Scat
+#> 36        39        0 356871.8 415803.7           NA  NA   NA
+#> 37        40        0 356356.3 415749.7           NA  NA   NA
+#> 38        41        0 356146.6 416308.5           NA  NA   NA
+#> 39        42        0 355428.2 416327.9           NA  NA   NA
 ```
 
 What we really need is the matrix consists of species
@@ -412,11 +457,11 @@ spCov <- transect_dm_2 %>% dplyr::select(Age, Type) %>%
 # Show the first five elements/replicates
 spDM[1:5]
 #>          V1 V2 V3 V4 V5
-#> Presence  0  0  0  0  1
+#> Presence  0  0  0  0  0
 spCov[1:5]
-#>        V1   V2   V3   V4      V5
-#> Age  <NA> <NA> <NA> <NA>     New
-#> Type <NA> <NA> <NA> <NA> Scratch
+#>      V1 V2 V3 V4 V5
+#> Age  NA NA NA NA NA
+#> Type NA NA NA NA NA
 ```
 
 This is the final result where the presence absence of species is

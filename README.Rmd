@@ -94,7 +94,7 @@ arguments <- c("myString, addTime",
                "dataFrame, datetimeCol, Xcol, Ycol, nPoint", 
                "dataFrame, Xcol, Ycol, UTMZone, distLength", 
                "dataFrame, elevData, repLength",
-               "speciesDF, datetimeCol, Xcol, Ycol, speciesCol, species, extractVars")
+               "speciesDF, SortID, Xcol, Ycol, whichCol, whichSp, samplingCov, samplingFun")
 
 r_functions <- data.frame(functions, purposes, arguments)
 colnames(r_functions) <- c("Function", "Purpose", "Arguments/inputs")
@@ -138,7 +138,7 @@ In high altitude areas like in Western part of Sumatra, GPS signals may be obstr
 
 ```{r }
 # Take means from every 10 coordinates (nPoint = 10)
-track_2 <- track2dm::meanPoint(dataFrame = track_1, nPoint = 10)
+track_2 <- track2dm::meanPoint(dataFrame = track_1, datetimeCol = "DateTime", nPoint = 10, Xcol = "X", Ycol = "Y")
 
 ```
 
@@ -147,7 +147,8 @@ track_2 <- track2dm::meanPoint(dataFrame = track_1, nPoint = 10)
 track_1_sub <- track_1[c(1:500),]
 
 # Take means from every 10 coordinates (nPoint = 10)
-track_2_sub <- track2dm::meanPoint(dataFrame = track_1_sub, nPoint = 10)
+track_2_sub <- track2dm::meanPoint(dataFrame = track_1_sub, datetimeCol = "DateTime", nPoint = 10,
+                                   Xcol = "X", Ycol = "Y")
 
 # plot the differences
 par(mfrow=c(1,2))
@@ -171,24 +172,27 @@ After that we can calculate the distances in three dimension (X, Y, and Z). In o
 
 ```{r }
 # Calculate 3D distance and matrix replicate
-transect_rep <- track2dm::dist3D(dataFrame = transect, elevData = elevation,  repLength = 1000)
+transect_rep <- track2dm::dist3D(dataFrame = transect, elevData = elevation,  repLength = 1000,
+                                 Xcol = "X", Ycol = "Y")
 head(transect_rep)
 ```
 
 ## 3. Extract detection matrix for a species
-Finally, we can extract detection matrix from selected species. As default, **track2dm::speciesDM** only compute the detection matrix. But if we also want to compute the survey covariates (the variables for each replicate), we need to specify that in **extraVars** argument, see below.
+Finally, we can extract detection matrix from selected species. As default, **track2dm::speciesDM** only compute the detection matrix. But if we also want to compute the survey covariates (the variables for each replicate or sampling covariates), we need to specify that in **samplingCov** argument and define a function/s on how to extract the information from each replicate using **samplingFun**. A *modal* is a predefinned function from track2dm package which is used to compute the mode or the most common character value in each replicate.
 
 ```{r }
 # Compute only detection matrix
-transect_dm_1 <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
-                                   Xcol = "X", Ycol = "Y", speciesCol = "Observation", 
-                                   species = "animal signs")
+transect_dm_1 <- track2dm::speciesDM(speciesDF = transect_rep, sortID = "DateTime",
+                                     Xcol = "X", Ycol = "Y", whichCol  = "Observation",
+                                     whichSp = "animal signs", samplingCov = FALSE,
+                                     samplingFun = FALSE)
 transect_dm_1
 
 # Compute detection matrix along with survey covariates for each replicate
-transect_dm_2 <- track2dm::speciesDM(speciesDF = transect_rep, datetimeCol = "DateTime", 
-                                   Xcol = "X", Ycol = "Y", speciesCol = "Observation", 
-                                   species = "animal signs", extractVars = c("Age", "Type"))
+transect_dm_2 <- track2dm::speciesDM(speciesDF = transect_rep, sortID = "DateTime",
+                                     Xcol = "X", Ycol = "Y", whichCol  = "Observation",
+                                     whichSp = "animal signs", samplingCov = c("Age", "Type"),
+                                     samplingFun = c(track2dm::modal, track2dm::modal))
 transect_dm_2
 
 ```
