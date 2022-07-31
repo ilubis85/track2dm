@@ -3,3 +3,8 @@
 .RData
 .Ruserdata
 .Rbuildignore
+docs
+inst/doc
+data-raw
+README.Rmd
+detectMatrix.bib
