@@ -7,33 +7,19 @@
 #' @return the most common values from a vector of elements.
 #'
 #' @export
-# Function to calculate Modus
+# Function to calculate Mode
+# Got the code from https://www.tutorialspoint.com/r/r_mean_median_mode.
 modal <- function(myVector){
 
-  # Convert to vector
-  myVector <- as.vector(unlist(myVector))
+  # Get the list of unique value
+  uniq_vec <- base::unique(myVector)
 
-  # If all NA, just extract the first
-  if(sum(is.na(myVector)) == length(myVector)){
-    outPut <- "NA"
+  # Frequent value
+  my_mode <- match(myVector, uniq_vec) %>% tabulate() %>% which.max()
 
-  } # If Some NA but not all, replace NA with "-"
-  else if (sum(is.na(myVector)) <= length(myVector)){
-    myVector <- tidyr::replace_na(myVector, replace = "NA")
+  # Extract the most common value
+  outPut <- uniq_vec[my_mode]
 
-    # Sort myVector
-    myVector <- sort(myVector, na.last = TRUE)
-
-    # Calculate modal
-    outPut <- names(sort(-table(myVector)))[1]
-
-  } # Else, put as it is
-  else {
-    # Sort myVector
-    myVector <- sort(myVector, na.last = TRUE)
-
-    # Calculate modal
-    outPut <- names(sort(-table(myVector)))[1]
-  }
+  # Return the result
   return(outPut)
 }
