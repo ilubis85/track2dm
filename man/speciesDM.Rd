@@ -2,7 +2,7 @@
 % Please edit documentation in R/speciesDM.R
 \name{speciesDM}
 \alias{speciesDM}
-\title{speciesDM}
+\title{Extract detection matrices over of a certain species}
 \usage{
 speciesDM(
   speciesDF,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/mean.R
 \name{mean}
 \alias{mean}
-\title{mean}
+\title{Calculate mean}
 \usage{
 mean(myVector)
 }

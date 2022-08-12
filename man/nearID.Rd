@@ -2,7 +2,7 @@
 % Please edit documentation in R/nearID.R
 \name{nearID}
 \alias{nearID}
-\title{nearID}
+\title{Copy IDs from other nearby track points}
 \usage{
 nearID(points1, points2, joinAtr)
 }

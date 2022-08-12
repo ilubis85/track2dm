@@ -2,7 +2,7 @@
 % Please edit documentation in R/speciesDM_grid.R
 \name{speciesDM_grid}
 \alias{speciesDM_grid}
-\title{speciesDM_grid}
+\title{Extract detection matrices over of a certain species grid cells}
 \usage{
 speciesDM_grid(
   spData,

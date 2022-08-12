@@ -1,4 +1,4 @@
-#' @title speciesDM
+#' @title Extract detection matrices over of a certain species
 #'
 #' @description A function to create detection matrix for selected species.
 #'

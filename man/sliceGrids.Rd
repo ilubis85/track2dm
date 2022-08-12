@@ -2,7 +2,7 @@
 % Please edit documentation in R/sliceGrids.R
 \name{sliceGrids}
 \alias{sliceGrids}
-\title{sliceGrids}
+\title{Split grid cells into smaller grid cells}
 \usage{
 sliceGrids(mainGrids, mainID, aggreFact, nRandom)
 }

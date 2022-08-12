@@ -1,4 +1,4 @@
-#' @title nearID
+#' @title Copy IDs from other nearby track points
 #'
 #' @description A function to copy IDs from other nearby track points.
 #'

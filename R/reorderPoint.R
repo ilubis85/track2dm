@@ -1,4 +1,4 @@
-#' @title reorderPoint
+#' @title Reorder point based on group characteristics
 #'
 #' @description A function to reorder point based on group information and distance among the points
 #'

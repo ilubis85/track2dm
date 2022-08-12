@@ -1,4 +1,4 @@
-#' @title timeFormat
+#' @title reformat date and time from GPX data
 #'
 #' @description A function to reformat date and time.
 #'

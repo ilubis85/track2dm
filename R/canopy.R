@@ -1,4 +1,4 @@
-#' @title canopy
+#' @title Calculate canopy closure from S.W.T.S. survey 2020
 #'
 #' @description A function to calculate mean of canopy closure from each spatial replicate.
 #'

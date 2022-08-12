@@ -2,7 +2,7 @@
 % Please edit documentation in R/dist3D.R
 \name{dist3D}
 \alias{dist3D}
-\title{dist3D}
+\title{Calculate distance in 3-dimension (X,Y,Z)}
 \usage{
 dist3D(dataFrame, Xcol, Ycol, elevData, repLength)
 }

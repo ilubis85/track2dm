@@ -1,4 +1,4 @@
-#' @title line2points
+#' @title Convert spatial lines dataframe into spatial points dataframe
 #'
 #' @description A function to turn a line track into an ordered points along that line track
 #'
@@ -20,11 +20,12 @@ line2points <- function(spLineDF, minDist){
     options(warn=-1)
 
     # Convert SpatialLinesDataFrame into SpatialLines
-    spLine <- as(singleLine, "SpatialLines")
+    spLine <- methods::as(singleLine, "SpatialLines")
 
     # Create a regular spaced random points along the line
     # Number of points is based on the length of line divided by minimum distance between points
-    spPoints <- sp::spsample(x = spLine, n = floor(gLength(spLine)/minDist), type = "regular")
+    spPoints <- sp::spsample(x = spLine, n = floor(rgeos::gLength(spLine)/minDist),
+                             type = "regular")
 
     # Calculate distance from each point
     pointDist <- rgeos::gProject(spgeom = spLine, sppoint = spPoints,  normalized = FALSE)
@@ -33,7 +34,7 @@ line2points <- function(spLineDF, minDist){
     orderID <- rgeos::gInterpolate(spgeom = spLine, d = pointDist, normalized=FALSE) %>% as.data.frame() %>%
       # Add ID
       dplyr::transmute(Id = 1:nrow(.), "X" = x, "Y" = y) %>%
-      akar::df2sp(., UTMZone = crs(spLineDF))
+      df2sp(., UTMZone = raster::crs(spLineDF))
     return(orderID)
   }
 

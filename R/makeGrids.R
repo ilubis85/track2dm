@@ -1,4 +1,4 @@
-#' @title makeGrids
+#' @title Create grid cells (fishnet) from a given spatial data
 #'
 #' @description A function to create fishnet from a given spatial object/extent.
 #'
@@ -14,16 +14,16 @@
 makeGrids <- function(spObject, cellSize, clip = FALSE){
 
   # Create a raster from a given extent
-  raster_cell <- raster::raster(ext=extent(spObject), res=cellSize)
+  raster_cell <- raster::raster(ext=raster::extent(spObject), res=cellSize)
 
   # Specify projection
-  crs(raster_cell) <- crs(spObject)
+  raster::crs(raster_cell) <- raster::crs(spObject)
 
   # Assign values for each cell
-  values(raster_cell) <- 1:ncell(raster_cell)
+  raster::values(raster_cell) <- 1:raster::ncell(raster_cell)
 
   # Convert raster to polygone
-  subgrid_sp <- rasterToPolygons(raster_cell)
+  subgrid_sp <- raster::rasterToPolygons(raster_cell)
 
   # Create ID
   subgrid_sp$id <- 1:nrow(subgrid_sp)

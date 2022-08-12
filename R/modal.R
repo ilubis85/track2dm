@@ -1,4 +1,4 @@
-#' @title modal
+#' @title Calculate the most common character values
 #'
 #' @description A function to measure the central tendency of the data (the most common characteristics of the sample).
 #'

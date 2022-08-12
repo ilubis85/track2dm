@@ -2,7 +2,7 @@
 % Please edit documentation in R/canopy.R
 \name{canopy}
 \alias{canopy}
-\title{canopy}
+\title{Calculate canopy closure from S.W.T.S. survey 2020}
 \usage{
 canopy(myVector)
 }

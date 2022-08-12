@@ -1,4 +1,4 @@
-#' @title df2sp
+#' @title Convert dataframe into spatial dataframe
 #'
 #' @description A function to convert data-frame to spatial object data-frame.
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/df2sp.R
 \name{df2sp}
 \alias{df2sp}
-\title{df2sp}
+\title{Convert dataframe into spatial dataframe}
 \usage{
 df2sp(dataFrame, Xcol, Ycol, UTMZone)
 }

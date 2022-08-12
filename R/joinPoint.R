@@ -1,4 +1,4 @@
-#' @title joinPoint
+#' @title Combine waypoints and trackpoints
 #'
 #' @description A function to combine and rearrange waypoints and trackpoints.
 #'

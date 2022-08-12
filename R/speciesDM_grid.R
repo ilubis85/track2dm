@@ -1,4 +1,4 @@
-#' @title speciesDM_grid
+#' @title Extract detection matrices over of a certain species grid cells
 #'
 #' @description A function to extract detection matrix for a species from all gridcells
 #'

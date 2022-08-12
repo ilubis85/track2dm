@@ -2,7 +2,7 @@
 % Please edit documentation in R/joinPoint.R
 \name{joinPoint}
 \alias{joinPoint}
-\title{joinPoint}
+\title{Combine waypoints and trackpoints}
 \usage{
 joinPoint(waypointDF, trackDF, IDcol, Xcol, Ycol)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/line2points.R
 \name{line2points}
 \alias{line2points}
-\title{line2points}
+\title{Convert spatial lines dataframe into spatial points dataframe}
 \usage{
 line2points(spLineDF, minDist)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/reorderPoint.R
 \name{reorderPoint}
 \alias{reorderPoint}
-\title{reorderPoint}
+\title{Reorder point based on group characteristics}
 \usage{
 reorderPoint(pointsDF, startPoint, groupID)
 }

@@ -1,4 +1,4 @@
-#' @title sliceGrids
+#' @title Split grid cells into smaller grid cells
 #'
 #' @description A function to create fishnet from a given spatial object/extent.
 #'
@@ -21,16 +21,16 @@ sliceGrids <- function(mainGrids, mainID, aggreFact, nRandom){
     side_length <- rgeos::gLength(mainGrids)/4
 
     # Create a raster based on aggregate factor
-    raster_cell <- raster::raster(ext=extent(mainGrids), res=side_length/aggreFact)
+    raster_cell <- raster::raster(ext=raster::extent(mainGrids), res=side_length/aggreFact)
 
     # Specify projection
-    crs(raster_cell) <- crs(mainGrids)
+    raster::crs(raster_cell) <- raster::crs(mainGrids)
 
     # Assign values for each cell
-    values(raster_cell) <- 1:ncell(raster_cell)
+    raster::values(raster_cell) <- 1:raster::ncell(raster_cell)
 
     # Convert raster to polygone
-    subgrid_sp <- rasterToPolygons(raster_cell)
+    subgrid_sp <- raster::rasterToPolygons(raster_cell)
 
     # Create ID
     subgrid_sp$id <- 1:nrow(subgrid_sp)
@@ -70,16 +70,16 @@ sliceGrids <- function(mainGrids, mainID, aggreFact, nRandom){
       side_length <- rgeos::gLength(mainGrid_i)/4
 
       # Create a raster based on aggregate factor
-      raster_cell <- raster::raster(ext=extent(mainGrid_i), res=side_length/aggreFact)
+      raster_cell <- raster::raster(ext=raster::extent(mainGrid_i), res=side_length/aggreFact)
 
       # Specify projection
-      crs(raster_cell) <- crs(mainGrid_i)
+      raster::crs(raster_cell) <- raster::crs(mainGrid_i)
 
       # Assign values for each cell
-      values(raster_cell) <- 1:ncell(raster_cell)
+      raster::values(raster_cell) <- 1:ncell(raster_cell)
 
       # Convert raster to polygone
-      subgrid_sp <- rasterToPolygons(raster_cell)
+      subgrid_sp <- raster::rasterToPolygons(raster_cell)
 
       # Create ID
       subgrid_sp$id <- 1:nrow(subgrid_sp)
@@ -102,7 +102,7 @@ sliceGrids <- function(mainGrids, mainID, aggreFact, nRandom){
     }
 
     # Combine the result
-    final_output <- do.call(bind, output_grids)
+    final_output <- do.call(raster::bind, output_grids)
   }
   # Return output
   return(final_output)

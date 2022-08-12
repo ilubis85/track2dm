@@ -1,4 +1,4 @@
-#' @title copyID
+#' @title Copy attributes from other spatial points dataframe
 #'
 #' @description A function to copy IDs from other nearby SpatialPointsDataframe.
 #'
@@ -55,7 +55,7 @@ copyID <- function(points1, points2){
   newResult <- dplyr::left_join(newpoints_re, points2@data, by = c("X", "Y", "WP_ID"))
 
   # Return as a spatialPointsDataframe
-  result_sp <- akar::df2sp(newResult, UTMZone = crs(points2))
+  result_sp <- df2sp(newResult, UTMZone = crs(points2))
 
   # Return the result
   return(result_sp)

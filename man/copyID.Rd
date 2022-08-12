@@ -2,7 +2,7 @@
 % Please edit documentation in R/copyID.R
 \name{copyID}
 \alias{copyID}
-\title{copyID}
+\title{Copy attributes from other spatial points dataframe}
 \usage{
 copyID(points1, points2)
 }

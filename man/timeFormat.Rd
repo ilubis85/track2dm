@@ -2,7 +2,7 @@
 % Please edit documentation in R/timeFormat.R
 \name{timeFormat}
 \alias{timeFormat}
-\title{timeFormat}
+\title{reformat date and time from GPX data}
 \usage{
 timeFormat(myString, addTime = "00")
 }

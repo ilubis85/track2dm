@@ -1,4 +1,4 @@
-#' @title dist3D
+#' @title Calculate distance in 3-dimension (X,Y,Z)
 #'
 #' @description A function to calculate 3D distance and then categories the observations based on a predefine replication length.
 #'

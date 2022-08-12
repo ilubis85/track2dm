@@ -2,7 +2,7 @@
 % Please edit documentation in R/modal.R
 \name{modal}
 \alias{modal}
-\title{modal}
+\title{Calculate the most common character values}
 \usage{
 modal(myVector)
 }

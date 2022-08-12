@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeGrids.R
 \name{makeGrids}
 \alias{makeGrids}
-\title{makeGrids}
+\title{Create grid cells (fishnet) from a given spatial data}
 \usage{
 makeGrids(spObject, cellSize, clip = FALSE)
 }

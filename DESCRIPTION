@@ -18,9 +18,8 @@ Imports:
     stringr(>= 1.4.0),
     lubridate(>= 1.8.0),
     stats(>= 4.2.1),
-    knitr(>= 1.39),
     magrittr(>= 2.0.3),
     ggplot2(>= 3.3.6),
-    rmarkdown(>= 2.14)
+    methods(>= 4.2.1)
 Depends: 
-    R (>= 4.2.1)
+    R (>= 4.2.0)
