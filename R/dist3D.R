@@ -20,6 +20,26 @@ dist3D <- function(dataFrame, Xcol, Ycol, elevData, repLength){
   # Add new column of distance to the track dataframe
   dataFrame$Dist <- as.numeric("")
 
+  # If Z contain NA values, remove all rows that contain NA
+  # and give warning if this problem occurs
+  if (anyNA(dataFrame$Z) == TRUE){
+
+    # Find which row?
+    whichGrid <- paste(dataFrame[1,Xcol], dataFrame[1,Ycol], sep = "_")
+
+    # Put into a message
+    message(paste("Elevation (z) data contains NA values",whichGrid, sep=" in "))
+
+    # Remove any rows contain NA values in Z
+    dataFrame <- dataFrame %>% tidyr::drop_na(Z)
+
+  } else {
+    dataFrame <- dataFrame
+  }
+
+  # Remove any rows contain NA values in Z
+  dataFrame <- dataFrame %>% tidyr::drop_na(Z)
+
   # Then Calculate #D distance using Pytagoras Theorem
   dataFrame[1,"Dist"] <- 0 # The first row of the distance is 0
 
@@ -33,17 +53,7 @@ dist3D <- function(dataFrame, Xcol, Ycol, elevData, repLength){
   }
   # Create a sequence number based on distance interval
   # If Z contain NA values, use the max non-NA values in Z
-  # But give warning if this problem occurs
   if (anyNA(dataFrame$Z) == TRUE){
-
-    # Find which row?
-    whichGrid <- dataFrame[1,1]
-
-    # Put into a message
-    message(paste("Elevation (z) data contains NA values",whichGrid, sep=" in "))
-
-    # Remove any rows contain NA value
-    dataFrame <- stats::na.omit(dataFrame)
     levels <- seq(from=0, to=max(dataFrame$Dist), by=as.numeric(repLength))
 
   } else {
