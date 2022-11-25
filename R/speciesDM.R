@@ -18,7 +18,7 @@
 #' @importFrom  magrittr %>%
 #'
 speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
-                       samplingCov = FALSE, samplingFun = FALSE){
+                           samplingCov = FALSE, samplingFun = FALSE){
 
   # Create a Presence/Absence (0/1) column based on the species occurrence
   for (i in 1:nrow(speciesDF)) {
@@ -102,9 +102,9 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
 
       # If sampling covariates are more than one, use iteration
       else if (length(samplingCov) >= 2 ) {
-        for (k in seq_along(samplingCov)) {
-          species_info[,samplingCov[k]] <- speciesDF_rep_r[,samplingCov[k]] %>%
-            samplingFun[[k]]()
+        for (l in seq_along(samplingCov)) {
+          species_info[,samplingCov[l]] <- speciesDF_rep_r[,samplingCov[l]] %>%
+            samplingFun[[l]]()
         }
         species_info
 
@@ -144,9 +144,9 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
 
       # If sampling covariates are more than one, use iteration
       else if (length(samplingCov) >= 2 ) {
-        for (k in seq_along(samplingCov)) {
-          species_info[,samplingCov[k]] <- speciesDF_rep_r[,samplingCov[k]] %>%
-            samplingFun[[k]]()
+        for (m in seq_along(samplingCov)) {
+          species_info[,samplingCov[m]] <- speciesDF_rep_r[,samplingCov[m]] %>%
+            samplingFun[[m]]()
         }
         species_info
 
@@ -162,12 +162,67 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
     # Return result
     species_result[[j]] <- sp_result
   }
-
+  ##############################################################################
   # Combine the result
   matrixDM <- do.call(rbind, species_result)
 
+  # Reshape the column to have replicate as column
+  # Separate between detection, covariates and XY coordinates
+  # Detection (deTect)
+  deTect <- matrixDM %>% dplyr::select(Presence) %>% t() %>% as.data.frame()
+
+  # Rename columns
+  colnames(deTect) <- paste("R", 1:ncol(deTect), sep = "")
+
+  # Survey covariates (surCov)
+  # If samplingCov is FALSE, Type "None"
+  if (sum(samplingCov == FALSE) >= 1){
+    surCov <- "None"
+  }
+
+  # If sampling covariates are more than one, use iteration
+  else if (length(samplingCov) >= 2 ) {
+
+    # Create a list
+    covars <- list()
+
+    for (n in seq_along(samplingCov)) {
+      covars[[n]] <- matrixDM[,samplingCov[n]] %>% t() %>% as.data.frame() %>%  # Transform and save as dataframe
+        # Convert to character so it can be combined
+        dplyr::mutate_if(is.numeric, as.character)
+
+      # Rename columns
+      colnames(covars[[n]]) <- paste(paste(samplingCov[n], collapse  = "_"),
+                                     1:ncol(deTect), sep = "_")
+    }
+
+    # Combine as new column
+    surCov <- do.call(cbind, covars)
+
+  } # If sampling covariates is 1, extract it directly
+  else {
+    surCov <-  matrixDM[,samplingCov] %>% t() %>% as.data.frame()  # Transform and save as dataframe
+
+    # Rename columns
+    colnames(surCov) <- paste(paste(samplingCov, collapse  = "_"),
+                              1:ncol(surCov), sep = "_")
+  }
+
+  # XY Coordinate centroid (XYcor)
+  # Combine X and Y
+  XYcor <-  matrixDM %>% dplyr::select(Xcol, Ycol) %>%
+    # Unite X and Y as one
+    tidyr::unite(data=., col="XY", Xcol:Ycol, sep = "_") %>%
+    t() %>% as.data.frame() # Transform and save as dataframe
+
+  # Rename columns
+  colnames(XYcor) <- paste("XY", 1:ncol(XYcor), sep = "_")
+
+  # Combine all as one
+  new_matrix <- cbind(deTect, surCov, XYcor)
+
   # Return the result
-  return(matrixDM)
+  return(new_matrix)
 }
 
 
