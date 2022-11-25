@@ -1,8 +1,8 @@
 Package: track2dm
 Type: Package
 Title: Create detection matrix from tracks and waypoints to be used for occupancy modelling
-Version: 0.1.4
-Date: 2021-09-10
+Version: 0.1.5
+Date: 2022-11-25
 Author: Muhammad I. Lubis
 Maintainer: Muhammad I. Lubis <ilubis85@gmail.com>
 Description: This package contains a set of functions to convert spatial data from biodiversity monitoring into detection matix.
