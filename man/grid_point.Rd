@@ -2,7 +2,7 @@
 % Please edit documentation in R/grid_point.R
 \name{grid_point}
 \alias{grid_point}
-\title{Calculate proportion of points over a multipoints dataframe.}
+\title{Calculate proportion of points over SpatialPointsDataframe.}
 \usage{
 grid_point(
   spPoints,
@@ -14,11 +14,11 @@ grid_point(
 )
 }
 \arguments{
-\item{spPoints}{A spatial points dataframe in UTM projection.}
+\item{spPoints}{A SpatialPointsDataframe in UTM projection.}
 
 \item{subGrids}{Grid cells within the landscape of interest, each grid cell can be identified with id column, also in UTM.}
 
-\item{whichCol}{Specific field or column where the feature exists.}
+\item{whichCol}{Specific field or column where the features exist.}
 
 \item{whichSp}{Specific type or category to be selected as presence/absence.}
 
@@ -28,5 +28,5 @@ grid_point(
 Proportion of points.
 }
 \description{
-A function to calculate proportion of points over a multipoints dataframe.
+A function to calculate proportion of points over SpatialPointsDataframe.
 }

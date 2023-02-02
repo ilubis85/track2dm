@@ -6,7 +6,7 @@
 #' @param cellSize Cell size for each subgrid in meters.
 #' @param clip Clip grids within the spObject (default FALSE or preserve the whole grids).
 #'
-#' @return A spatialpolygonedataframe of grid cells.
+#' @return A SpatialPolygoneDataframe of grid cells.
 #'
 #'
 #' @export

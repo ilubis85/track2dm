@@ -19,18 +19,18 @@ grid_stat <- function(rasterData, subGrids, myFunc, as_Raster = TRUE, rasRes = 1
     grid_sub <- subGrids[i,]
 
     # Crop raster with a grid
-    raster_clip <- crop(rasterData, grid_sub)
+    raster_clip <- raster::crop(rasterData, grid_sub)
 
     # Calculate mean values for each subgrid
-    meanRaster <- extract(raster_clip, grid_sub, fun = myFunc, na.rm = TRUE)
+    meanRaster <- raster::extract(raster_clip, grid_sub, fun = myFunc, na.rm = TRUE)
 
     # Add the result to the grid
     subGrids[ i,"value"] <- meanRaster
   }
   if (as_Raster == TRUE){
     # Rasterize the subGrids with user defined resolution (default is 1km)
-    subGrids_ras <- raster(subGrids, res = rasRes)
-    subGrids_raster <- rasterize(subGrids, subGrids_ras, field = "value")
+    subGrids_ras <- raster::raster(subGrids, res = rasRes)
+    subGrids_raster <- raster::rasterize(subGrids, subGrids_ras, field = "value")
 
   } else {subGrids_raster <- subGrids}
   return(subGrids_raster)

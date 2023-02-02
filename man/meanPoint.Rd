@@ -9,7 +9,7 @@ meanPoint(dataFrame, datetimeCol, Xcol, Ycol, nPoint)
 \arguments{
 \item{dataFrame}{A spatial points data-frame.}
 
-\item{datetimeCol}{A quoted name of column that consists date and time object (as.POSIXct.}
+\item{datetimeCol}{A quoted name of column that consists date and time object (as.POSIXct).}
 
 \item{Xcol}{A quoted name of column that consists X coordinates.}
 

@@ -14,7 +14,7 @@ makeGrids(spObject, cellSize, clip = FALSE)
 \item{clip}{Clip grids within the spObject (default FALSE or preserve the whole grids).}
 }
 \value{
-A spatialpolygonedataframe of grid cells.
+A SpatialPolygoneDataframe of grid cells.
 }
 \description{
 A function to create fishnet from a given spatial object/extent.

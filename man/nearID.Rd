@@ -7,9 +7,9 @@
 nearID(points1, points2, joinAtr)
 }
 \arguments{
-\item{points1}{Spatial points dataframe consist of X and Y that needs attribute from points2.}
+\item{points1}{Spatial points data-frame consist of X and Y that needs attribute from points2.}
 
-\item{points2}{Spatial points dataframe where the attributes available to be copied.}
+\item{points2}{Spatial points data-frame where the attributes available to be copied.}
 
 \item{joinAtr}{A vector of attribute (columns) to be copied.}
 }

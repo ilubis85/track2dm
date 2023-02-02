@@ -2,8 +2,8 @@
 #'
 #' @description A function to copy IDs from other nearby track points.
 #'
-#' @param points1 Spatial points dataframe consist of X and Y that needs attribute from points2.
-#' @param points2 Spatial points dataframe where the attributes available to be copied.
+#' @param points1 Spatial points data-frame consist of X and Y that needs attribute from points2.
+#' @param points2 Spatial points data-frame where the attributes available to be copied.
 #' @param joinAtr A vector of attribute (columns) to be copied.
 #'
 #' @return Similar data with wayPoints with additional Id copied from nearby track points.
@@ -19,7 +19,7 @@ nearID <- function(points1, points2, joinAtr){
   pointdist <- raster::pointDistance(points1[,c("X", "Y")], points2[,c("X", "Y")],  lonlat = FALSE)
 
   # Get the minimum distance between points1 and points2, return the index value
-  mindist <- apply(pointdist, 1, which.min)
+  mindist <- base::apply(pointdist, 1, which.min)
 
   # Copy the attribute from points2 to points1 using iteration
   # Get the attribute ID from nearby points

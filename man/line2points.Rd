@@ -2,12 +2,12 @@
 % Please edit documentation in R/line2points.R
 \name{line2points}
 \alias{line2points}
-\title{Convert spatial lines dataframe into spatial points dataframe}
+\title{Convert SpatialLinesDataframe into SpatialPointsDataframe}
 \usage{
 line2points(spLineDF, minDist)
 }
 \arguments{
-\item{spLineDF}{A A SpatialLinesDataFrame of a track from a transect survey.}
+\item{spLineDF}{A SpatialLinesDataFrame of a track from a transect survey.}
 
 \item{minDist}{Minimum distance between points.}
 }

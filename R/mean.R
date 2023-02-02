@@ -1,4 +1,4 @@
-#' @title Calculate mean
+#' @title Calculate mean from data.
 #'
 #' @description A function to calculate mean from numeric vector.
 #'

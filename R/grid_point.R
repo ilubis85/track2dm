@@ -1,10 +1,10 @@
-#' @title Calculate proportion of points over a multipoints dataframe.
+#' @title Calculate proportion of points over SpatialPointsDataframe.
 #'
-#' @description A function to calculate proportion of points over a multipoints dataframe.
+#' @description A function to calculate proportion of points over SpatialPointsDataframe.
 #'
-#' @param spPoints A spatial points dataframe in UTM projection.
+#' @param spPoints A SpatialPointsDataframe in UTM projection.
 #' @param subGrids Grid cells within the landscape of interest, each grid cell can be identified with id column, also in UTM.
-#' @param whichCol Specific field or column where the feature exists.
+#' @param whichCol Specific field or column where the features exist.
 #' @param whichSp Specific type or category to be selected as presence/absence.
 #' @param rasRes Raster resolution (default 1000 mtr).
 #'
@@ -28,7 +28,7 @@ grid_point <- function(spPoints, subGrids, whichCol, whichSp, as_Raster = TRUE, 
       # If no wawpoints, put 0
       if (nrow(point_clip_wp) == 0) {point_prop <- 0
       } else { # Calculate proportion
-        point_prop <- sum(point_clip_wp@data[,whichCol]==whichSp, na.rm = TRUE)/nrow(point_clip_wp)
+        point_prop <- base::sum(point_clip_wp@data[,whichCol]==whichSp, na.rm = TRUE)/nrow(point_clip_wp)
       }
       point_prop
     }

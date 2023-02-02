@@ -3,7 +3,7 @@
 #' @description A function clear multi-points downloaded from GPS (Global Positioning System).
 #'
 #' @param dataFrame A spatial points data-frame.
-#' @param datetimeCol A quoted name of column that consists date and time object (as.POSIXct.
+#' @param datetimeCol A quoted name of column that consists date and time object (as.POSIXct).
 #' @param Xcol A quoted name of column that consists X coordinates.
 #' @param Ycol A quoted name of column that consists Y coordinates.
 #' @param nPoint A number of point to average.

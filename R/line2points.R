@@ -1,8 +1,8 @@
-#' @title Convert spatial lines dataframe into spatial points dataframe
+#' @title Convert SpatialLinesDataframe into SpatialPointsDataframe
 #'
 #' @description A function to turn a line track into an ordered points along that line track
 #'
-#' @param spLineDF A A SpatialLinesDataFrame of a track from a transect survey.
+#' @param spLineDF A SpatialLinesDataFrame of a track from a transect survey.
 #' @param minDist Minimum distance between points.
 #'
 #' @return A SpatialPointsDataFrame from the line track.
@@ -41,7 +41,7 @@ line2points <- function(spLineDF, minDist){
     return(orderID_sp)
   }
 
-  # Then use the function to convert spatialLinesDataframe into SpatialPointsDataframe
+  # Then use the function to convert SpatialLinesDataframe into SpatialPointsDataframe
   # If single line, run the function directly
   if (nrow(spLineDF) == 1){
     spLineDF_agg <-  line2fun(spLineDF)
