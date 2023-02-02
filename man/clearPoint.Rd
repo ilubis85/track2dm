@@ -13,11 +13,11 @@ clearPoint(dataFrame, Xcol, Ycol, UTMZone, distLength, nPart = 1000)
 
 \item{Ycol}{A quoted name of column that consists Y coordinates.}
 
-\item{UTMZone}{A UTM projection of the target file.}
+\item{UTMZone}{UTM projection of the target file.}
 
 \item{distLength}{A numeric value of a distance}
 
-\item{nPart}{split the dataframe into equal parts based on number of rows defined by user (default nPart = 1000)}
+\item{nPart}{split the data-frame into equal parts based on number of rows defined by user (default nPart = 1000)}
 }
 \value{
 Spatial object data-frame.

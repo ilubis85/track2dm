@@ -5,9 +5,9 @@
 #' @param dataFrame A data-frame contains at least "X" and "Y" in UTM projection.
 #' @param Xcol A quoted name of column that consists X coordinates.
 #' @param Ycol A quoted name of column that consists Y coordinates.
-#' @param UTMZone A UTM projection of the target file.
+#' @param UTMZone UTM projection of the target file.
 #' @param distLength A numeric value of a distance
-#' @param nPart split the dataframe into equal parts based on number of rows defined by user (default nPart = 1000)
+#' @param nPart split the data-frame into equal parts based on number of rows defined by user (default nPart = 1000)
 #'
 #' @return Spatial object data-frame.
 #'
@@ -42,7 +42,7 @@ clearPoint <- function(dataFrame, Xcol, Ycol, UTMZone, distLength, nPart = 1000)
     points_sp_dist_mtr[lower.tri(points_sp_dist_mtr, diag = TRUE)]<- NA
 
     # Create T/F, True if distance > threshold km, False if else
-    points_sp_dist_mtr_cr <- colSums(points_sp_dist_mtr, na.rm=TRUE) == 0
+    points_sp_dist_mtr_cr <- base::colSums(points_sp_dist_mtr, na.rm=TRUE) == 0
 
     # Remove points within distance based on threshold (drop out FALSE criteria)
     outlist[[i]] <- splitDF[[i]][points_sp_dist_mtr_cr,]

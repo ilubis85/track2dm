@@ -1,11 +1,11 @@
-#' @title Copy attributes from other spatial points dataframe
+#' @title Copy attributes from other spatial points data-frame
 #'
-#' @description A function to copy IDs from other nearby SpatialPointsDataframe.
+#' @description A function to copy ID's from other nearby SpatialPointsDataframe.
 #'
-#' @param points1 Spatial points dataframe consist of X and Y that copys attribute from points2.
-#' @param points2 Spatial points dataframe where the attributes available to be copied.
+#' @param points1 SpatialPointsDataframe consist of X and Y that copy attributes from points2.
+#' @param points2 SpatialPointsDataframe where the attributes available to be copied.
 #'
-#' @return Similar data with points1 with additional Id copied from nearby points2.
+#' @return Similar data with points1 with additional ID's copied from nearby points2.
 #'
 #'
 #'
@@ -55,7 +55,8 @@ copyID <- function(points1, points2){
   newResult <- dplyr::left_join(newpoints_re, points2@data, by = c("X", "Y", "WP_ID"))
 
   # Return as a spatialPointsDataframe
-  result_sp <- df2sp(newResult, UTMZone = crs(points2))
+  result_sp <- sp::SpatialPointsDataFrame(coords = newResult[,c("X","Y")], data = newResult,
+                                          proj4string = raster::crs(points2))
 
   # Return the result
   return(result_sp)

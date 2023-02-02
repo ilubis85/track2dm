@@ -2,18 +2,18 @@
 % Please edit documentation in R/copyID.R
 \name{copyID}
 \alias{copyID}
-\title{Copy attributes from other spatial points dataframe}
+\title{Copy attributes from other spatial points data-frame}
 \usage{
 copyID(points1, points2)
 }
 \arguments{
-\item{points1}{Spatial points dataframe consist of X and Y that copys attribute from points2.}
+\item{points1}{SpatialPointsDataframe consist of X and Y that copy attributes from points2.}
 
-\item{points2}{Spatial points dataframe where the attributes available to be copied.}
+\item{points2}{SpatialPointsDataframe where the attributes available to be copied.}
 }
 \value{
-Similar data with points1 with additional Id copied from nearby points2.
+Similar data with points1 with additional ID's copied from nearby points2.
 }
 \description{
-A function to copy IDs from other nearby SpatialPointsDataframe.
+A function to copy ID's from other nearby SpatialPointsDataframe.
 }

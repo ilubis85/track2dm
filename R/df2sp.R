@@ -1,10 +1,10 @@
-#' @title Convert dataframe into spatial dataframe
+#' @title Convert data-frame into spatial data-frame
 #'
 #' @description A function to convert data-frame to spatial object data-frame.
 #'
-#' @param dataFrame A data-frame contains to be converted to spatial object data-frame.
-#' @param Xcol A quoted name of column that consists X coordinates.
-#' @param Ycol A quoted name of column that consists Y coordinates.
+#' @param dataFrame A data-frame to be converted into spatial object data-frame.
+#' @param Xcol A quoted name of column that consists of X coordinates.
+#' @param Ycol A quoted name of column that consists of Y coordinates.
 #' @param  UTMZone A UTM projection of the target.
 #'
 #' @return Spatial object data-frame.

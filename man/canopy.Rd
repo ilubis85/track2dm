@@ -7,7 +7,7 @@
 canopy(myVector)
 }
 \arguments{
-\item{myVector}{A vector contains canopy opennes data from densiometer.}
+\item{myVector}{A vector contains canopy openness data from densiometer.}
 }
 \value{
 Mean of the canopy closure for a spatial replicate.

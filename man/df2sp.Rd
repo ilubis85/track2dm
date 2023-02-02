@@ -2,16 +2,16 @@
 % Please edit documentation in R/df2sp.R
 \name{df2sp}
 \alias{df2sp}
-\title{Convert dataframe into spatial dataframe}
+\title{Convert data-frame into spatial data-frame}
 \usage{
 df2sp(dataFrame, Xcol, Ycol, UTMZone)
 }
 \arguments{
-\item{dataFrame}{A data-frame contains to be converted to spatial object data-frame.}
+\item{dataFrame}{A data-frame to be converted into spatial object data-frame.}
 
-\item{Xcol}{A quoted name of column that consists X coordinates.}
+\item{Xcol}{A quoted name of column that consists of X coordinates.}
 
-\item{Ycol}{A quoted name of column that consists Y coordinates.}
+\item{Ycol}{A quoted name of column that consists of Y coordinates.}
 
 \item{UTMZone}{A UTM projection of the target.}
 }
