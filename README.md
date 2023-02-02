@@ -50,7 +50,7 @@ other GIS software.
 
 In this study, we developed an R package which we called *track2dm* that
 can be used to create detection matrix from transect lines which account
-for altitudinal differences. The main purpose of this document is to
+for latitudinal differences. The main purpose of this document is to
 elaborate how the package works in converting the field survey data into
 detection matrix to be used for hierarchical occupancy modelling.
 
@@ -318,7 +318,7 @@ data first (as we did in the beginning).
 
 ``` r
 # Calculate 3D distance and matrix replicate
-transect_rep <- track2dm::dist3D(dataFrame = transect, elevData = elevation,  repLength = 1000,
+transect_rep <- track2dm::dist3D(dataFrame = transect, elevData = elevation,  repLength = 5000,
                                  Xcol = "X", Ycol = "Y")
 head(transect_rep)
 #> # A tibble: 6 × 9
@@ -351,46 +351,16 @@ transect_dm_1 <- track2dm::speciesDM(speciesDF = transect_rep, sortID = "DateTim
                                      whichSp = "animal signs", samplingCov = FALSE,
                                      samplingFun = FALSE)
 transect_dm_1
-#>    Replicate Presence        X        Y  Observation samplingCov
-#> 1          1        0 353203.9 406667.9           NA        None
-#> 2          2        0 353672.5 407231.3           NA        None
-#> 3          3        0 353732.8 407778.2           NA        None
-#> 4          4        0 354244.9 408234.0           NA        None
-#> 5          5        0 355050.7 408086.0           NA        None
-#> 6          6        1 355976.0 408028.0 animal signs        None
-#> 7          7        0 356298.1 408527.5           NA        None
-#> 8          8        1 357296.0 409119.0 animal signs        None
-#> 9          9        0 357629.8 409452.0           NA        None
-#> 10        10        0 358226.2 409934.4           NA        None
-#> 11        11        0 359085.0 409940.9           NA        None
-#> 12        12        0 359779.7 409966.7           NA        None
-#> 13        13        1 359839.0 409959.0 animal signs        None
-#> 14        14        0 360366.6 410427.0           NA        None
-#> 15        15        0 360759.6 411202.6           NA        None
-#> 16        16        0 360825.6 411928.7           NA        None
-#> 17        17        0 361507.4 412270.4           NA        None
-#> 18        19        1 360633.0 410947.0 animal signs        None
-#> 19        20        0 361547.5 412398.9           NA        None
-#> 20        21        0 361503.6 412525.0           NA        None
-#> 21        22        0 361373.7 413363.3           NA        None
-#> 22        24        1 361449.0 412628.0 animal signs        None
-#> 23        25        1 361217.0 413758.0 animal signs        None
-#> 24        26        0 360682.7 413856.5           NA        None
-#> 25        27        0 359856.5 414031.5           NA        None
-#> 26        28        0 359048.3 414345.2           NA        None
-#> 27        29        1 360089.0 413942.0 animal signs        None
-#> 28        30        1 359349.0 414234.0 animal signs        None
-#> 29        31        0 358706.7 414575.5           NA        None
-#> 30        32        0 357783.3 414693.3           NA        None
-#> 31        33        0 357095.5 415203.3           NA        None
-#> 32        34        0 356896.4 415842.0           NA        None
-#> 33        36        1 358844.0 414466.0 animal signs        None
-#> 34        37        1 357480.0 414874.0 animal signs        None
-#> 35        38        1 357054.0 415417.0 animal signs        None
-#> 36        39        0 356871.8 415803.7           NA        None
-#> 37        40        0 356356.3 415749.7           NA        None
-#> 38        41        0 356146.6 416308.5           NA        None
-#> 39        42        0 355428.2 416327.9           NA        None
+#>          R1 R2 R3 R4 R5 R6 R7 R8 R9 surCov                             XY_1
+#> Presence  0  1  1  1  1  1  0  1  0   None 353203.85641911_406667.948983039
+#>                                       XY_2                    XY_3
+#> Presence 355975.999999952_408027.999999999 359838.999999961_409959
+#>                                       XY_4                    XY_5
+#> Presence 360632.999999956_410946.999999999 361448.999999957_412628
+#>                             XY_6                              XY_7
+#> Presence 360088.999999962_413942 358706.716852618_414575.527131112
+#>                                       XY_8                              XY_9
+#> Presence 358843.999999957_414465.999999999 356146.633214442_416308.479970842
 
 # Compute detection matrix along with survey covariates for each replicate
 transect_dm_2 <- track2dm::speciesDM(speciesDF = transect_rep, sortID = "DateTime",
@@ -398,78 +368,41 @@ transect_dm_2 <- track2dm::speciesDM(speciesDF = transect_rep, sortID = "DateTim
                                      whichSp = "animal signs", samplingCov = c("Age", "Type"),
                                      samplingFun = c(track2dm::modal, track2dm::modal))
 transect_dm_2
-#>    Replicate Presence        X        Y  Observation Age Type
-#> 1          1        0 353203.9 406667.9           NA  NA   NA
-#> 2          2        0 353672.5 407231.3           NA  NA   NA
-#> 3          3        0 353732.8 407778.2           NA  NA   NA
-#> 4          4        0 354244.9 408234.0           NA  NA   NA
-#> 5          5        0 355050.7 408086.0           NA  NA   NA
-#> 6          6        1 355976.0 408028.0 animal signs  NA   NA
-#> 7          7        0 356298.1 408527.5           NA  NA   NA
-#> 8          8        1 357296.0 409119.0 animal signs  NA   NA
-#> 9          9        0 357629.8 409452.0           NA  NA   NA
-#> 10        10        0 358226.2 409934.4           NA  NA   NA
-#> 11        11        0 359085.0 409940.9           NA  NA   NA
-#> 12        12        0 359779.7 409966.7           NA  NA   NA
-#> 13        13        1 359839.0 409959.0 animal signs  NA   NA
-#> 14        14        0 360366.6 410427.0           NA  NA   NA
-#> 15        15        0 360759.6 411202.6           NA  NA   NA
-#> 16        16        0 360825.6 411928.7           NA  NA   NA
-#> 17        17        0 361507.4 412270.4           NA  NA   NA
-#> 18        19        1 360633.0 410947.0 animal signs New Scat
-#> 19        20        0 361547.5 412398.9           NA  NA   NA
-#> 20        21        0 361503.6 412525.0           NA  NA   NA
-#> 21        22        0 361373.7 413363.3           NA  NA   NA
-#> 22        24        1 361449.0 412628.0 animal signs New Scat
-#> 23        25        1 361217.0 413758.0 animal signs  NA   NA
-#> 24        26        0 360682.7 413856.5           NA  NA   NA
-#> 25        27        0 359856.5 414031.5           NA  NA   NA
-#> 26        28        0 359048.3 414345.2           NA  NA   NA
-#> 27        29        1 360089.0 413942.0 animal signs New Scat
-#> 28        30        1 359349.0 414234.0 animal signs  NA   NA
-#> 29        31        0 358706.7 414575.5           NA  NA   NA
-#> 30        32        0 357783.3 414693.3           NA  NA   NA
-#> 31        33        0 357095.5 415203.3           NA  NA   NA
-#> 32        34        0 356896.4 415842.0           NA  NA   NA
-#> 33        36        1 358844.0 414466.0 animal signs Old Scat
-#> 34        37        1 357480.0 414874.0 animal signs New Scat
-#> 35        38        1 357054.0 415417.0 animal signs New Scat
-#> 36        39        0 356871.8 415803.7           NA  NA   NA
-#> 37        40        0 356356.3 415749.7           NA  NA   NA
-#> 38        41        0 356146.6 416308.5           NA  NA   NA
-#> 39        42        0 355428.2 416327.9           NA  NA   NA
-```
-
-What we really need is the matrix consists of species
-detection/non-detection information for each replicate from a sampling
-unit, and also the survey covariates. This could be done using the
-following script.
-
-``` r
-# Extract detection matrix
-spDM <- transect_dm_2 %>% dplyr::select(Presence) %>% 
-  t() %>% as.data.frame()
-
-# Extract survey covariates
-spCov <- transect_dm_2 %>% dplyr::select(Age, Type) %>% 
-  t() %>% as.data.frame()
-
-# Show the first five elements/replicates
-spDM[1:5]
-#>          V1 V2 V3 V4 V5
-#> Presence  0  0  0  0  0
-spCov[1:5]
-#>      V1 V2 V3 V4 V5
-#> Age  NA NA NA NA NA
-#> Type NA NA NA NA NA
+#>          R1 R2 R3 R4 R5 R6 R7 R8 R9 Age_1 Age_2 Age_3 Age_4 Age_5 Age_6 Age_7
+#> Presence  0  1  1  1  1  1  0  1  0  <NA>  <NA>  <NA>  <NA>  <NA>  <NA>  <NA>
+#>          Age_8 Age_9 Type_1 Type_2 Type_3 Type_4 Type_5 Type_6 Type_7 Type_8
+#> Presence   Old  <NA>   <NA>   <NA>   <NA>   <NA>   <NA>   <NA>   <NA>   Scat
+#>          Type_9                             XY_1
+#> Presence   <NA> 353203.85641911_406667.948983039
+#>                                       XY_2                    XY_3
+#> Presence 355975.999999952_408027.999999999 359838.999999961_409959
+#>                                       XY_4                    XY_5
+#> Presence 360632.999999956_410946.999999999 361448.999999957_412628
+#>                             XY_6                              XY_7
+#> Presence 360088.999999962_413942 358706.716852618_414575.527131112
+#>                                       XY_8                              XY_9
+#> Presence 358843.999999957_414465.999999999 356146.633214442_416308.479970842
 ```
 
 This is the final result where the presence absence of species is
-recorded for each track segment. This can be read as: from the first to
-fourth segment, no species were recorded. It was until the fifth segment
-that the species were present in a **type** of **scratch** and it looks
-like **new** (approx. 1-2 weeks old). This data is ready for occupancy
-modelling analysis :)
+recorded for each track segment. This can be read as: Species were
+observed in all segments except for the first, seventh and ninth
+segment. The following columns (XY\_) show the central point of each
+segment which can be used for plotting to review the results visually.
+The following codes show how to do it.
+
+``` r
+# Convert detection matrix to spatial points
+dm_points <- track2dm::dm2spatial(detectMatrix = transect_dm_1, proJect = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
+
+# Plot
+tm_shape(elevation) +
+  tm_raster(style = "cont") +
+  tm_shape(dm_points) + tm_dots(col = 'Detection', shape=17, size=0.5)
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" /> This
+data is ready for occupancy modelling analysis :)
 
 **Next, how to do this for multiple tracks??**
 

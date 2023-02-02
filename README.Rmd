@@ -19,17 +19,18 @@ knitr::opts_chunk$set(
 # track2dm : Create detection matrix from transect surveys
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 ## What is it?
 
-One of the questions which frequently addresses by wildlife scientists is about where a species occurs in the landscape. This question is hampered by the fact that most of wildlife species cannot be perfectly detected due to several conditions such as the weather conditions, landscape characteristics, the observer experience, or the ecology of the species. For these reasons, the animals may present in the site, but the observer failed to detect it (__False Absence__) or the species was truly absent (__True Absence__). However, failing to detect species will underestimate the true occupancy of the species in the study areas. The management actions taken from incorrect estimation of species occurrence will have negative impact to the species, especially when occupied habitat is cleared for other purposes. 
+One of the questions which frequently addresses by wildlife scientists is about where a species occurs in the landscape. This question is hampered by the fact that most of wildlife species cannot be perfectly detected due to several conditions such as the weather conditions, landscape characteristics, the observer experience, or the ecology of the species. For these reasons, the animals may present in the site, but the observer failed to detect it (**False Absence**) or the species was truly absent (**True Absence**). However, failing to detect species will underestimate the true occupancy of the species in the study areas. The management actions taken from incorrect estimation of species occurrence will have negative impact to the species, especially when occupied habitat is cleared for other purposes.
 
 In 2002, a statistical model by MacKenzie et al. [-@MacKenzie2002] is introduced which can estimate both probability of occurrence (known as **psi**) as well as the probability of detection (known as **p**) to account for detectability of the animals. The detectability can be estimated from repeated observations for each unit/site [@Bailey2005]. The replication can be in the form of temporal or spatial replications. *Temporal replications* are when a number of sites (units) are visited several times. Whilst *spatial replications* are when the survey efforts are splitted into several equal parts. For instance, a sampling unit was observed by using 5 km transect, each km will be served as a replicate, so there will be five replicates in this sampling unit. This *track2dm* package is developed to deal with the spatial replication.
 
 Most of wildlife surveys are done using transect based method to look for the presence or absence of the animals in the study area. This is usually done by randomly select transects and the species is observed along the tracks. The length of transects should be sufficient to be able to calculate both the detection and occurrence of the species. In this kind of study, the transect should be divided into equal lenghth and each lengt will be used as a replicate. However, splitting the transects into equal length can be very tedious especially when we want to incorporate the altitudinal differences to avoid bias in measuring the survey efforts. Currently there is no applications that provide such tools, except the one that split lines into equal areas in ArcGIS or other GIS software.
 
-In this study, we developed an R package which we called *track2dm* that can be used to create detection matrix from transect lines which account for altitudinal differences. The main purpose of this document is to elaborate how the package works in converting the field survey data into detection matrix to be used for hierarchical occupancy modelling. 
+In this study, we developed an R package which we called *track2dm* that can be used to create detection matrix from transect lines which account for latitudinal differences. The main purpose of this document is to elaborate how the package works in converting the field survey data into detection matrix to be used for hierarchical occupancy modelling.
 
 ## How to install?
 
@@ -39,6 +40,7 @@ You can install the released version of track2dm and the development version fro
 # install.packages("devtools")
 devtools::install_github("ilubis85/track2dm")
 ```
+
 ## How does it work?
 
 We have provided some data for simulation to understand how the package works. Three types of data are needed, the track where the survey is recorded (usually downloaded from Global Positioning System (GPS), the observation along the track (usually written in excel format) and digital elevation model (DEM) in raster format. The data can be loaded after the package is called.
@@ -77,7 +79,7 @@ tm_shape(elevation) +
   tm_shape(observation_pt) + tm_dots(col = "red", shape=16, size=0.2)
 ```
 
-So how the package works? Below is the list of functions currently developed to create detection matrix for a species. 
+So how the package works? Below is the list of functions currently developed to create detection matrix for a species.
 
 ```{r echo=FALSE}
 functions <- c("timeFormat()", "df2sp()", "meanPoint()", "clearPoint()","dist3D()", "speciesDM()")
@@ -107,10 +109,13 @@ r_functions %>%
   kbl() %>% 
   kable_styling()
 ```
+
 There are at least *three steps* required to convert survey data into detection matrix. The first is preparing both tracks and observation. Two problems should be dealt with in this step; correcting the time format and cleaning the funny shape tracks (tangled lines). Then the cleaned tracks and observation are combined and then the survey effort (in km) can be calculated by using the X-Y-Z information from each points. The last is to compute the detection matrix (usually shown as present and absent as 1 and 0) for a selected species.
 
 ## 1. Prepare track and observation points
+
 We need at least three information to be able to calculate distance; Date-Time, X and Y coordinates. Date and Time should be in as.POSIXct format, while X and Y in numeric or double format. However, sometime Date and Time format we got (from GPS) is in different format (mostly as.character). For this case we need to use **track2dm::timeFormat()** function. See codes below on how to use it and how it produces the right format. We do the same for observation data.
+
 ```{r , message=FALSE}
 
 # Load library
@@ -134,6 +139,7 @@ track_1 %>% str()
 observation_1 %>% str()
 
 ```
+
 In high altitude areas like in Western part of Sumatra, GPS signals may be obstructed by the altitudinal differences or thick canopy cover which produces inaccurate geo-locations which will lead to bias in calculating the survey efforts (in terms of length of transect surveys). To deal with this, functions called **track2dm::meanPoint** or/and **track2dm::clearPoint** will be used to remove the bias either by take means from a number of subsequent points (*meanPoint*) or clear a certain number of points between points based on a predefined distance (*clearPoint*). For example we used **meanPoint** for track_1 data.
 
 ```{r }
@@ -167,17 +173,20 @@ transect <- dplyr::full_join(track_2, observation_1, by = c("DateTime", "X", "Y"
 head(transect)
 
 ```
+
 ## 2. Calculate distance in three dimention (X-Y-Z)
+
 After that we can calculate the distances in three dimension (X, Y, and Z). In order to do it, we need Z information and we can get it from elevation data in raster format downloaded from [USGS website](https://earthexplorer.usgs.gov). We need to load the elevation data first (as we did in the beginning).
 
 ```{r }
 # Calculate 3D distance and matrix replicate
-transect_rep <- track2dm::dist3D(dataFrame = transect, elevData = elevation,  repLength = 1000,
+transect_rep <- track2dm::dist3D(dataFrame = transect, elevData = elevation,  repLength = 5000,
                                  Xcol = "X", Ycol = "Y")
 head(transect_rep)
 ```
 
 ## 3. Extract detection matrix for a species
+
 Finally, we can extract detection matrix from selected species. As default, **track2dm::speciesDM** only compute the detection matrix. But if we also want to compute the survey covariates (the variables for each replicate or sampling covariates), we need to specify that in **samplingCov** argument and define a function/s on how to extract the information from each replicate using **samplingFun**. A *modal* is a predefinned function from track2dm package which is used to compute the mode or the most common character value in each replicate.
 
 ```{r }
@@ -196,25 +205,20 @@ transect_dm_2 <- track2dm::speciesDM(speciesDF = transect_rep, sortID = "DateTim
 transect_dm_2
 
 ```
-What we really need is the matrix consists of species detection/non-detection information for each replicate from a sampling unit, and also the survey covariates. This could be done using the following script.
+
+This is the final result where the presence absence of species is recorded for each track segment. This can be read as: Species were observed in all segments except for the first, seventh and ninth segment. The following columns (XY_) show the central point of each segment which can be used for plotting to review the results visually. The following codes show how to do it. 
 
 ```{r }
-# Extract detection matrix
-spDM <- transect_dm_2 %>% dplyr::select(Presence) %>% 
-  t() %>% as.data.frame()
+# Convert detection matrix to spatial points
+dm_points <- track2dm::dm2spatial(detectMatrix = transect_dm_1, proJect = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
 
-# Extract survey covariates
-spCov <- transect_dm_2 %>% dplyr::select(Age, Type) %>% 
-  t() %>% as.data.frame()
-
-# Show the first five elements/replicates
-spDM[1:5]
-spCov[1:5]
+# Plot
+tm_shape(elevation) +
+  tm_raster(style = "cont") +
+  tm_shape(dm_points) + tm_dots(col = 'Detection', shape=17, size=0.5)
 ```
-This is the final result where the presence absence of species is recorded for each track segment. This can be read as: from the first to fourth segment, no species were recorded. It was until the fifth segment that the species were present in a **type** of **scratch** and it looks like **new** (approx. 1-2 weeks old). This data is ready for occupancy modelling analysis :)
-
+This data is ready for occupancy modelling analysis :)
 
 **Next, how to do this for multiple tracks??**
-
 
 ### References
