@@ -1,17 +1,18 @@
 Package: track2dm
 Type: Package
-Title: Create detection matrix from tracks and waypoints to be used for occupancy modelling
+Title: Create detection matrix from line transects for occupancy modelling
 Version: 0.1.5
 Date: 2022-11-25
 Author: Muhammad I. Lubis
 Maintainer: Muhammad I. Lubis <ilubis85@gmail.com>
-Description: This package contains a set of functions to convert spatial data from biodiversity monitoring into detection matix.
+Description: This package contains a set of functions to convert occupancy survey dataset into detection matix.
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.1
 Imports:
     dplyr(>= 1.0.9),
+    tidyr(>= 1.2.0),
     sp(>= 1.5-0),
     rgeos(>= 0.5-9),
     raster(>= 3.5-21),
