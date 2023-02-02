@@ -37,9 +37,6 @@ dist3D <- function(dataFrame, Xcol, Ycol, elevData, repLength){
     dataFrame <- dataFrame
   }
 
-  # Remove any rows contain NA values in Z
-  dataFrame <- dataFrame %>% tidyr::drop_na(Z)
-
   # Then Calculate #D distance using Pytagoras Theorem
   dataFrame[1,"Dist"] <- 0 # The first row of the distance is 0
 
