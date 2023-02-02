@@ -2,24 +2,24 @@
 % Please edit documentation in R/dist3D.R
 \name{dist3D}
 \alias{dist3D}
-\title{Calculate distance in 3-dimension (X,Y,Z)}
+\title{Calculate distance in 3-dimension (X,Y,and Z)}
 \usage{
 dist3D(dataFrame, Xcol, Ycol, elevData, repLength)
 }
 \arguments{
-\item{dataFrame}{A dataframe contains pairs of coordinate in UTM projection to calculate distance using Euclidean distance formula.}
+\item{dataFrame}{A data-frame contains pairs of coordinate in UTM projection to calculate distance using Euclidean distance formula.}
 
-\item{Xcol}{A quoted name of column that consists X coordinates.}
+\item{Xcol}{A quoted name of column that consists of X coordinates.}
 
-\item{Ycol}{A quoted name of column that consists Y coordinates.}
+\item{Ycol}{A quoted name of column that consists of Y coordinates.}
 
-\item{elevData}{A raster layer contains elevation data in meter to calculate altitude (Z).}
+\item{elevData}{A raster layer contains elevation data (DEM) in meter to calculate altitude (Z).}
 
-\item{repLength}{An information about a desired length of each spatial replicate.}
+\item{repLength}{A predefined replication length.}
 }
 \value{
 New columns that specify distance and what replicates that the observations are belong to.
 }
 \description{
-A function to calculate 3D distance and then categories the observations based on a predefine replication length.
+A function to calculate 3D distance and then categories the observations based on a predefined replication length.
 }

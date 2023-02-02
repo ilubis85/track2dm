@@ -2,18 +2,18 @@
 % Please edit documentation in R/dm2spatial.R
 \name{dm2spatial}
 \alias{dm2spatial}
-\title{Convert detection matrices into spatial data}
+\title{Convert detection matrix into spatial data}
 \usage{
 dm2spatial(detectMatrix, proJect)
 }
 \arguments{
-\item{detectMatrix}{A matrix contains species detect/non-detection resulted from swts::speciesDM() function.}
+\item{detectMatrix}{A matrix contains species detection/non-detection.}
 
 \item{proJect}{Projection code.}
 }
 \value{
-A spatial points dataframe contains species detection/non-detection.
+A spatial points data-frame contains species detection/non-detection.
 }
 \description{
-to convert detection matrix to spatial points data.
+to convert detection matrix to SpatialPointsDataframe.
 }

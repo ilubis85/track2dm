@@ -1,10 +1,10 @@
-#' @title Convert detection matrices into spatial data
+#' @title Convert detection matrix into spatial data
 #'
-#' @description to convert detection matrix to spatial points data.
+#' @description to convert detection matrix to SpatialPointsDataframe.
 #'
-#' @param detectMatrix A matrix contains species detect/non-detection resulted from swts::speciesDM() function.
+#' @param detectMatrix A matrix contains species detection/non-detection.
 #' @param proJect Projection code.
-#' @return A spatial points dataframe contains species detection/non-detection.
+#' @return A spatial points data-frame contains species detection/non-detection.
 #'
 #' @export
 #' @importFrom  magrittr %>%

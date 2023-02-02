@@ -27,11 +27,11 @@ grid_fragstat(
 
 \item{as_Raster}{TRUE, output will be converted to raster (TRUE).}
 
-\item{rasRes}{If as_Raster = TRUE, then specify the resolution. Default is 1000m..}
+\item{rasRes}{If as_Raster = TRUE, then specify the resolution. Default is 1000m.}
 }
 \value{
 Gridcells in raster with 1 km resolution or polygon with values from landscapesmetrices function.
 }
 \description{
-A function to calculate landscape matrices within gridcells.
+A function to calculate landscape matrices (fragmentation statistics) within gridcells.
 }

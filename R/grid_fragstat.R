@@ -1,6 +1,6 @@
 #' @title Calculate landscape matrices within gridcells
 #'
-#' @description A function to calculate landscape matrices within gridcells.
+#' @description A function to calculate landscape matrices (fragmentation statistics) within gridcells.
 #'
 #' @param landCover Raster dataset consists of land cover/use classes in UTM projection.
 #' @param landLevel Specify matrix level(only landscape and class level available)
@@ -8,7 +8,7 @@
 #' @param subGrids Grid cells within the landscape of interest, each grid cell can be identified with id column, also in UTM.
 #' @param lsmFunc A function from landscapemetrices package.
 #' @param as_Raster TRUE, output will be converted to raster (TRUE).
-#' @param rasRes If as_Raster = TRUE, then specify the resolution. Default is 1000m..
+#' @param rasRes If as_Raster = TRUE, then specify the resolution. Default is 1000m.
 #'
 #' @return Gridcells in raster with 1 km resolution or polygon with values from landscapesmetrices function.
 #'
@@ -64,8 +64,8 @@ grid_fragstat <- function(landCover, landLevel = "landscape", lClass = FALSE,
   }
   if (as_Raster == TRUE){
     # Rasterize the subGrids with 1 km resolution
-    subGrids_ras <- raster(subGrids, res = rasRes)
-    subGrids_raster <- rasterize(subGrids, subGrids_ras, field = "value")
+    subGrids_ras <- raster::raster(subGrids, res = rasRes)
+    subGrids_raster <- raster::rasterize(subGrids, subGrids_ras, field = "value")
   } else {subGrids_raster <- subGrids}
   return(subGrids_raster)
 }

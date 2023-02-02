@@ -1,12 +1,12 @@
-#' @title Calculate distance in 3-dimension (X,Y,Z)
+#' @title Calculate distance in 3-dimension (X,Y,and Z)
 #'
-#' @description A function to calculate 3D distance and then categories the observations based on a predefine replication length.
+#' @description A function to calculate 3D distance and then categories the observations based on a predefined replication length.
 #'
-#' @param dataFrame A dataframe contains pairs of coordinate in UTM projection to calculate distance using Euclidean distance formula.
-#' @param Xcol A quoted name of column that consists X coordinates.
-#' @param Ycol A quoted name of column that consists Y coordinates.
-#' @param elevData A raster layer contains elevation data in meter to calculate altitude (Z).
-#' @param repLength An information about a desired length of each spatial replicate.
+#' @param dataFrame A data-frame contains pairs of coordinate in UTM projection to calculate distance using Euclidean distance formula.
+#' @param Xcol A quoted name of column that consists of X coordinates.
+#' @param Ycol A quoted name of column that consists of Y coordinates.
+#' @param elevData A raster layer contains elevation data (DEM) in meter to calculate altitude (Z).
+#' @param repLength A predefined replication length.
 #'
 #' @return New columns that specify distance and what replicates that the observations are belong to.
 #'
@@ -51,13 +51,13 @@ dist3D <- function(dataFrame, Xcol, Ycol, elevData, repLength){
   # Create a sequence number based on distance interval
   # If Z contain NA values, use the max non-NA values in Z
   if (anyNA(dataFrame$Z) == TRUE){
-    levels <- seq(from=0, to=max(dataFrame$Dist), by=as.numeric(repLength))
+    levels <- base::seq(from=0, to=max(dataFrame$Dist), by=as.numeric(repLength))
 
   } else {
-    levels <- seq(from=0, to=max(dataFrame$Dist), by=as.numeric(repLength))
+    levels <- base::seq(from=0, to=max(dataFrame$Dist), by=as.numeric(repLength))
   }
   # Create a new column that specify the length of replicates (spatial replicates in meters)
-  dataFrame$Replicate <- findInterval(dataFrame$Dist, levels)
+  dataFrame$Replicate <- base::findInterval(dataFrame$Dist, levels)
   return(dataFrame)
 }
 
