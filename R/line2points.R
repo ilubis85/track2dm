@@ -33,9 +33,12 @@ line2points <- function(spLineDF, minDist){
     # Return points at specified distance along a line
     orderID <- rgeos::gInterpolate(spgeom = spLine, d = pointDist, normalized=FALSE) %>% as.data.frame() %>%
       # Add ID
-      dplyr::transmute(Id = 1:nrow(.), "X" = x, "Y" = y) %>%
-      df2sp(., UTMZone = raster::crs(spLineDF))
-    return(orderID)
+      dplyr::transmute(Id = 1:nrow(.), "X" = x, "Y" = y)
+
+    # Transform to spatial object
+    orderID_sp <- sp::SpatialPointsDataFrame(coords = orderID[,c("X","Y")], data = orderID,
+                                             proj4string = raster::crs(spLineDF))
+    return(orderID_sp)
   }
 
   # Then use the function to convert spatialLinesDataframe into SpatialPointsDataframe

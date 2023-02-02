@@ -71,7 +71,7 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
                                      elevData = elevData,  repLength = repLength)
 
     # Create detection matrix for selected species
-    subgrid_i_DM <- track2dm::speciesDM_new(speciesDF = subgrid_i_3d, sortID = sortID,
+    subgrid_i_DM <- track2dm::speciesDM(speciesDF = subgrid_i_3d, sortID = sortID,
                                             whichCol = whichCol, Xcol = Xcol, Ycol = Ycol,
                                             whichSp = whichSp, samplingCov = samplingCov,
                                             samplingFun = samplingFun)

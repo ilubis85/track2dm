@@ -10,6 +10,8 @@ makeGrids(spObject, cellSize, clip = FALSE)
 \item{spObject}{A spatial object in UTM projection.}
 
 \item{cellSize}{Cell size for each subgrid in meters.}
+
+\item{clip}{Clip grids within the spObject (default FALSE or preserve the whole grids).}
 }
 \value{
 A spatialpolygonedataframe of grid cells.
