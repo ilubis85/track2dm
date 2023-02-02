@@ -16,7 +16,7 @@ speciesDM(
 )
 }
 \arguments{
-\item{speciesDF}{A matrix contains Replicate column resulted from swts::dist3D() function.}
+\item{speciesDF}{A matrix contains Replicate column.}
 
 \item{sortID}{A name of column that used to order the point based on a sequence (time based or ID based).}
 

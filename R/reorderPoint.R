@@ -2,7 +2,7 @@
 #'
 #' @description A function to reorder point based on group information and distance among the points
 #'
-#' @param pointsDF A dataframe of points to be reordered, it should contain grouping Ids.
+#' @param pointsDF A data-frame of points to be reordered, it should contain grouping Ids.
 #' @param startPoint A specific row from pointsDF where the point starts.
 #' @param groupID The Id that represents the group information.
 #'
@@ -12,7 +12,7 @@
 #'
 #' @export
 # Create a function that copy the ID from nearby track points to a waypoint
-# Both data are spatial points dataframe in UTM projection
+# Both data are spatial points data-frame in UTM projection
 reorderPoint <- function(pointsDF, startPoint, groupID){
 
   ########################## PART 1 ####################################

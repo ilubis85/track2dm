@@ -7,7 +7,7 @@
 reorderPoint(pointsDF, startPoint, groupID)
 }
 \arguments{
-\item{pointsDF}{A dataframe of points to be reordered, it should contain grouping Ids.}
+\item{pointsDF}{A data-frame of points to be reordered, it should contain grouping Ids.}
 
 \item{startPoint}{A specific row from pointsDF where the point starts.}
 

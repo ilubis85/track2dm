@@ -2,7 +2,7 @@
 #'
 #' @description A function to plot detection matrix for selected species.
 #'
-#' @param DetMatrix A detection matrix for selected species obtained from using swts::speciesDM() function.
+#' @param DetMatrix A detection matrix for selected species.
 #' @param label Whether to use label of the replicates (default = TRUE).
 #' @param Title The title of the plot.
 #'

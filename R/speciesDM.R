@@ -2,7 +2,7 @@
 #'
 #' @description A function to create detection matrix for selected species.
 #'
-#' @param speciesDF A matrix contains Replicate column resulted from swts::dist3D() function.
+#' @param speciesDF A matrix contains Replicate column.
 #' @param sortID A name of column that used to order the point based on a sequence (time based or ID based).
 #' @param Xcol A quoted name of column that consists X coordinates.
 #' @param Ycol A quoted name of column that consists Y coordinates.

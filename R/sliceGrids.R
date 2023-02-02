@@ -2,10 +2,10 @@
 #'
 #' @description A function to create fishnet from a given spatial object/extent.
 #'
-#' @param mainGrids A spatial polygone dataframe contain main gridcells to be divided.
-#' @param mainID A colum in the main gridcells contain the cells ID.
+#' @param mainGrids A SpatialPolygoneDataframe of the main gridcells to be sliced.
+#' @param mainID A column in the main gridcells contain the cells ID.
 #' @param aggreFact Aggregation factor expressed as number of cells in each direction (horizontally and vertically).
-#' @param nRandom if nRandom is not FALSE, then randomise the subgrids.
+#' @param nRandom if nRandom is not FALSE, then randomize the subgrids.
 #'
 #' @return A spatialpolygonedataframe of smaller grid cells.
 #'

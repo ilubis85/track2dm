@@ -20,13 +20,13 @@ speciesDM_grid(
 )
 }
 \arguments{
-\item{spData}{A spatialPointsDataframe contain the occupancy data.}
+\item{spData}{A SpatialPointsDataframe contain the occupancy data.}
 
 \item{sortID}{A name of column that used to order the point based on a sequence (time based or ID based).}
 
 \item{repLength}{An information about a desired length of each spatial replicate.}
 
-\item{gridCell}{A spatialPolygonDataframe used to split/intersect the occu data.}
+\item{gridCell}{A SpatialPolygonDataframe used to split/intersect the occupancy data.}
 
 \item{subgridCol}{A column contain the subgrid id used to split the data based on gridcell.}
 
@@ -45,7 +45,7 @@ speciesDM_grid(
 \item{samplingFun}{A list of method to deal with samplingCov (only modal (for character), mean (for numeric), and canopy (to calculate canopy closure) functions that are currently available.}
 }
 \value{
-A dataframe contain detection matrices from all gridcell.
+A data-frame contain detection matrices from all gridcell.
 }
 \description{
 A function to extract detection matrix for a species from all gridcells

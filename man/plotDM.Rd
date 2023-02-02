@@ -7,7 +7,7 @@
 plotDM(DetMatrix, label = TRUE, Title = "Title")
 }
 \arguments{
-\item{DetMatrix}{A detection matrix for selected species obtained from using swts::speciesDM() function.}
+\item{DetMatrix}{A detection matrix for selected species.}
 
 \item{label}{Whether to use label of the replicates (default = TRUE).}
 

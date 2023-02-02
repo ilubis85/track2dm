@@ -2,9 +2,9 @@
 #'
 #' @description A function to extract detection matrix for a species from all gridcells
 #'
-#' @param spData A spatialPointsDataframe contain the occupancy data.
+#' @param spData A SpatialPointsDataframe contain the occupancy data.
 #' @param sortID A name of column that used to order the point based on a sequence (time based or ID based).
-#' @param gridCell A spatialPolygonDataframe used to split/intersect the occu data.
+#' @param gridCell A SpatialPolygonDataframe used to split/intersect the occupancy data.
 #' @param subgridCol A column contain the subgrid id used to split the data based on gridcell.
 #' @param elevData A raster layer contains elevation data in meter to calculate altitude (Z).
 #' @param repLength An information about a desired length of each spatial replicate.
@@ -15,7 +15,7 @@
 #' @param Xcol A column that consists X coordinates.
 #' @param Ycol A column that consists Y coordinates.
 #'
-#' @return A dataframe contain detection matrices from all gridcell.
+#' @return A data-frame contain detection matrices from all gridcell.
 #'
 #' @export
 speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elevData,
