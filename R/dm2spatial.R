@@ -36,7 +36,7 @@ dm2spatial <- function(detectMatrix, proJect){
 
   # Convert to spatial data
   new_detMax_sp <- sp::SpatialPointsDataFrame(coords = new_detMax[,c("X","Y")], data = new_detMax,
-                                              proj4string = CRS(proJect))
+                                              proj4string = sp::CRS(proJect))
   # Return output
   return(new_detMax_sp)
 }
