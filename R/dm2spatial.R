@@ -13,15 +13,15 @@
 dm2spatial <- function(detectMatrix, proJect){
   # Separate and transform detection
   new_deTect <- detectMatrix %>%
-    dplyr::select(starts_with("R")) %>%
+    dplyr::select(dplyr::starts_with("R")) %>%
     # Transform column to row
-    tidyr::pivot_longer(cols = starts_with("R")) %>%
+    tidyr::pivot_longer(cols = dplyr::starts_with("R")) %>%
     # Rearrange
-    dplyr::mutate("Rep" = 1:nrow(.)) %>% dplyr::select(Rep, "Detection"=value)
+    dplyr::mutate("Rep" = 1:nrow(detectMatrix)) %>% dplyr::transmute(Rep, "Detection"=value)
 
   # Separate, transform, and separate X and Y Coordinates
   new_XYcor <- detectMatrix %>%
-    dplyr::select(starts_with("XY")) %>%
+    dplyr::select(dplyr::starts_with("XY")) %>%
     # Transform column to row
     tidyr::pivot_longer(cols = starts_with("XY")) %>%
     # Separate between X and Y
@@ -29,14 +29,12 @@ dm2spatial <- function(detectMatrix, proJect){
     # Select and reformat
     dplyr::select(-name) %>% dplyr::mutate_if(is.character, as.numeric)
 
-  # Combine both detection and coordinate
-  new_detMax <- cbind(new_deTect, new_XYcor) %>%
-    # Remove NA
-    na.omit(.)
+  # Combine both detection and coordinate & Remove NA
+  new_detMax <- na.omit(cbind(new_deTect, new_XYcor))
 
   # Convert to spatial data
   new_detMax_sp <- sp::SpatialPointsDataFrame(coords = new_detMax[,c("X","Y")], data = new_detMax,
-                                              proj4string = sp::CRS(proJect))
+                                              proj4string = proJect)
   # Return output
   return(new_detMax_sp)
 }
