@@ -17,7 +17,7 @@ dm2spatial <- function(detectMatrix, proJect){
     # Transform column to row
     tidyr::pivot_longer(cols = dplyr::starts_with("R")) %>%
     # Rearrange
-    dplyr::mutate("Rep" = 1:nrow(detectMatrix)) %>% dplyr::transmute(Rep, "Detection"=value)
+    dplyr::mutate("Rep" = 1:nrow(.)) %>% dplyr::transmute(Rep, "Detection"=value)
 
   # Separate, transform, and separate X and Y Coordinates
   new_XYcor <- detectMatrix %>%
