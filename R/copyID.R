@@ -30,16 +30,41 @@ copyID <- function(points1, points2){
     # Create a buffer using width from pointdist
     point_buff <- rgeos::gBuffer(subset_i, width = floor(pointdist/2))
 
+    # plot for check
+    # plot(point_buff, border = 'red')
+    # plot(digitasi, col='gray40', add=TRUE)
+    # plot(subset_i, pch=18, col="blue", cex=1.4, add=TRUE)
+    # plot(points2, pch=17, col='black', cex=1.5, add=TRUE)
+    # pointLabel(coordinates(points2), labels = as.character(points2@data$WP_ID), cex = 0.5)
+
     # Intersect between buffer with data from points2
-    # If there are points within the buffer area, return the points
     if (rgeos::gIntersects(point_buff, points2) == TRUE){
       points2_in <- raster::intersect(points2, point_buff)
+
       # Compile the result
       point_in <- data.frame("Id" = NA, "X" = points2_in@data$X,
                              "Y" = points2_in@data$Y,
                              "WP_ID" = points2_in@data$WP_ID)
-    } else {
-      # If no pints2 within the buffer area, return points1
+
+      # If there is only one point within the buffer area, return the point_in
+      if (nrow(points2_in) == 1){ point_in <- point_in
+
+      } # If there are multiple points within the buffer area,
+      else{
+        # Calculate distance from each point to preious point (i-1)
+        for (j in 1:nrow(point_in)) {
+          point_in[j, 'dist_to_prev_point'] <- raster::pointDistance(p1 = points1@data[i-1,c("X", "Y")],
+                                                                     p2 = point_in[j, c("X", "Y")],
+                                                                     lonlat = FALSE)
+        }
+        # Then arrange points by distance from a point (i) to previous waypoint (i-1)
+        point_in <- point_in %>% dplyr::arrange(dist_to_prev_point) %>%
+          # Then remove dist_to_prev_point
+          dplyr::select(-dist_to_prev_point)
+      }
+    }
+    # If no pints2 within the buffer area, return points1
+    else {
       point_in <- data.frame("Id" =subset_i@data$Id,
                              "X" = subset_i@data$X,
                              "Y" = subset_i@data$Y, "WP_ID" = NA)
