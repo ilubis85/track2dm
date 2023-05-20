@@ -28,11 +28,11 @@ copyID <- function(points1, points2){
     pointdist <- raster::pointDistance(points1[1, c("X", "Y")], points1[2, c("X", "Y")],  lonlat = FALSE)
 
     # Create a buffer using width from pointdist
-    point_buff <- rgeos::gBuffer(subset_i, width = floor(pointdist/2))
+    point_buff <- rgeos::gBuffer(subset_i, width = floor(pointdist))
 
     # plot for check
     # plot(point_buff, border = 'red')
-    # plot(digitasi, col='gray40', add=TRUE)
+    # plot(smart_ln, col='gray40', add=TRUE)
     # plot(subset_i, pch=18, col="blue", cex=1.4, add=TRUE)
     # plot(points2, pch=17, col='black', cex=1.5, add=TRUE)
     # pointLabel(coordinates(points2), labels = as.character(points2@data$WP_ID), cex = 0.5)
@@ -53,14 +53,30 @@ copyID <- function(points1, points2){
       else{
         # Calculate distance from each point to preious point (i-1)
         for (j in 1:nrow(point_in)) {
-          point_in[j, 'dist_to_prev_point'] <- raster::pointDistance(p1 = points1@data[i-1,c("X", "Y")],
-                                                                     p2 = point_in[j, c("X", "Y")],
-                                                                     lonlat = FALSE)
+          # For the first row, calculate distance from point1_i
+          if (i == 1){
+            point_in[j, 'dist_to_prev_point'] <- raster::pointDistance(p1 = points1@data[i,c("X", "Y")],
+                                                                       p2 = point_in[j, c("X", "Y")],
+                                                                       lonlat = FALSE)
+          } else {
+            # For rows > 1
+            point_in[j, 'dist_to_prev_point'] <- raster::pointDistance(p1 = points1@data[i-1,c("X", "Y")],
+                                                                       p2 = point_in[j, c("X", "Y")],
+                                                                       lonlat = FALSE)
+          }
         }
         # Then arrange points by distance from a point (i) to previous waypoint (i-1)
-        point_in <- point_in %>% dplyr::arrange(dist_to_prev_point) %>%
-          # Then remove dist_to_prev_point
-          dplyr::select(-dist_to_prev_point)
+        # For the first row, arrange distance from points1 i
+        if (i == 1){
+          point_in <- point_in %>% dplyr::arrange(desc(dist_to_prev_point)) %>%
+            # Then remove dist_to_prev_point
+            dplyr::select(-dist_to_prev_point)
+        } else {
+          # For rows > 1 calculate distance from points1 i-1
+          point_in <- point_in %>% dplyr::arrange(dist_to_prev_point) %>%
+            # Then remove dist_to_prev_point
+            dplyr::select(-dist_to_prev_point)
+        }
       }
     }
     # If no pints2 within the buffer area, return points1
@@ -74,10 +90,11 @@ copyID <- function(points1, points2){
   }
   # Combine the result
   newpoints_re <- do.call(rbind, newpoints)
-  newpoints_re
 
   # Combine newpoints_re with ponts2 data
-  newResult <- dplyr::left_join(newpoints_re, points2@data, by = c("X", "Y", "WP_ID"))
+  newResult <- dplyr::left_join(newpoints_re, points2@data, by = c("X", "Y", "WP_ID")) %>%
+    # Remove duplicate values
+    unique()
 
   # Return as a spatialPointsDataframe
   result_sp <- sp::SpatialPointsDataFrame(coords = newResult[,c("X","Y")], data = newResult,
