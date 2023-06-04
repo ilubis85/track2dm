@@ -24,13 +24,13 @@ knitr::opts_chunk$set(
 
 ## What is it?
 
-One of the questions which frequently addresses by wildlife scientists is about where a species occurs in the landscape. This question is hampered by the fact that most of wildlife species cannot be perfectly detected due to several conditions such as the weather conditions, landscape characteristics, the observer experience, or the ecology of the species. For these reasons, the animals may present in the site, but the observer failed to detect it (**False Absence**) or the species was truly absent (**True Absence**). However, failing to detect species will underestimate the true occupancy of the species in the study areas. The management actions taken from incorrect estimation of species occurrence will have negative impact to the species, especially when occupied habitat is cleared for other purposes.
+Wildlife scientists often grapple with the question of where a species occurs in the landscape. However, this question is hindered by the fact that most wildlife species cannot be perfectly detected due to various conditions, including weather, landscape characteristics, observer experience, and the species' ecology. As a result, animals may be present at a site but go undetected by the observer (**false absence**), or the species may genuinely be absent (**true absence**). Failing to detect species leads to an underestimation of their true occupancy in study areas. Incorrect estimations of species occurrence can have negative impacts, particularly when occupied habitat is cleared for other purposes.
 
-In 2002, a statistical model by MacKenzie et al. [-@MacKenzie2002] is introduced which can estimate both probability of occurrence (known as **psi**) as well as the probability of detection (known as **p**) to account for detectability of the animals. The detectability can be estimated from repeated observations for each unit/site [@Bailey2005]. The replication can be in the form of temporal or spatial replications. *Temporal replications* are when a number of sites (units) are visited several times. Whilst *spatial replications* are when the survey efforts are splitted into several equal parts. For instance, a sampling unit was observed by using 5 km transect, each km will be served as a replicate, so there will be five replicates in this sampling unit. This *track2dm* package is developed to deal with the spatial replication.
+In 2002, MacKenzie et al. [-@MacKenzie2002] introduced a statistical model capable of estimating the probability of occurrence (known as **psi**) and the probability of detection (known as **p**) to account for the detectability of animals. Detectability can be estimated through repeated observations at each unit/site [@Bailey2005]. These observations can take the form of temporal or spatial replications. *Temporal replications* involve visiting a number of sites (units) multiple times, while *spatial replications* entail dividing survey efforts into several equal parts. For example, in a sampling unit observed using a 5 km transect, each kilometer serves as a replicate, resulting in five replicates for that sampling unit. 
 
-Most of wildlife surveys are done using transect based method to look for the presence or absence of the animals in the study area. This is usually done by randomly select transects and the species is observed along the tracks. The length of transects should be sufficient to be able to calculate both the detection and occurrence of the species. In this kind of study, the transect should be divided into equal lenghth and each lengt will be used as a replicate. However, splitting the transects into equal length can be very tedious especially when we want to incorporate the altitudinal differences to avoid bias in measuring the survey efforts. Currently there is no applications that provide such tools, except the one that split lines into equal areas in ArcGIS or other GIS software.
+Transect-based methods are commonly used in wildlife surveys to determine the presence or absence of animals in a study area. Typically, transects are randomly selected, and species are observed along the tracks. The length of the transects should be sufficient to calculate both the detection and occurrence of the species. In this type of study, it is advisable to divide the transects into equal lengths, with each length serving as a replicate. However, splitting the transects into equal lengths can be tedious, especially when incorporating altitudinal differences to avoid bias in measuring survey efforts. Currently, there are no applications that provide tools for this purpose, except for ones that split lines into equal areas in ArcGIS or other GIS software.
 
-In this study, we developed an R package which we called *track2dm* that can be used to create detection matrix from transect lines which account for latitudinal differences. The main purpose of this document is to elaborate how the package works in converting the field survey data into detection matrix to be used for hierarchical occupancy modelling.
+To bridge the knowledge gap, we have developed a specialized R package called track2dm. Its primary objective is to facilitate the creation of a detection matrix from transect lines, taking into account latitudinal differences. The aim of this document is to provide a practical introduction to the functionality of the track2dm package, demonstrating how it effectively converts field survey data into a detection matrix that is specifically tailored for hierarchical occupancy modeling.
 
 ## How to install?
 
@@ -43,63 +43,42 @@ devtools::install_github("ilubis85/track2dm")
 
 ## How does it work?
 
-We have provided some data for simulation to understand how the package works. Three types of data are needed, the track where the survey is recorded (usually downloaded from Global Positioning System (GPS), the observation along the track (usually written in excel format) and digital elevation model (DEM) in raster format. The data can be loaded after the package is called.
+Within the track2dm package, we have included pre-loaded data for simulation purposes. To effectively demonstrate the package's functionality, two types of data are required: the observation data, which captures species occurrences along the track and is usually formatted in Excel; and the digital elevation model (DEM) data, provided in raster format. Once the package is called, these data can be easily loaded for further analysis and utilization.
 
 ```{r example}
 # LOAD ALL DATA
 # Read elevation raster data from the package
-data("elevation")
-
-# Read a survey track from the package
-data("track")
+data("dem")
 
 # Read the observation from the package
-data("observation")
-
-# Convert dataframe (track and observation to spatial points data-frame)
-track_pt <- track2dm::df2sp(track, Xcol = "X", Ycol = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
-observation_pt <- track2dm::df2sp(observation, Xcol = "X", Ycol = "Y", UTMZone = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
+data("occu_survey")
 
 ```
 
-In this example, the track is a data-frame that contains date and time, X, Y and usually Z information (elevation) downloaded from GPS. Whilst observation is a data-frame that contains any information about the observed species. The elevation is needed to extract Z values to calculate distance in three dimension (3D).
+In this particular example, the survey data is stored as a data frame and consists of information such as the date, time, X and Y coordinates, and any relevant information related to the observed species, which are typically obtained from a GPS device. It is important to note that elevation data is necessary to extract Z values, allowing for the calculation of distances in three dimensions (3D) during the analysis process.
 
 ```{r track}
-head(track, 5)
-head(observation, 5)
+head(occu_survey, 5)
 ```
 
-This figure below shows what the data look like when we plot them using tmap package. The data is used with permission from WCS Indonesia and the data has been published in journal of (In preparation)!!.
+*Acknowledgment*: The data used in this package is derived from a real survey but has been modified for practical purposes. We would like to acknowledge the original source of the data and express gratitude for their permission to use and modify it for the development and demonstration of this package.
 
-```{r fig_1, out.width='100%', fig.align='centre',  fig.pos="H", fig.cap="Survey tracks and several animal waypoints with elevation information", collapse = TRUE, echo = FALSE}
-library(tmap)
-tm_shape(elevation) +
-  tm_raster(style = "cont") +
-  tm_shape(track_pt) + tm_dots(col = "grey", shape=20, size=0.3) +
-  tm_shape(observation_pt) + tm_dots(col = "red", shape=16, size=0.2)
-```
-
-So how the package works? Below is the list of functions currently developed to create detection matrix for a species.
+The track2dm package offers several key functions that greatly simplify the generation of a detection matrix for a species. In this tutorial, we will primarily utilize the following functions:
 
 ```{r echo=FALSE}
-functions <- c("timeFormat()", "df2sp()", "meanPoint()", "clearPoint()","dist3D()", "speciesDM()")
+functions <- c("dist3D()", "speciesDM()", "makeGrids()", "sliceGrids()", "speciesDM_grid()", "line2points()", "copyID()", "dm2spatial")
 
-purposes <- c("reformat time",
-              "Convert dataframe to spatial object dataframe",
-              "Calculate the means of points",
-              "Clear the points from points",
-              "Calculate distance based on X, Y, and Z information from a dataframe",
-              "Extract detection matrix from the species observation")
+purposes <- c("Calculate distance based on X, Y, and Z information from a dataframe",
+              "Extract detection matrix from the species observation",
+              "Create grid cells (fishnet) from a given spatial data",
+              "Split grid cells into smaller grid cells",
+              "Extract detection matrix from the species observation over a grid cells",
+              "Convert SpatialLinesDataframe into SpatialPointsDataframe",
+              "Copy attributes from other spatial points data-frame",
+              "Convert detection matrix into spatial data")
 
-arguments <- c("myString, addTime", 
-               "dataFrame, Xcol, Ycol, UTMZone", 
-               "dataFrame, datetimeCol, Xcol, Ycol, nPoint", 
-               "dataFrame, Xcol, Ycol, UTMZone, distLength", 
-               "dataFrame, elevData, repLength",
-               "speciesDF, SortID, Xcol, Ycol, whichCol, whichSp, samplingCov, samplingFun")
-
-r_functions <- data.frame(functions, purposes, arguments)
-colnames(r_functions) <- c("Function", "Purpose", "Arguments/inputs")
+r_functions <- data.frame(functions, purposes)
+colnames(r_functions) <- c("Function", "Purpose")
 ```
 
 ```{r tab_1, caption = "test", echo=FALSE}
@@ -109,116 +88,83 @@ r_functions %>%
   kbl() %>% 
   kable_styling()
 ```
+In this tutorial, our main objective is to create a detection matrix using the observation transect lines data obtained from surveys. In some cases, if the track lines are missing or not available, we have the option to re-digitize them using GIS software. This enables us to create accurate detection matrices based on the newly digitized track lines. We will address this process in more detail later on in the tutorial, providing guidance on how to handle such scenarios effectively.
 
-There are at least *three steps* required to convert survey data into detection matrix. The first is preparing both tracks and observation. Two problems should be dealt with in this step; correcting the time format and cleaning the funny shape tracks (tangled lines). Then the cleaned tracks and observation are combined and then the survey effort (in km) can be calculated by using the X-Y-Z information from each points. The last is to compute the detection matrix (usually shown as present and absent as 1 and 0) for a selected species.
+## 1. Create detection matrix from a single transect line
 
-## 1. Prepare track and observation points
-
-We need at least three information to be able to calculate distance; Date-Time, X and Y coordinates. Date and Time should be in as.POSIXct format, while X and Y in numeric or double format. However, sometime Date and Time format we got (from GPS) is in different format (mostly as.character). For this case we need to use **track2dm::timeFormat()** function. See codes below on how to use it and how it produces the right format. We do the same for observation data.
+To create a detection matrix from a single transect line, you can use the track2dm package. First, calculate the distances between points along the transect line while considering latitudinal differences using the **dist3D()** function. Then, divide the line into segments of a predefined length. Finally, convert the segmented line into a detection matrix using the **speciesDM()** function, which assigns presence (1) or absence (0) values to each unit based on observed species data.
 
 ```{r , message=FALSE}
 
 # Load library
 library(tidyverse)
 
-# Check the structure of the data
-track %>% str()
-observation %>%  str()
+# Check the species list
+occu_survey$Species %>% table() # We will create a DM from deer (Rusa Unicolor - RUU)
 
-# Change Date and Time format 
-library(stringr)
-track_1 <- track %>% 
-  dplyr::mutate(DateTime = track2dm::timeFormat(DateTime))
+# Calculate distances 
+occu_dist <- track2dm::dist3D(dataFrame = occu_survey, Xcol = "X", Ycol = "Y", elevData = dem, repLength = 2000)
 
-# Add +7 hours since the time format is in UTC
-observation_1 <- observation %>%
-  dplyr::mutate(DateTime = track2dm::timeFormat(DateTime, addTime = "07"))
+# Create detection matrix
+ruu_dm <- track2dm::speciesDM(speciesDF = occu_dist, sortID = "DateTime", Xcol = "X", Ycol = "Y", whichCol = "Species", whichSp = "RUU", samplingCov = "Habitat", samplingFun = track2dm::modal)
 
-# Check again the format
-track_1 %>% str()
-observation_1 %>% str()
+# Check the detection matrix
+head(ruu_dm, 5)
 
 ```
 
-In high altitude areas like in Western part of Sumatra, GPS signals may be obstructed by the altitudinal differences or thick canopy cover which produces inaccurate geo-locations which will lead to bias in calculating the survey efforts (in terms of length of transect surveys). To deal with this, functions called **track2dm::meanPoint** or/and **track2dm::clearPoint** will be used to remove the bias either by take means from a number of subsequent points (*meanPoint*) or clear a certain number of points between points based on a predefined distance (*clearPoint*). For example we used **meanPoint** for track_1 data.
+Using a 2 km length of replicates, a total of 24 replicates were generated, indicating the presence (1) or absence (0) of deer species. The provided codes also generated survey covariates, such as the habitat (FOR for forest) where the observations occurred. The X and Y coordinates can be utilized to create a visual representation of the detection matrix for review purposes. This can be achieved by converting the detection matrix into a spatial points dataframe using the **dm2spatial()** function. The resulting dataframe can then be plotted on a map using the *tmap package*, allowing for a spatial visualization of the deer species distribution.
 
-```{r }
-# Take means from every 10 coordinates (nPoint = 10)
-track_2 <- track2dm::meanPoint(dataFrame = track_1, datetimeCol = "DateTime", nPoint = 10, Xcol = "X", Ycol = "Y")
+```{r fig_1, out.width='75%', fig.align='left',  fig.pos="H", fig.cap="Points depicting presence (black dots) and absence (red dots) of deer using 1000 mtr replicate length)", collapse = TRUE, echo = FALSE}
+# Convert to spatial dataframe
+# Specify the data projection using the same projection from elevation data
+ruu_dm_sp <- track2dm::dm2spatial(detectMatrix = ruu_dm, proJect = raster::crs(dem))
+
+# Visualize the detection matrix
+library(tmap)
+tm_shape(dem) +
+  tm_raster(style = "cont", palette = terrain.colors(8)) +
+  tm_shape(ruu_dm_sp) + tm_dots(col = 'Detection', palette = c("red", "black"), shape=18, size=0.5)+
+  tm_layout(legend.outside = TRUE)
+```
+## 2. Create detection matrix from multiple transect line
+
+In this example, the detection matrix for deer represents observations from a single unit sample. However, in real studies, the study area is typically divided into grid cells of equal size. To simulate this, the survey area will be divided into multiple grid cells by creating grid cells using the **makeGrids()** function in the next part of the tutorial. The detection matrix for the selected species will then be created from all the grid cells simultaneously using the **speciesDM_grids()** function. To use the speciesDM_grids() function, spatial data for observations, elevation data, and the grid cell polygons are required as inputs. This approach enables the generation of a comprehensive detection matrix for the selected species across the entire set of grid cells in the study area, allowing for more robust occupancy modeling.
+
+```{r , message=FALSE}
+
+# Create a grid cell over the study area
+grid_5km <- track2dm::makeGrids(spObject = dem, cellSize = 5000)
+
+# Convert observation data into spatial data
+occu_survey_sp <- sp::SpatialPointsDataFrame(coords = occu_survey[,c("X", "Y")], data = occu_survey, proj4string = raster::crs(dem))
+
+# Create detection matrix directly for RUU
+ruu_grids_dm <- track2dm::speciesDM_grid(spData = occu_survey_sp, repLength = 1000, gridCell = grid_5km, subgridCol = "id", elevData = dem, sortID = "DateTime", Xcol = "X", Ycol = "Y", whichCol = "Species", whichSp = "RUU", samplingCov = "Habitat", samplingFun = track2dm::modal)
+
+# Check the detection matrix
+head(ruu_grids_dm, 5)
 
 ```
+We can then visualise the detection matrix from each grid cell similar to previous plot.
 
-```{r fig_2, out.width='75%', fig.align='center',  fig.pos="H", fig.cap="Reducing number of points by taking the means for every 10 subsequent points (showing the first 500 points)", collapse = TRUE, echo = FALSE}
-# Show subsets of points to see the differences clearly
-track_1_sub <- track_1[c(1:500),]
+```{r fig_2, out.width='75%', fig.align='left',  fig.pos="H", fig.cap="Points depicting presence (black dots) and absence (red dots) of deer form each grid cell)", collapse = TRUE, echo = FALSE}
+# Convert to spatial dataframe
+# Specify the data projection using the same projection from elevation data
+ruu_dm_grid_sp <- track2dm::dm2spatial(detectMatrix = ruu_grids_dm, proJect = raster::crs(dem))
 
-# Take means from every 10 coordinates (nPoint = 10)
-track_2_sub <- track2dm::meanPoint(dataFrame = track_1_sub, datetimeCol = "DateTime", nPoint = 10,
-                                   Xcol = "X", Ycol = "Y")
-
-# plot the differences
-par(mfrow=c(1,2))
-plot(track_1_sub$X, track_1_sub$Y, pch=15, col="blue", cex=0.6, las=1, cex.axis=0.5)
-plot(track_2_sub$X, track_2_sub$Y, pch=16, col="red", cex=0.6, las=1, cex.axis=0.5)
-par(mfrow=c(1,1))
-
+# Visualize the detection matrix
+library(tmap)
+tm_shape(dem) +
+  tm_raster(style = "cont", palette = terrain.colors(8)) +
+  tm_shape(grid_5km) + tm_borders(lty=2)+
+  tm_shape(ruu_dm_grid_sp) + tm_dots(col = 'Detection', palette = c("red", "black"), shape=18, size=0.5)+
+  tm_layout(legend.outside = TRUE)
 ```
+Figure 2 above displays the detection matrix obtained from seven 5km grid cells where the surveys were conducted. The matrix consists of seven rows representing observations from each grid cell, with a maximum of eight replicates (R8) for each observation. This detection matrix serves as a valuable input for occupancy modeling, enabling further analysis and interpretation of the species' occurrence patterns and habitat preferences within the surveyed grid cells.
 
-Now we can combine the cleaned track and observation into one data-frame.
+The detection matrix can be saved as a dataframe using the **write.csv()** function, allowing for easy data storage and further analysis. Alternatively, for review purposes and spatial analysis, the detection matrix can be saved as a spatial dataframe using the **writeOGR()** function or other similar functions commonly used for spatial data storage. These approaches provide flexibility in saving the detection matrix in different formats based on the specific requirements of the analysis or subsequent processing steps.
 
-```{r }
-# Combine both track and observation
-transect <- dplyr::full_join(track_2, observation_1, by = c("DateTime", "X", "Y")) %>%
-  dplyr::arrange(DateTime, X, Y)
-head(transect)
-
-```
-
-## 2. Calculate distance in three dimention (X-Y-Z)
-
-After that we can calculate the distances in three dimension (X, Y, and Z). In order to do it, we need Z information and we can get it from elevation data in raster format downloaded from [USGS website](https://earthexplorer.usgs.gov). We need to load the elevation data first (as we did in the beginning).
-
-```{r }
-# Calculate 3D distance and matrix replicate
-transect_rep <- track2dm::dist3D(dataFrame = transect, elevData = elevation,  repLength = 5000,
-                                 Xcol = "X", Ycol = "Y")
-head(transect_rep)
-```
-
-## 3. Extract detection matrix for a species
-
-Finally, we can extract detection matrix from selected species. As default, **track2dm::speciesDM** only compute the detection matrix. But if we also want to compute the survey covariates (the variables for each replicate or sampling covariates), we need to specify that in **samplingCov** argument and define a function/s on how to extract the information from each replicate using **samplingFun**. A *modal* is a predefinned function from track2dm package which is used to compute the mode or the most common character value in each replicate.
-
-```{r }
-# Compute only detection matrix
-transect_dm_1 <- track2dm::speciesDM(speciesDF = transect_rep, sortID = "DateTime",
-                                     Xcol = "X", Ycol = "Y", whichCol  = "Observation",
-                                     whichSp = "animal signs", samplingCov = FALSE,
-                                     samplingFun = FALSE)
-transect_dm_1
-
-# Compute detection matrix along with survey covariates for each replicate
-transect_dm_2 <- track2dm::speciesDM(speciesDF = transect_rep, sortID = "DateTime",
-                                     Xcol = "X", Ycol = "Y", whichCol  = "Observation",
-                                     whichSp = "animal signs", samplingCov = c("Age", "Type"),
-                                     samplingFun = c(track2dm::modal, track2dm::modal))
-transect_dm_2
-
-```
-
-This is the final result where the presence absence of species is recorded for each track segment. This can be read as: Species were observed in all segments except for the first, seventh and ninth segment. The following columns (XY_) show the central point of each segment which can be used for plotting to review the results visually. The following codes show how to do it. 
-
-```{r }
-# Convert detection matrix to spatial points
-dm_points <- track2dm::dm2spatial(detectMatrix = transect_dm_1, proJect = "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs")
-
-# Plot
-tm_shape(elevation) +
-  tm_raster(style = "cont") +
-  tm_shape(dm_points) + tm_dots(col = 'Detection', shape=17, size=0.5)
-```
-This data is ready for occupancy modelling analysis :)
-
-**Next, how to do this for multiple tracks??**
+**Next, how to create detection matrix from patrol data that does not have tracklines?**
 
 ### References
