@@ -59,6 +59,10 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
 
   ##############################################################################
   # EXTRACT DETECTION MATRIX USING ITERATION
+  # Create progress bar
+  pb = progress::progress_bar$new(
+    format = "  processing [:bar] :percent in :elapsed",
+    total = length(new_subgrid_list), clear = FALSE, width= 60)
 
   # Then for each subgrid id, extract DM using for loop (iteration)
   for (i in seq_along(new_subgrid_list)) {
@@ -101,6 +105,10 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
 
     # Extract XY coordinates
     dm_XY[[i]] <- subgrid_i_DM %>% dplyr::select(starts_with("XY"))
+
+    # Progress bar
+    pb$tick()
+    Sys.sleep(1 / length(new_subgrid_list))
   }
   ##############################################################################
   # COMPILING THE RESULT

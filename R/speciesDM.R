@@ -32,6 +32,11 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
   # Create a list for the output
   species_result <- list()
 
+  # Create progress bar
+  pb = progress::progress_bar$new(
+    format = "  processing [:bar] :percent in :elapsed",
+    total = length(rep_list), clear = FALSE, width= 60)
+
   for (j in seq_along(rep_list)) {
 
     # Select the data based on selected replicate
@@ -161,6 +166,10 @@ speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
 
     # Return result
     species_result[[j]] <- sp_result
+
+    # Progress bar
+    pb$tick()
+    Sys.sleep(1 / length(rep_list))
   }
   ##############################################################################
   # Combine the result
