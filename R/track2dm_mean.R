@@ -8,7 +8,7 @@
 #'
 #' @export
 # Function to calculate mean
-mean <- function(myVector){
+track2dm_mean <- function(myVector){
   # Sort myVector
   myVector <- sort(myVector, na.last = TRUE)
 
