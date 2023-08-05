@@ -22,6 +22,8 @@ grid_point(
 
 \item{whichSp}{Specific type or category to be selected as presence/absence.}
 
+\item{as_Raster}{if TRUE will create raster data.}
+
 \item{rasRes}{Raster resolution (default 1000 mtr).}
 }
 \value{

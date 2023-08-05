@@ -6,6 +6,7 @@
 #' @param subGrids Grid cells within the landscape of interest, each grid cell can be identified with id column, also in UTM.
 #' @param whichCol Specific field or column where the features exist.
 #' @param whichSp Specific type or category to be selected as presence/absence.
+#' @param as_Raster if TRUE will create raster data.
 #' @param rasRes Raster resolution (default 1000 mtr).
 #'
 #' @return Proportion of points.
