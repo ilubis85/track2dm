@@ -15,7 +15,7 @@
 #' @export
 dist3D <- function(dataFrame, Xcol, Ycol, elevData, repLength){
   # Add elevation data from DEM that has been provided
-  dataFrame$Z <- raster::extract(elevData, dataFrame[,c(Xcol, Ycol)])
+  dataFrame$Z <- terra::extract(elevData, dataFrame[,c(Xcol, Ycol)])
 
   # Add new column of distance to the track dataframe
   dataFrame$Dist <- as.numeric("")

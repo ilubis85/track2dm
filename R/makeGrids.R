@@ -14,17 +14,20 @@
 # Create a function to make a subgrid
 makeGrids <- function(spObject, cellSize, clip = FALSE){
 
+  # Create spat object
+  spObject_spat <- terra::vect(spObject)
+
   # Create a raster from a given extent
-  raster_cell <- raster::raster(ext=raster::extent(spObject), res=cellSize)
+  raster_cell <- terra::rast(ext=terra::ext(spObject_spat), res=cellSize)
 
   # Specify projection
-  raster::crs(raster_cell) <- raster::crs(spObject)
+  terra::crs(raster_cell) <- terra::crs(spObject_spat)
 
   # Assign values for each cell
-  raster::values(raster_cell) <- 1:raster::ncell(raster_cell)
+  terra::values(raster_cell) <- 1:terra::ncell(raster_cell)
 
   # Convert raster to polygone
-  subgrid_sp <- raster::rasterToPolygons(raster_cell)
+  subgrid_sp <- terra::as.polygons(raster_cell)
 
   # Create ID
   subgrid_sp$id <- 1:nrow(subgrid_sp)
@@ -36,7 +39,7 @@ makeGrids <- function(spObject, cellSize, clip = FALSE){
   } # if TRUE, preserve the grids that within the spObject
   else {
     # Clip the subgrids with spObject
-    subgrid_sp_clip <- raster::intersect(subgrid_sp, spObject)
+    subgrid_sp_clip <- terra::intersect(subgrid_sp, spObject_spat)
 
     # Preserve the shape of subgrids (do not clip)
     subgrid_sp_clip <- subgrid_sp[subgrid_sp$id %in% subgrid_sp_clip$id, ]

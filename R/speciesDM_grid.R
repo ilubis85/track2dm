@@ -22,7 +22,7 @@ speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
                                whichCol, whichSp, Xcol, Ycol, samplingCov = FALSE, samplingFun = FALSE) {
 
   # Intersect spData data with gridCell
-  occ_clip <- raster::intersect(spData, gridCell)
+  occ_clip <- terra::intersect(spData, gridCell)
 
   # Create list of subgridCol
   subgrid_list <- occ_clip@data[, subgridCol] %>% unique()
