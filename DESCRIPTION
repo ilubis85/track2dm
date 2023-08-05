@@ -1,8 +1,8 @@
 Package: track2dm
 Type: Package
 Title: Create detection matrix from line transects for occupancy modelling
-Version: 0.1.5
-Date: 2022-11-25
+Version: 0.1.7
+Date: 2023-08-05
 Author: Muhammad I. Lubis
 Maintainer: Muhammad I. Lubis <ilubis85@gmail.com>
 Description: This package contains a set of functions to convert occupancy survey dataset into detection matix.
@@ -11,16 +11,17 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
 Imports:
-    dplyr(>= 1.0.9),
-    tidyr(>= 1.2.0),
-    sp(>= 1.5-0),
-    rgeos(>= 0.5-9),
-    raster(>= 3.5-21),
-    stringr(>= 1.4.0),
-    lubridate(>= 1.8.0),
-    stats(>= 4.2.1),
+    dplyr(>= 1.1.2),
+    tidyr(>= 1.3.0),
+    sp(>= 2.0-0),
+    rgeos(>= 0.6-4),
+    raster(>= 3.6-23),
+    stringr(>= 1.5.0),
+    lubridate(>= 1.9.2),
+    stats(>= 4.3.1),
     magrittr(>= 2.0.3),
-    ggplot2(>= 3.3.6),
-    methods(>= 4.2.1)
+    ggplot2(>= 3.4.2),
+    methods(>= 4.3.1),
+    progress(>= 1.2.2)
 Depends: 
-    R (>= 4.2.0)
+    R (>= 4.3.0)
