@@ -57,7 +57,7 @@ track2pts <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, poin
     waypoints_i <- waypoints[[i]]
 
     # Add WP_ID for each waypoints, to be copied on the track
-    waypoints_i@data <- waypoints_i@data %>% dplyr::mutate(WP_ID = 1:nrow(.))
+    waypoints_i@data <- waypoints_i@data %>% dplyr::mutate(WP_ID = 1:nrow(waypoints_i@data))
 
     # Convert tracks to multipoints
     tracks_pts_i <- track2dm::line2points(spLineDF = tracks_i, minDist = 100)
@@ -67,7 +67,7 @@ track2pts <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, poin
 
     # Copy common columns
     track_pt_wpID@data <- track_pt_wpID@data %>%
-      dplyr::mutate_at(vars(point_id_1, point_id_2), na_if, y="") %>%
+      dplyr::mutate_at(dplyr::vars(point_id_1, point_id_2), dplyr::na_if, y="") %>%
       tidyr::fill(point_id_1, point_id_2)
 
     # Combine result
