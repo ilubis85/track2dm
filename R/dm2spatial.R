@@ -1,16 +1,16 @@
-#' @title Convert detection matrix into spatial data
+#' @title Convert detection matrix into sf object
 #'
-#' @description to convert detection matrix to SpatialPointsDataframe.
+#' @description to convert detection matrix to sf object.
 #'
 #' @param detectMatrix A matrix contains species detection/non-detection.
-#' @param proJect Projection code.
-#' @return A spatial points data-frame contains species detection/non-detection.
+#' @param spProject spatial object where its projection to be copied.
+#' @return An sf data-frame contains species detection/non-detection.
 #'
 #' @export
 #' @importFrom  magrittr %>%
 #'
 # Create a function to convert detection matrix to spatial points data
-dm2spatial <- function(detectMatrix, proJect){
+dm2spatial <- function(detectMatrix, spProject){
   # Separate and transform detection
   new_deTect <- detectMatrix %>%
     dplyr::select(dplyr::starts_with("R")) %>%
@@ -32,10 +32,9 @@ dm2spatial <- function(detectMatrix, proJect){
   # Combine both detection and coordinate & Remove NA
   new_detMax <- na.omit(cbind(new_deTect, new_XYcor))
 
-  # Convert to spatial data
-  new_detMax_sp <- sp::SpatialPointsDataFrame(coords = new_detMax[,c("X","Y")], data = new_detMax,
-                                              proj4string = proJect)
+  # Convert to spatial data using sf
+  new_detMax_sp <- sf::st_as_sf(x = new_detMax, coords = c('X','Y'),
+                                crs = terra::crs(spProject))
   # Return output
   return(new_detMax_sp)
 }
-
