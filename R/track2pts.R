@@ -20,12 +20,21 @@ track2pts <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, poin
 
   # 1 : SPLIT TRACKS
   tracks <- list()
-  for (i in 1:nrow(trackSp)) {
-    tracks[[i]] <- trackSp[i,]
+
+  # List of tracks
+  track_list <- trackSp@data[, c(track_id_1, track_id_2)] %>% unique()
+
+  for (i in 1:nrow(track_list)) {
+    tracks[[i]]  <- subset(trackSp, trackSp@data[, track_id_1] == track_list[i,1] &
+                             trackSp@data[, track_id_2] == track_list[i,2])
   }
+
+  # Merge tracks with similar columns
+  print(paste("track_length", length(tracks), sep = " = "))
 
   # 2 : SELECT WAYPOINT BASED ON SELECTED TRACK
   waypoints <- list()
+
   for (k in seq_along(tracks)) {
 
     # Select tracks
@@ -38,6 +47,7 @@ track2pts <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, poin
     # Then select way point based on track category
     waypoints[[k]] <- subset(waypointSp, waypointSp@data[,point_id_1] == id_1 &
                                waypointSp@data[,point_id_2] == id_2)
+
   }
 
   # 3 : CREATE DM FOR EACH COMBINATION OF TRACKS AND WP
@@ -60,7 +70,12 @@ track2pts <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, poin
     waypoints_i@data <- waypoints_i@data %>% dplyr::mutate(WP_ID = 1:nrow(waypoints_i@data))
 
     # Convert tracks to multipoints
-    tracks_pts_i <- track2dm::line2points(spLineDF = tracks_i, minDist = 100)
+    tracks_pts_i <- track2dm::line2points(spLineDF = tracks_i, minDist = minDist)
+
+    # Show plot
+    # plot(tracks_i, col="grey")
+    # plot(waypoints_i, pch=16, col='black', add=TRUE)
+    # plot(tracks_pts_i, pch=1, col='red', add=TRUE)
 
     # Then copy the ID
     track_pt_wpID <- track2dm::copyID(points1 = tracks_pts_i, points2 = waypoints_i)
