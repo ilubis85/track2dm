@@ -19,45 +19,37 @@ line2points <- function(spLineDF, minDist){
     # Suppress warning
     options(warn=-1)
 
-    # Convert SpatialLinesDataFrame into SpatialLines
-    spLine <- methods::as(singleLine, "SpatialLines")
+    # Convert to sf object
+    spLine_sf <- sf::st_as_sf(singleLine)
 
     # If length minDist > length spLine, extract just mid point
-    if(rgeos::gLength(spLine) < minDist){
+    if(as.numeric(sf::st_length(spLine_sf)) < minDist){
 
       # Extract one random point
       # Number of points is based on the length of line divided by minimum distance between points
-      spPoints <- sp::spsample(x = spLine, n = 1, type = "regular")
-
-      # Calculate distance from each point
-      pointDist <- rgeos::gProject(spgeom = spLine, sppoint = spPoints,  normalized = FALSE)
+      spPoints <- sf::st_line_sample(x = spLine_sf, n = 1, type = "random")
 
       # Return points at specified distance along a line
-      orderID <- rgeos::gInterpolate(spgeom = spLine, d = pointDist, normalized=FALSE) %>% as.data.frame() %>%
+      orderID <- st_cast(sfPoints, to = 'POINT') %>% st_coordinates() %>% as.data.frame() %>%
         # Add ID
-        dplyr::transmute(Id = 1:nrow(.), "X" = x, "Y" = y)
+        dplyr::transmute(Id = 1:nrow(.), X, Y)
 
     }else{ # Extract all
 
       # Create a regular spaced random points along the line
       # Number of points is based on the length of line divided by minimum distance between points
-      spPoints <- sp::spsample(x = spLine, n = floor(rgeos::gLength(spLine)/minDist),
-                               type = "regular")
-
-      # Calculate distance from each point
-      pointDist <- rgeos::gProject(spgeom = spLine, sppoint = spPoints,  normalized = FALSE)
+      sfPoints <- sf::st_line_sample(x = spLine_sf, n = floor(as.numeric(sf::st_length(spLine_sf))/minDist),
+                                     type = "regular")
 
       # Return points at specified distance along a line
-      orderID <- rgeos::gInterpolate(spgeom = spLine, d = pointDist, normalized=FALSE) %>% as.data.frame() %>%
+      orderID <- st_cast(sfPoints, to = 'POINT') %>% st_coordinates() %>% as.data.frame() %>%
         # Add ID
-        dplyr::transmute(Id = 1:nrow(.), "X" = x, "Y" = y)
-
+        dplyr::transmute(Id = 1:nrow(.), X, Y)
     }
 
     # Transform to spatial object
-    orderID_sp <- sp::SpatialPointsDataFrame(coords = orderID[,c("X","Y")], data = orderID,
-                                             proj4string = raster::crs(spLineDF))
-    return(orderID_sp)
+    orderID_sf <- sf::st_as_sf(x = orderID, coords = c("X","Y"), crs = terra::crs(spLineDF))
+    return(orderID_sf)
   }
 
   # Then use the function to convert SpatialLinesDataframe into SpatialPointsDataframe
