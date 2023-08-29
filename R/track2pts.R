@@ -62,6 +62,9 @@ track2pts <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, poin
   # Convert each track to multipoints
   for (i in 1:length(tracks)) {
 
+    # Suppress warning
+    options(warn=-1)
+
     # Select individual item
     tracks_i <- tracks[[i]]
     waypoints_i <- waypoints[[i]]
