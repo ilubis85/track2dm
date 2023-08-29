@@ -22,18 +22,37 @@ line2points <- function(spLineDF, minDist){
     # Convert SpatialLinesDataFrame into SpatialLines
     spLine <- methods::as(singleLine, "SpatialLines")
 
-    # Create a regular spaced random points along the line
-    # Number of points is based on the length of line divided by minimum distance between points
-    spPoints <- sp::spsample(x = spLine, n = floor(rgeos::gLength(spLine)/minDist),
-                             type = "regular")
+    # If length minDist > length spLine, extract just mid point
+    if(rgeos::gLength(spLine) < minDist){
 
-    # Calculate distance from each point
-    pointDist <- rgeos::gProject(spgeom = spLine, sppoint = spPoints,  normalized = FALSE)
+      # Extract one random point
+      # Number of points is based on the length of line divided by minimum distance between points
+      spPoints <- sp::spsample(x = spLine, n = 1, type = "regular")
 
-    # Return points at specified distance along a line
-    orderID <- rgeos::gInterpolate(spgeom = spLine, d = pointDist, normalized=FALSE) %>% as.data.frame() %>%
-      # Add ID
-      dplyr::transmute(Id = 1:nrow(.), "X" = x, "Y" = y)
+      # Calculate distance from each point
+      pointDist <- rgeos::gProject(spgeom = spLine, sppoint = spPoints,  normalized = FALSE)
+
+      # Return points at specified distance along a line
+      orderID <- rgeos::gInterpolate(spgeom = spLine, d = pointDist, normalized=FALSE) %>% as.data.frame() %>%
+        # Add ID
+        dplyr::transmute(Id = 1:nrow(.), "X" = x, "Y" = y)
+
+    }else{ # Extract all
+
+      # Create a regular spaced random points along the line
+      # Number of points is based on the length of line divided by minimum distance between points
+      spPoints <- sp::spsample(x = spLine, n = floor(rgeos::gLength(spLine)/minDist),
+                               type = "regular")
+
+      # Calculate distance from each point
+      pointDist <- rgeos::gProject(spgeom = spLine, sppoint = spPoints,  normalized = FALSE)
+
+      # Return points at specified distance along a line
+      orderID <- rgeos::gInterpolate(spgeom = spLine, d = pointDist, normalized=FALSE) %>% as.data.frame() %>%
+        # Add ID
+        dplyr::transmute(Id = 1:nrow(.), "X" = x, "Y" = y)
+
+    }
 
     # Transform to spatial object
     orderID_sp <- sp::SpatialPointsDataFrame(coords = orderID[,c("X","Y")], data = orderID,
@@ -51,7 +70,7 @@ line2points <- function(spLineDF, minDist){
     # Create a list
     outPut <- list()
     for (i in 1:nrow(spLineDF)) {
-      outPut[[i]] <- line2fun(spLineDF[i,])
+      outPut[[i]] <- line2fun(singleLine = spLineDF[i,])
     }
     # Combine the output
     spLineDF_agg <- do.call(rbind, outPut)
