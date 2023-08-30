@@ -50,6 +50,9 @@ makeGrids <- function(spObject, cellSize, clip = FALSE){
     # Reselect column
     final_grids <- subgrid_sp_clip[,"id"]
   }
+  # Convert to sf
+  final_grids_sf <- sf::st_as_sf(final_grids)
+
   # Return result
-  return(final_grids)
+  return(final_grids_sf)
 }

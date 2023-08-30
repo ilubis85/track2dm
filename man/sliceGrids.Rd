@@ -4,7 +4,7 @@
 \alias{sliceGrids}
 \title{Split grid cells into smaller grid cells}
 \usage{
-sliceGrids(mainGrids, mainID, aggreFact, nRandom)
+sliceGrids(mainGrids, mainID, aggreFact)
 }
 \arguments{
 \item{mainGrids}{A SpatialPolygoneDataframe of the main gridcells to be sliced.}
@@ -12,8 +12,6 @@ sliceGrids(mainGrids, mainID, aggreFact, nRandom)
 \item{mainID}{A column in the main gridcells contain the cells ID.}
 
 \item{aggreFact}{Aggregation factor expressed as number of cells in each direction (horizontally and vertically).}
-
-\item{nRandom}{if nRandom is not FALSE, then randomize the subgrids.}
 }
 \value{
 A spatialpolygonedataframe of smaller grid cells.

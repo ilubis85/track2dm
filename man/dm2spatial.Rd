@@ -2,18 +2,18 @@
 % Please edit documentation in R/dm2spatial.R
 \name{dm2spatial}
 \alias{dm2spatial}
-\title{Convert detection matrix into spatial data}
+\title{Convert detection matrix into sf object}
 \usage{
-dm2spatial(detectMatrix, proJect)
+dm2spatial(detectMatrix, spProject)
 }
 \arguments{
 \item{detectMatrix}{A matrix contains species detection/non-detection.}
 
-\item{proJect}{Projection code.}
+\item{spProject}{spatial object where its projection to be copied.}
 }
 \value{
-A spatial points data-frame contains species detection/non-detection.
+An sf data-frame contains species detection/non-detection.
 }
 \description{
-to convert detection matrix to SpatialPointsDataframe.
+to convert detection matrix to sf object.
 }
