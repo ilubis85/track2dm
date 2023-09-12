@@ -37,6 +37,9 @@ track2pts <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, poin
 
   for (k in seq_along(tracks)) {
 
+    # Suppress warning
+    options(warn=-1)
+
     # Select tracks
     track_k <- tracks[[k]]
 
