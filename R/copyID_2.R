@@ -12,6 +12,11 @@
 #' @export
 # Create a function that copy the ID from nearby track points to a waypoint
 copyID_2 <- function(points1, points2){
+
+  # Convert to sf object
+  points1_sf <- sf::st_as_sf(points1)
+  points2_sf <- sf::st_as_sf(points2)
+
   # For each point, create a buffer with length is about a half of between 2 points from "points1"
   # Then check if there are any other points from "points2" within the buffer area
   # If there are more than one points of points2, get the nearest one
@@ -20,27 +25,27 @@ copyID_2 <- function(points1, points2){
   newpoints <- list()
 
   # Use iteration for each point
-  for (i in 1:nrow(points1)) {
+  for (i in 1:nrow(points1_sf)) {
     # Select the i data
-    subset_i <- points1[i,]
+    subset_i <- points1_sf[i,]
 
     # Calculate the length between two points of points1
-    pointdist <- terra::distance(sf::st_coordinates(points1[1,]),  lonlat = FALSE,
-                                 sf::st_coordinates(points1[2,]))
+    pointdist <- terra::distance(sf::st_coordinates(points1_sf[1,]),  lonlat = FALSE,
+                                 sf::st_coordinates(points1_sf[2,]))
 
     # Create a buffer using width from pointdist
     point_buff <- sf::st_buffer(x = subset_i, dist = floor(pointdist))
 
     # plot for check
     # plot(st_geometry(point_buff), border = 'red')
-    # plot(st_geometry(digitasi_sf), col='gray40', add=TRUE)
+    # plot(sub_dijitasi, col='gray40', add=TRUE)
     # plot(st_geometry(subset_i), pch=18, col="blue", cex=1.4, add=TRUE)
-    # plot(st_geometry(points2), pch=17, col='black', cex=1.5, add=TRUE)
-    # pointLabel(st_coordinates(points2), labels = as.character(points2$WP_ID), cex = 0.5)
+    # plot(st_geometry(points2_sf), pch=17, col='black', cex=1.5, add=TRUE)
+    # pointLabel(st_coordinates(points2_sf), labels = as.character(points2$WP_ID), cex = 0.5)
 
     # Intersect between buffer with data from points2
-    if (sum(sf::st_intersects(point_buff, points2, sparse = F)) >= 1){
-      points2_in <- sf::st_intersection(points2, point_buff)
+    if (sum(sf::st_intersects(point_buff, points2_sf, sparse = F)) >= 1){
+      points2_in <- sf::st_intersection(points2_sf, point_buff)
 
       # Compile the result
       point_in <- data.frame("Id" = NA, "X" = points2_in$X,
@@ -52,16 +57,16 @@ copyID_2 <- function(points1, points2){
 
       } # If there are multiple points within the buffer area,
       else{
-        # Calculate distance from each point to preious point (i-1)
+        # Calculate distance from each point to previous point (i-1)
         for (j in 1:nrow(point_in)) {
           # For the first row, calculate distance from point1_i
           if (i == 1){
-            point_in[j, 'dist_to_prev_point'] <- terra::distance(x = sf::st_coordinates(points1[i,]),
+            point_in[j, 'dist_to_prev_point'] <- terra::distance(x = sf::st_coordinates(points1_sf[i,]),
                                                                  y = as.matrix(point_in[j, c("X", "Y")]),
                                                                  pairwise=TRUE, lonlat = FALSE)
           } else {
             # For rows > 1
-            point_in[j, 'dist_to_prev_point'] <- terra::distance(x =  sf::st_coordinates(points1[i-1,]),
+            point_in[j, 'dist_to_prev_point'] <- terra::distance(x =  sf::st_coordinates(points1_sf[i-1,]),
                                                                  y = as.matrix(point_in[j, c("X", "Y")]),
                                                                  pairwise=TRUE, lonlat = FALSE)
           }
@@ -93,12 +98,12 @@ copyID_2 <- function(points1, points2){
   newpoints_re <- do.call(rbind, newpoints)
 
   # Combine newpoints_re with ponts2 data
-  newResult <- dplyr::left_join(newpoints_re, points2, by = c("X", "Y", "WP_ID")) %>%
-    # Remove duplicate values
-    unique()
+  newResult <- dplyr::left_join(newpoints_re, points2_sf, by = c("X", "Y", "WP_ID")) %>%
+    unique() %>% # Remove duplicate values
+    dplyr::mutate(Id = 1:nrow(.)) # Re-numbered ID
 
   # Return as a spatialPointsDataframe
-  result_sp <- sf::st_as_sf(x = newResult, coords = c("X","Y"), crs = terra::crs(points2))
+  result_sp <- sf::st_as_sf(x = newResult, coords = c("X","Y"), crs = terra::crs(points2_sf))
 
   # Return the result
   return(result_sp)
