@@ -16,7 +16,7 @@
 #'
 #' @export
 # Create a function
-track2pts <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, point_id_1, point_id_2){
+track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, point_id_1, point_id_2){
 
   # Convert to sf object
   tracksf <- sf::st_as_sf(trackSp)
