@@ -76,8 +76,8 @@ plot(occ19_sub, col="blue", pch=16, cex=0.5, add=TRUE)
 occ19_sub_df <- as.data.frame(occ19_sub)
 
 # Calculate 3D distance
-occ19_df_3d <- track2dm::dist3D(dataFrame = occ19_sub_df, Xcol = "X", Ycol = "Y",
-                                elevData = elev,  repLength = 5000)
+(occ19_df_3d <- track2dm::dist3D(dataFrame = occ19_sub_df, Xcol = "X", Ycol = "Y",
+                                elevData = elev,  repLength = 5000, distType = "3D"))
 # DONE !!!
 
 # Extract DM
@@ -131,44 +131,20 @@ test_1 <- track2dm::line2points(spLineDF = trcks_patrol, minDist = 100)
 # Overlay
 points(test_1, pch=17, col='green')
 
-# Compare result
-test_2 <- track2dm::line2points_2(spLineDF = trcks_patrol, minDist = 100)
-
-# Done !!
-
 #### Edit copyID ####
 # Test
 wp_patrol_wpID_1 <- track2dm::copyID(points1 = test_1, points2 = wp_patrol)
-wp_patrol_wpID_1@data
-
-# Simpan file shp yang telah kita buat
-# rgdal::writeOGR(obj = wp_patrol_wpID_1, dsn = "E:/myRpackages/track2dm_test/zahra_250723_zip",
-#                 layer ="wp_patrol_wpID_1", driver="ESRI Shapefile", overwrite_layer = TRUE)
-
-wp_patrol_wpID_2 <- track2dm::copyID_2(points1 = test_1, points2 = wp_patrol)
-wp_patrol_wpID_2
 
 # sf::write_sf(obj = wp_patrol_wpID_2, dsn = "E:/myRpackages/track2dm_test/zahra_250723_zip",
 #              layer ="wp_patrol_wpID_2", driver="ESRI Shapefile", overwrite_layer = TRUE)
 # Looks ok
 
 #### Edit track2pts ####
-track2pts_1 <- track2dm::track2pts(trackSp = trcks_patrol, track_id_1 = "Patrol_ID",
+track2pts <- track2dm::track2points(trackSp = trcks_patrol, track_id_1 = "Patrol_ID",
                                    track_id_2 = "Patrol_D", waypointSp = wp_patrol,
                                    point_id_1 = "Patrol_ID", point_id_2 = "Waypoint_D",
                                    minDist = 100)
-# track2pts_1@data
-
+track2pts %>% view()
 # Simpan file shp yang telah kita buat
-# rgdal::writeOGR(obj = track2pts_1, dsn = "D:/myRpackage/Package_testing/track2dm_bugs/zahra_250723",
-#                 layer ="track2pts_1a", driver="ESRI Shapefile", overwrite_layer = TRUE)
-
-track2pts_2 <- track2pts_2(trackSp = trcks_patrol, track_id_1 = "Patrol_ID",
-                                   track_id_2 = "Patrol_D", waypointSp = wp_patrol,
-                                   point_id_1 = "Patrol_ID", point_id_2 = "Waypoint_D",
-                                   minDist = 100)
-track2pts_2 %>% view()
-
-# Simpan file shp yang telah kita buat
-sf::write_sf(obj = track2pts_2, dsn = "D:/myRpackage/Package_testing/track2dm_bugs/zahra_250723",
-                layer ="track2pts_2a", driver="ESRI Shapefile", overwrite_layer = TRUE)
+# sf::write_sf(obj = track2pts_2, dsn = "D:/myRpackage/Package_testing/track2dm_bugs/zahra_250723",
+#                 layer ="track2pts_2a", driver="ESRI Shapefile", overwrite_layer = TRUE)

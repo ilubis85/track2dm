@@ -2,24 +2,26 @@
 % Please edit documentation in R/dist3D.R
 \name{dist3D}
 \alias{dist3D}
-\title{Calculate distance in 3-dimension (X,Y,and Z)}
+\title{Calculate the distance in three dimensions if X, Y, and Z coordinates are available.}
 \usage{
-dist3D(dataFrame, Xcol, Ycol, elevData, repLength)
+dist3D(dataFrame, Xcol, Ycol, elevData, repLength, distType = "3D")
 }
 \arguments{
-\item{dataFrame}{A data-frame contains pairs of coordinate in UTM projection to calculate distance using Euclidean distance formula.}
+\item{dataFrame}{A data frame containing information, including X and Y coordinates in UTM projection.}
 
-\item{Xcol}{A quoted name of column that consists of X coordinates.}
+\item{Xcol}{A quoted column name representing X coordinates within the dataFrame.}
 
-\item{Ycol}{A quoted name of column that consists of Y coordinates.}
+\item{Ycol}{A quoted column name representing Y coordinates within the dataFrame.}
 
-\item{elevData}{A raster layer contains elevation data (DEM) in meter to calculate altitude (Z).}
+\item{elevData}{Elevation data in meters in "SpatRaster" format, utilized for extracting Z values.}
 
-\item{repLength}{A predefined replication length.}
+\item{repLength}{A predefined replication length specified in meters.}
+
+\item{distType}{Specify whether to calculate distance in 3D or 2D (Default is 3D).}
 }
 \value{
-New columns that specify distance and what replicates that the observations are belong to.
+New columns specifying the distance and the corresponding replicates to which the observations belong.
 }
 \description{
-A function to calculate 3D distance and then categories the observations based on a predefined replication length.
+A function designed to compute the 3D distance and subsequently categorize observations according to a predefined replication length.
 }
