@@ -2,7 +2,7 @@
 % Please edit documentation in R/track2pts.R
 \name{track2pts}
 \alias{track2pts}
-\title{Combine track and waypoints based on two common columns}
+\title{Generate ordered points using the 'line2points' and 'copyID' functions, utilizing two common columns gathered from waypoints and transect lines.}
 \usage{
 track2pts(
   trackSp,
@@ -15,23 +15,23 @@ track2pts(
 )
 }
 \arguments{
-\item{trackSp}{Digitised tracks in spatial dataframe.}
+\item{trackSp}{A spatial data frame containing digitized track lines.}
 
-\item{track_id_1}{The first common column in tracks data (e.g., Patrol_ID).}
+\item{track_id_1}{The first common column in the track lines data frame, such as 'Patrol_ID'.}
 
-\item{track_id_2}{The second common column in tracks data (e.g., Patrol_Date).}
+\item{track_id_2}{The second common column in the track lines data frame, such as 'Patrol_Date'.}
 
-\item{minDist}{Minimum distance between points.}
+\item{minDist}{The minimum distance between points, measured in meters.}
 
-\item{waypointSp}{Waypoints in spatial dataframe.}
+\item{waypointSp}{A spatial points data frame recorded during the survey along the trackSp.}
 
-\item{point_id_1}{The first common column in waypoints data (e.g., Patrol_ID).}
+\item{point_id_1}{The first common column in spatial points data frame, such as 'Patrol_ID'.}
 
-\item{point_id_2}{The second common column in waypoints data (e.g., Waypoint_Date).}
+\item{point_id_2}{The second common column in spatial points data frame. such as 'Waypoint_Date'.}
 }
 \value{
-Spatial points dataframe.
+An ordered spatial points data frame derived from 'trackSp' and 'waypointSp'.
 }
 \description{
-A function that combine track and waypoints based on two common columns.
+A function to generate ordered points using the 'line2points' and 'copyID' functions, utilizing two common columns gathered from waypoints and transect lines.
 }
