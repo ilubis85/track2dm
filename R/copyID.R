@@ -1,17 +1,22 @@
-#' @title Copy attributes from other spatial points data-frame
+#' @title Copy attributes from another spatial points data frame
 #'
-#' @description A function to copy ID's from other nearby SpatialPointsDataframe.
+#' @description A function designed to copy attributes from a nearby spatial points data frame.
 #'
-#' @param points1 SpatialPointsDataframe consist of X and Y that copy attributes from points2.
-#' @param points2 SpatialPointsDataframe where the attributes available to be copied.
+#' @param points1 A spatial points data frame, comprising X and Y coordinates, designed to replicate attributes from another spatial points data frame (points2).
+#' @param points2 A spatial points data frame with available attributes to be copied.
 #'
-#' @return Similar data with points1 with additional ID's copied from nearby points2.
+#' @return Data in a spatial points data frame (points1) mirroring all attributes copied from another spatial data frame (points2).
 #'
 #'
 #'
 #' @export
-# Create a function that copy the ID from nearby track points to a waypoint
+# Create a function that copy the attributes from nearby track points to a waypoint
 copyID <- function(points1, points2){
+
+  # Convert to sf object
+  points1_sf <- sf::st_as_sf(points1)
+  points2_sf <- sf::st_as_sf(points2)
+
   # For each point, create a buffer with length is about a half of between 2 points from "points1"
   # Then check if there are any other points from "points2" within the buffer area
   # If there are more than one points of points2, get the nearest one
@@ -20,49 +25,50 @@ copyID <- function(points1, points2){
   newpoints <- list()
 
   # Use iteration for each point
-  for (i in 1:nrow(points1)) {
+  for (i in 1:nrow(points1_sf)) {
     # Select the i data
-    subset_i <- points1[i,]
+    subset_i <- points1_sf[i,]
 
     # Calculate the length between two points of points1
-    pointdist <- raster::pointDistance(points1[1, c("X", "Y")], points1[2, c("X", "Y")],  lonlat = FALSE)
+    pointdist <- terra::distance(sf::st_coordinates(points1_sf[1,]),  lonlat = FALSE,
+                                 sf::st_coordinates(points1_sf[2,]))
 
     # Create a buffer using width from pointdist
-    point_buff <- rgeos::gBuffer(subset_i, width = floor(pointdist))
+    point_buff <- sf::st_buffer(x = subset_i, dist = floor(pointdist))
 
     # plot for check
-    # plot(point_buff, border = 'red')
-    # plot(smart_ln, col='gray40', add=TRUE)
-    # plot(subset_i, pch=18, col="blue", cex=1.4, add=TRUE)
-    # plot(points2, pch=17, col='black', cex=1.5, add=TRUE)
-    # pointLabel(coordinates(points2), labels = as.character(points2@data$WP_ID), cex = 0.5)
+    # plot(st_geometry(point_buff), border = 'red')
+    # plot(sub_dijitasi, col='gray40', add=TRUE)
+    # plot(st_geometry(subset_i), pch=18, col="blue", cex=1.4, add=TRUE)
+    # plot(st_geometry(points2_sf), pch=17, col='black', cex=1.5, add=TRUE)
+    # pointLabel(st_coordinates(points2_sf), labels = as.character(points2$WP_ID), cex = 0.5)
 
     # Intersect between buffer with data from points2
-    if (rgeos::gIntersects(point_buff, points2) == TRUE){
-      points2_in <- raster::intersect(points2, point_buff)
+    if (sum(sf::st_intersects(point_buff, points2_sf, sparse = F)) >= 1){
+      points2_in <- sf::st_intersection(points2_sf, point_buff)
 
       # Compile the result
-      point_in <- data.frame("Id" = NA, "X" = points2_in@data$X,
-                             "Y" = points2_in@data$Y,
-                             "WP_ID" = points2_in@data$WP_ID)
+      point_in <- data.frame("Id" = NA, "X" = points2_in$X,
+                             "Y" = points2_in$Y,
+                             "WP_ID" = points2_in$WP_ID)
 
       # If there is only one point within the buffer area, return the point_in
       if (nrow(points2_in) == 1){ point_in <- point_in
 
       } # If there are multiple points within the buffer area,
       else{
-        # Calculate distance from each point to preious point (i-1)
+        # Calculate distance from each point to previous point (i-1)
         for (j in 1:nrow(point_in)) {
           # For the first row, calculate distance from point1_i
           if (i == 1){
-            point_in[j, 'dist_to_prev_point'] <- raster::pointDistance(p1 = points1@data[i,c("X", "Y")],
-                                                                       p2 = point_in[j, c("X", "Y")],
-                                                                       lonlat = FALSE)
+            point_in[j, 'dist_to_prev_point'] <- terra::distance(x = sf::st_coordinates(points1_sf[i,]),
+                                                                 y = as.matrix(point_in[j, c("X", "Y")]),
+                                                                 pairwise=TRUE, lonlat = FALSE)
           } else {
             # For rows > 1
-            point_in[j, 'dist_to_prev_point'] <- raster::pointDistance(p1 = points1@data[i-1,c("X", "Y")],
-                                                                       p2 = point_in[j, c("X", "Y")],
-                                                                       lonlat = FALSE)
+            point_in[j, 'dist_to_prev_point'] <- terra::distance(x =  sf::st_coordinates(points1_sf[i-1,]),
+                                                                 y = as.matrix(point_in[j, c("X", "Y")]),
+                                                                 pairwise=TRUE, lonlat = FALSE)
           }
         }
         # Then arrange points by distance from a point (i) to previous waypoint (i-1)
@@ -79,11 +85,11 @@ copyID <- function(points1, points2){
         }
       }
     }
-    # If no pints2 within the buffer area, return points1
+    # If no points2 within the buffer area, return points1
     else {
-      point_in <- data.frame("Id" =subset_i@data$Id,
-                             "X" = subset_i@data$X,
-                             "Y" = subset_i@data$Y, "WP_ID" = NA)
+      point_in <- data.frame("Id" =subset_i$Id,
+                             "X" = sf::st_coordinates(subset_i)[1],
+                             "Y" = sf::st_coordinates(subset_i)[2], "WP_ID" = NA)
     }
     # Return result
     newpoints[[i]] <- point_in
@@ -92,13 +98,12 @@ copyID <- function(points1, points2){
   newpoints_re <- do.call(rbind, newpoints)
 
   # Combine newpoints_re with ponts2 data
-  newResult <- dplyr::left_join(newpoints_re, points2@data, by = c("X", "Y", "WP_ID")) %>%
-    # Remove duplicate values
-    unique()
+  newResult <- dplyr::left_join(newpoints_re, points2_sf, by = c("X", "Y", "WP_ID")) %>%
+    unique() %>% # Remove duplicate values
+    dplyr::mutate(Id = 1:nrow(.)) # Re-numbered ID
 
   # Return as a spatialPointsDataframe
-  result_sp <- sp::SpatialPointsDataFrame(coords = newResult[,c("X","Y")], data = newResult,
-                                          proj4string = raster::crs(points2))
+  result_sp <- sf::st_as_sf(x = newResult, coords = c("X","Y"), crs = terra::crs(points2_sf))
 
   # Return the result
   return(result_sp)
