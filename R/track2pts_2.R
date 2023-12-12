@@ -103,9 +103,10 @@ track2pts_2 <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, po
     Sys.sleep(1 / length(tracks))
   }
   # 4 : Combine as a result
-  result <- do.call(rbind, track_pts)do.call(rbind, track_pts) %>%
-    # Rearrange id
-    dplyr::mutate(Id = 1:nrow(.))
+  result_com <- do.call(rbind, track_pts)
+
+  # Rearrange id
+  result <- result_com %>% dplyr::mutate(Id = 1:nrow(result_com))
 
   return(result)
 }
