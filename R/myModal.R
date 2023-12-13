@@ -1,15 +1,15 @@
-#' @title Calculate the most common character values.
+#' @title Compute the most common character values, also known as the mode.
 #'
-#' @description A function to measure the central tendency of the data (the most common characteristics of the sample).
+#' @description A function designed to assess the central tendency of the data, identifying the most common characteristics within the sample.
 #'
-#' @param myVector A vector contains character values.
+#' @param myVector A vector comprising character values.
 #'
-#' @return the most common values from a vector of elements.
+#' @return The most common values from a vector containing elements of strings.
 #'
 #' @export
 # Function to calculate Mode
 # Modified from https://www.tutorialspoint.com/r/r_mean_median_mode.
-modal <- function(myVector){
+myModal <- function(myVector){
 
   # Convert to vector
   myVector <- as.vector(myVector)
@@ -28,7 +28,7 @@ modal <- function(myVector){
     uniq_vec <- base::unique(myVector)
 
     # Frequent value
-    my_mode <- match(myVector, uniq_vec) %>% tabulate() %>% which.max()
+    my_mode <- base::match(myVector, uniq_vec) %>% tabulate() %>% which.max()
 
     # Extract the most common value
     outPut <- uniq_vec[my_mode]
