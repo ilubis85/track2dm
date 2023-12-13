@@ -74,7 +74,7 @@ copyID <- function(points1, points2){
         # Then arrange points by distance from a point (i) to previous waypoint (i-1)
         # For the first row, arrange distance from points1 i
         if (i == 1){
-          point_in <- point_in %>% dplyr::arrange(desc(dist_to_prev_point)) %>%
+          point_in <- point_in %>% dplyr::arrange(dplyr::desc(dist_to_prev_point)) %>%
             # Then remove dist_to_prev_point
             dplyr::select(-dist_to_prev_point)
         } else {

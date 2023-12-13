@@ -24,14 +24,14 @@ dm2spatial <- function(detectMatrix, spProject){
   new_XYcor <- detectMatrix %>%
     dplyr::select(dplyr::starts_with("XY")) %>%
     # Transform column to row
-    tidyr::pivot_longer(cols = starts_with("XY")) %>%
+    tidyr::pivot_longer(cols = dplyr::starts_with("XY")) %>%
     # Separate between X and Y
     tidyr::separate(data = ., col = value, into = c("X", "Y"), sep = "_") %>%
     # Select and reformat
     dplyr::select(-name) %>% dplyr::mutate_if(is.character, as.numeric)
 
   # Combine both detection and coordinate & Remove NA
-  new_detMax <- na.omit(cbind(new_deTect, new_XYcor))
+  new_detMax <- stats::na.omit(cbind(new_deTect, new_XYcor))
 
   # Convert to spatial data using sf
   new_detMax_sp <- sf::st_as_sf(x = new_detMax, coords = c('X','Y'),
