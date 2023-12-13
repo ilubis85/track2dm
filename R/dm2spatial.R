@@ -1,16 +1,17 @@
-#' @title Convert detection matrix into sf object
+#' @title Transform the detection matrix into an sf object.
 #'
-#' @description to convert detection matrix to sf object.
+#' @description A function to transform the detection matrix into an sf object.
 #'
-#' @param detectMatrix A matrix contains species detection/non-detection.
-#' @param spProject spatial object where its projection to be copied.
-#' @return An sf data-frame contains species detection/non-detection.
+#' @param detectMatrix A matrix containing species detection/non-detection, generated from 'speciesDM'.
+#' @param spProject Spatial object with its projection to be duplicated.
+#' @return An sf data frame containing species detection/non-detection.
 #'
 #' @export
 #' @importFrom  magrittr %>%
 #'
 # Create a function to convert detection matrix to spatial points data
 dm2spatial <- function(detectMatrix, spProject){
+
   # Separate and transform detection
   new_deTect <- detectMatrix %>%
     dplyr::select(dplyr::starts_with("R")) %>%
