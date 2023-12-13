@@ -38,8 +38,8 @@ grid_point <- function(spPoints, subGrids, whichCol, whichSp, as_Raster = TRUE, 
   }
   if(as_Raster == TRUE){
     # Rasterize the subGrids with 1 km resolution
-    subGrids_ras <- raster::raster(subGrids, res = rasRes)
-    subGrids_raster <- raster::rasterize(subGrids, subGrids_ras, field = "prop")
+    subGrids_ras <- terra::rast(subGrids, res = rasRes)
+    subGrids_raster <- terra::rasterize(subGrids, subGrids_ras, field = "prop")
   } else {subGrids_raster <- subGrids}
   return(subGrids_raster)
 }

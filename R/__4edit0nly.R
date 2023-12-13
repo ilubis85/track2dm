@@ -144,7 +144,7 @@ test_1 <- track2dm::line2points(spLineDF = trcks_patrol, minDist = 100)
 # Overlay
 points(test_1, pch=17, col='green')
 
-#### Edit copyID ####
+#### IV - DATA CLEANING ####
 # Test
 wp_patrol_wpID_1 <- track2dm::copyID(points1 = test_1, points2 = wp_patrol)
 
