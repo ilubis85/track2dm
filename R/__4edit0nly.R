@@ -1,62 +1,75 @@
 # CODES' WORKSHOP
 # A place to edit or create new functions
 # ilubis85@gmail.com
-# 2022
+# 2023
 #
 # Remove previous project
 rm(list = ls())
 
-##### speciesDM ####
 # Get some data for example
 # Loading packages
 library(tidyverse)
-library(rgdal)
-library(rgeos)
-library(raster)
 library(track2dm)
 library(terra)
 library(sf)
 
-# Define projection
-# Atur proyeksi data
-utm47n <- "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs"
-geo <- "+proj=longlat +datum=WGS84 +no_defs "
+#### I - ADD DATA TO PACKAGE ####
+# WKNP resort : DONE !!!
+# wknp_resort <- st_read(dsn = "D:/data_spasial/GIS_INA/vec_03_conservation_areas/001_Conservation_areas/TNWK",
+#                 layer = "Resort_TNWK") %>%
+#   dplyr::select(-ID, -Shape_Leng, -Shape_Area )
+# wknp_resort
+# wknp_resort<- st_zm(wknp_resort)
+# names(wknp_resort)
+#
+# # Save as internal file
+# usethis::use_data(wknp_resort, internal = F)
 
-# add data for testing
-# Add occupancy data
-occ19 <-  rgdal::readOGR(dsn= "D:/myPhD_thesis/05_Ch3_tiger_pathways/3_Occupancy_2020/OCC_2020/02_preprocessed_data",
-                         layer="Occupancy_2020_pt")
-# Add elevation
-elev <- terra::rast("D:/myPhD_thesis/05_Ch3_tiger_pathways/4_Spatial_data/Elev_30m.tif")
+#### II - ADD DATA FOR TESTING ####
+# # add data for testing
+# wknp_wp <- sf::st_read(dsn= "D:/myRpackage/Package_testing/track2dm_bugs/zahra_250723",
+#                          layer="WP_wk_dummy_sub")
+# # Select columns and rename
+# str(wknp_wp)
+# wknp_wp <- wknp_wp %>% select('patrol_id'=`Patrol_ID`, 'station'=`Station`, 'leader'=`Leader`,
+#                    'wp_date'=`Waypoint_D`, 'wp_time'=`Waypoint_T`, 'x'=`X`, 'y'=`Y`,
+#                    'observation'=`Observat_1`, 'species'=`Jenis_satw`, 'activeness'=`Keaktifan`,
+#                    'age'=`Usia_temua`, 'action'=`Tindakan`)
+#
+# wknp_tracks <- sf::st_read(dsn= "D:/myRpackage/Package_testing/track2dm_bugs/zahra_250723",
+#                            layer="track_to_dm_wk_dummy_sub") %>%
+#   dplyr::select('patrol_id'=`Patrol_ID`, 'patrol_date'=`Patrol_D`)
+#
+# # Plot
+# plot(st_geometry(wknp_tracks), col='grey')
+# plot(st_geometry(wknp_wp), pch=15, col='red', add=TRUE)
+#
+# # Save as internal file
+# usethis::use_data(wknp_tracks, internal = F)
+# usethis::use_data(wknp_wp, internal = F)
 
-# Add leuser boundary
-leuser <- rgdal::readOGR(dsn= "D:/GIS_INA/vec_05_landscape", layer="Leuser_ecosystem")
+# NEED TO DOCUMENTING THE DATA
 
-# Add grid cell
-grid17km <-  rgdal::readOGR(dsn= "D:/myPhD_thesis/05_Ch3_tiger_pathways/4_Spatial_data", layer="Grid_SWTS_17km")
 
-# For testing, use small subset of the grids
-grid17km@data$GridID %>% table()
-grid17km_sub <- subset(grid17km, grid17km@data[,"GridID"] == "N29W37" | grid17km@data[,"GridID"] == "N29W38")
+#### III - SURVEY PREP ####
+# Select one resort
+Kuala_Penet <- wknp_resort %>% dplyr::filter(Resort == 'Kuala Penet' | Resort == 'Kuala Kambas')
 
-#### EDIT makeGrids ####
+# Plot
+plot(st_geometry(Kuala_Penet), col='green', border='grey', lwd=2)
+plot(st_geometry(wknp_tracks), col='black', lwd=1.5, add=TRUE)
+plot(st_geometry(wknp_wp), pch=15, col='red', add=TRUE)
+
 # Make a grid
-test_grid <- makeGrids(spObject = grid17km_sub, cellSize = 5000, clip = T)
-plot(st_geometry(test_grid), border='green')
-plot(occ19, pch=20, cex=0.5, col='red', add=TRUE)
+grid_2km <- makeGrids(spObject = Kuala_Penet, cellSize = 2000, clip = F)
+plot(st_geometry(grid_2km), border='blue', add=TRUE)
 # DONE !!
 
 #### EDIT sliceGrid ####
 # slice grids
-slice_test <- track2dm::sliceGrids(mainGrids = test_grid, mainID = "id", aggreFact = 4)
-plot(st_geometry(slice_test), border='blue', add=TRUE)
+grid_slice <- track2dm::sliceGrids(mainGrids = grid_2km, mainID = "id", aggreFact = 2)
+plot(st_geometry(grid_slice), border='yellow', add=TRUE)
 
-# Test using occu grids
-grid4.25km <- track2dm::sliceGrids(mainGrids = grid17km, mainID = "GridID", aggreFact = 4)
-
-# Plot
-plot(st_geometry(grid4.25km), border="grey")
-plot(grid17km, border="black", add=TRUE)
 # DONE !!
 
 #### EDIT dist3D ####
