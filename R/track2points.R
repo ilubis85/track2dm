@@ -90,10 +90,10 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
     # Then copy the ID
     track_pt_wpID <- track2dm::copyID(points1 = tracks_pts_k, points2 = waypoints_k)
 
-    # Copy common columns
-    track_pt_wpID <- track_pt_wpID %>%
-      dplyr::mutate_at(dplyr::vars(point_id_1, point_id_2), dplyr::na_if, y="") %>%
-      tidyr::fill(point_id_1, point_id_2)
+    # Fill empty point_id_1 and point_id_2 columns
+    # track_pt_wpID <- track_pt_wpID %>%
+    #   dplyr::mutate_at(dplyr::vars(point_id_1, point_id_2), dplyr::na_if, y="") %>%
+    #   tidyr::fill(point_id_1, point_id_2)
 
     # Combine result
     track_pts[[k]] <- track_pt_wpID
