@@ -73,22 +73,8 @@ plot(st_geometry(grid_slice), border='yellow', add=TRUE)
 # DONE !!
 
 
-# Extract DM
-colnames(occ19_df_3d)
-(tiger_dm_19 <- track2dm::speciesDM(speciesDF = occ19_df_3d, sortID = "Grid_ID",
-                                        Xcol = "X", Ycol = "Y", whichCol = "Species", whichSp = "PAT",
-                                        samplingCov = FALSE,
-                                        samplingFun = FALSE))
-# DONE !!
 
-#### EDIT dm2spatial ####
-# Test dm2spatial
-tiger_dm_19_sp <- track2dm::dm2spatial(detectMatrix = tiger_dm_19, spProject = grid17km_sub)
 
-# Plot
-plot(occ19_sub, col="gray40", pch=15, cex=0.5, add=T)
-plot(tiger_dm_19_sp, col="red", pch=16, add=T)
-# DONE!!
 
 ##### EDIT speciesDM_Grid ####
 # Tiger
@@ -180,7 +166,41 @@ plot(st_geometry(wknp_resort), add=TRUE)
 
 # Calculate 3D distance
 (track2pts_df_3d <- track2dm::dist3D(dataFrame = track2pts_df, Xcol = "X", Ycol = "Y",
-                                 elevData = wknp_elev_48s,  repLength = 1000, distType = "2D"))
+                                 elevData = wknp_elev_48s,  repLength = 2000, distType = "2D"))
 # DONE !!!
+
+#### speciesDM ####
+# Select which species
+track2pts_df_3d %>% view()
+track2pts_df_3d$species %>% table()
+
+# Extract DM
+(elephant_dm <- track2dm::speciesDM(speciesDF = track2pts_df_3d, sortID = "Id",
+                                    Xcol = "X", Ycol = "Y", whichCol = "species",
+                                    whichSp = "Gajah Sumatera - Elephas maximus",
+                                    samplingCov = FALSE, samplingFun = FALSE))
+# DONE !!
+
+#### dm2spatial ####
+# Test dm2spatial
+elephant_dm_sf <- track2dm::dm2spatial(detectMatrix = elephant_dm, spProject = wknp_resort)
+
+# Plot
+plot(st_geometry(wknp_tracks), col="gray40", pch=15, cex=0.5)
+plot(elephant_dm_sf, col="red", pch=16, add=T)
+
+
+library(tmap)
+tm_shape(wknp_tracks) + tm_lines() +
+  tm_shape(elephant_dm_sf) + tm_dots(col = 'Detection', size=1.5)
+
+# Simpan file shp yang telah kita buat
+sf::write_sf(obj = elephant_dm_sf, dsn = "D:/myRpackage/Package_testing/track2dm_bugs/zahra_250723",
+                layer ="elephant_dm_sf", driver="ESRI Shapefile", overwrite_layer = TRUE)
+
+
+# DONE!!
+
+
 
 
