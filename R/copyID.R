@@ -34,12 +34,12 @@ copyID <- function(points1, points2){
                                  sf::st_coordinates(points1_sf[2,]))
 
     # Create a buffer using width from pointdist
-    point_buff <- sf::st_buffer(x = subset_i, dist = floor(pointdist))
+    point_buff <- sf::st_buffer(x = subset_i, dist = base::floor(pointdist))
 
     # plot for check
-    plot(st_geometry(point_buff), border = 'red')
-    plot(st_geometry(subset_i), pch=18, col="blue", cex=1.4, add=TRUE)
-    plot(st_geometry(points2_sf), pch=17, col='black', cex=1.5, add=TRUE)
+    # plot(st_geometry(point_buff), border = 'red')
+    # plot(st_geometry(subset_i), pch=18, col="blue", cex=1.4, add=TRUE)
+    # plot(st_geometry(points2_sf), pch=17, col='black', cex=1.5, add=TRUE)
 
     # Intersect between buffer with data from points2
     if (sum(sf::st_intersects(point_buff, points2_sf, sparse = F)) >= 1){
