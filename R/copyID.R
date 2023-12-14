@@ -37,20 +37,19 @@ copyID <- function(points1, points2){
     point_buff <- sf::st_buffer(x = subset_i, dist = floor(pointdist))
 
     # plot for check
-    # plot(st_geometry(point_buff), border = 'red')
-    # plot(sub_dijitasi, col='gray40', add=TRUE)
-    # plot(st_geometry(subset_i), pch=18, col="blue", cex=1.4, add=TRUE)
-    # plot(st_geometry(points2_sf), pch=17, col='black', cex=1.5, add=TRUE)
-    # pointLabel(st_coordinates(points2_sf), labels = as.character(points2$WP_ID), cex = 0.5)
+    plot(st_geometry(point_buff), border = 'red')
+    plot(st_geometry(subset_i), pch=18, col="blue", cex=1.4, add=TRUE)
+    plot(st_geometry(points2_sf), pch=17, col='black', cex=1.5, add=TRUE)
 
     # Intersect between buffer with data from points2
     if (sum(sf::st_intersects(point_buff, points2_sf, sparse = F)) >= 1){
       points2_in <- sf::st_intersection(points2_sf, point_buff)
 
       # Compile the result
-      point_in <- data.frame("Id" = NA, "X" = points2_in$X,
-                             "Y" = points2_in$Y,
-                             "WP_ID" = points2_in$WP_ID)
+      point_in <- data.frame("Id" = NA,
+                             "X" = sf::st_coordinates(points2_in)[,'X'],
+                             "Y" = sf::st_coordinates(points2_in)[,'Y'],
+                             "WP_ID" = dplyr::select(sf::st_drop_geometry(points2_in),'WP_ID'))
 
       # If there is only one point within the buffer area, return the point_in
       if (nrow(points2_in) == 1){ point_in <- point_in
@@ -76,12 +75,12 @@ copyID <- function(points1, points2){
         if (i == 1){
           point_in <- point_in %>% dplyr::arrange(dplyr::desc(dist_to_prev_point)) %>%
             # Then remove dist_to_prev_point
-            dplyr::select(-dist_to_prev_point)
+            dplyr::select(1:4)
         } else {
           # For rows > 1 calculate distance from points1 i-1
           point_in <- point_in %>% dplyr::arrange(dist_to_prev_point) %>%
             # Then remove dist_to_prev_point
-            dplyr::select(-dist_to_prev_point)
+            dplyr::select(1:4)
         }
       }
     }
@@ -97,8 +96,11 @@ copyID <- function(points1, points2){
   # Combine the result
   newpoints_re <- do.call(rbind, newpoints)
 
+  # COnvert to dataframe
+  points2_df <- data.frame(sf::st_drop_geometry(points2_sf), sf::st_coordinates(points2_sf))
+
   # Combine newpoints_re with ponts2 data
-  newResult <- dplyr::left_join(newpoints_re, points2_sf, by = c("X", "Y", "WP_ID")) %>%
+  newResult <- dplyr::left_join(newpoints_re, points2_df, by = c("X", "Y", "WP_ID")) %>%
     unique() %>% # Remove duplicate values
     dplyr::mutate(Id = 1:nrow(.)) # Re-numbered ID
 
@@ -108,3 +110,4 @@ copyID <- function(points1, points2){
   # Return the result
   return(result_sp)
 }
+
