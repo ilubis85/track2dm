@@ -24,7 +24,7 @@ spatialDM(
 
 \item{Ycol}{A quoted column name representing Y coordinates within the dataFrame.}
 
-\item{whichCol}{A column containing all the species for which to extract detection matrices .}
+\item{whichCol}{A column containing all the species for which to extract detection matrices.}
 
 \item{whichSp}{A selected species or entity name within the "whichCol" column to be extracted as detection matrices.}
 

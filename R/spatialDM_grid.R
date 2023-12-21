@@ -1,24 +1,24 @@
-#' @title Extract detection matrices over of a certain species grid cells
+#' @title Generate a spatial detection matrix (spatialDM) for a specific species or entities within specified grid cells.
 #'
-#' @description A function to extract detection matrix for a species from all gridcells
+#' @description A function to Generate a spatial detection matrix (spatialDM) for a specific species or entities within specified grid cells.
 #'
-#' @param spData A SpatialPointsDataframe contain the occupancy data.
-#' @param sortID A name of column that used to order the point based on a sequence (time based or ID based).
-#' @param gridCell A SpatialPolygonDataframe used to split/intersect the occupancy data.
-#' @param subgridCol A column contain the subgrid id used to split the data based on gridcell.
-#' @param elevData A raster layer contains elevation data in meter to calculate altitude (Z).
-#' @param repLength An information about a desired length of each spatial replicate.
-#' @param whichCol A column that contains all the species occurrence
-#' @param whichSp A selected species name within the "whichCol" column to be extracted
-#' @param samplingCov Sampling covariates to be extracted (default is FALSE)from each replicate.
-#' @param samplingFun A list of method to deal with samplingCov (only modal (for character), mean (for numeric), and canopy (to calculate canopy closure) functions that are currently available.
-#' @param Xcol A column that consists X coordinates.
-#' @param Ycol A column that consists Y coordinates.
+#' @param spData A spatial points containing the recorded species or entities along the transect in sf format.
+#' @param sortID A column name utilized to sequence the points, whether based on time or ID.
+#' @param gridCell Spatial polygons or grid cells employed for the subdivision or intersection of the 'spData'.
+#' @param subgridCol A column containing the subgrid ID used to partition the data based on grid cells.
+#' @param elevData A raster layer containing elevation data in meters to calculate altitude (Z).
+#' @param repLength User input specifying the desired length of each spatial replicate.
+#' @param whichCol A column containing all the species for which to extract detection matrices.
+#' @param whichSp A selected species or entity name within the "whichCol" column to be extracted as detection matrices.
+#' @param samplingCov Sampling covariates recorded during the surveys that are to be extracted from each replicate (default is FALSE).
+#' @param samplingFun A list of methods to handle samplingCov, specifically designed for SWTS survey, including only modal (for character), mean (for numeric), and canopy (to calculate canopy closure) functions, are currently available.
+#' @param Xcol A quoted column name representing X coordinates within the dataFrame.
+#' @param Ycol A quoted column name representing Y coordinates within the dataFrame.
 #'
-#' @return A data-frame contain detection matrices from all gridcell.
+#' @return A data frame containing the detection matrix for selected species or entities, along with their geographic coordinates and sampling covariates from all gri9d cells.
 #'
 #' @export
-speciesDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elevData,
+spatialDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elevData,
                                whichCol, whichSp, Xcol, Ycol, samplingCov = FALSE, samplingFun = FALSE) {
 
   # Intersect spData data with gridCell
