@@ -20,7 +20,7 @@ sliceGrids <- function(mainGrids, mainID, aggreFact){
   if (nrow(mainGrids_sf) == 1){
 
     # calculate the length of one side of the first grid
-    side_length <- rgeos::gLength(mainGrids)/4
+    side_length <- sf::st_length(sf::st_cast(mainGrid_i, "LINESTRING"))[1]/4
 
     # Create a raster based on aggregate factor
     raster_cell <- terra::rast(ext=terra::ext(mainGrids_sf), res=side_length/aggreFact)
@@ -38,11 +38,11 @@ sliceGrids <- function(mainGrids, mainID, aggreFact){
     subgrid_sf <- sf::st_as_sf(subgrid_sp)
 
     # Create ID
-    subgrid_sf$id <- 1:nrow(subgrid_sf)
+    subgrid_sf$Subgrid_id <- 1:nrow(subgrid_sf)
 
     # Combine names from the two grids
     subgrid_sf <- subgrid_sf %>%
-      dplyr::mutate(subgrid_id = paste(mainGrids_sf[,mainID[1]], id, sep = "_"))
+      dplyr::mutate(subgrid_id = paste(mainGrids_sf[,mainID[1]], Subgrid_id, sep = "_"))
 
     # Create final output
     final_output <- subgrid_sp
@@ -94,11 +94,11 @@ sliceGrids <- function(mainGrids, mainID, aggreFact){
       subgrid_sf <- sf::st_as_sf(subgrid_sp)
 
       # Create ID
-      subgrid_sf$id <- 1:nrow(subgrid_sf)
+      subgrid_sf$Subgrid_id <- 1:nrow(subgrid_sf)
 
       # Combine names from the two grids
       subgrid_sf <- subgrid_sf %>%
-        dplyr::mutate(subgrid_id = paste(mainGrids_sf[,mainID[1]], id, sep = "_"))
+        dplyr::mutate(subgrid_id = paste(mainGrids_sf[,mainID[1]], Subgrid_id, sep = "_"))
 
       # Final output
       output_grids[[i]] <- subgrid_sf

@@ -30,7 +30,7 @@ makeGrids <- function(spObject, cellSize, clip = FALSE){
   subgrid_sp <- terra::as.polygons(raster_cell)
 
   # Create ID
-  subgrid_sp$id <- 1:nrow(subgrid_sp)
+  subgrid_sp$Grid_id <- 1:nrow(subgrid_sp)
 
   # Whether to create grids within spObject or preserve the whole grids
   if (clip == FALSE){
@@ -42,13 +42,13 @@ makeGrids <- function(spObject, cellSize, clip = FALSE){
     subgrid_sp_clip <- terra::intersect(subgrid_sp, spObject_spat)
 
     # Preserve the shape of subgrids (do not clip)
-    subgrid_sp_clip <- subgrid_sp[subgrid_sp$id %in% subgrid_sp_clip$id, ]
+    subgrid_sp_clip <- subgrid_sp[subgrid_sp$Grid_id %in% subgrid_sp_clip$Grid_id, ]
 
     # Rewrite the grid ID
-    subgrid_sp_clip$id <- 1:nrow(subgrid_sp_clip)
+    subgrid_sp_clip$Grid_id <- 1:nrow(subgrid_sp_clip)
 
     # Reselect column
-    final_grids <- subgrid_sp_clip[,"id"]
+    final_grids <- subgrid_sp_clip[,"Grid_id"]
   }
   # Convert to sf
   final_grids_sf <- sf::st_as_sf(final_grids)
