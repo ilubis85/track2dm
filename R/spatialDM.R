@@ -1,23 +1,23 @@
-#' @title Extract detection matrices over of a certain species
+#' @title Generate detection matrices specific to a particular species or entities along the transects.
 #'
-#' @description A function to create detection matrix for selected species.
+#' @description A function to Generate detection matrices specific to a particular species or entities along the transects..
 #'
-#' @param speciesDF A matrix contains Replicate column.
-#' @param sortID A name of column that used to order the point based on a sequence (time based or ID based).
-#' @param Xcol A quoted name of column that consists X coordinates.
-#' @param Ycol A quoted name of column that consists Y coordinates.
-#' @param whichCol A column that contains all the species occurrence.
-#' @param whichSp A selected species name within the "whichCol" column to be extracted.
-#' @param samplingCov Sampling covariates to be extracted (default is FALSE)from each replicate.
-#' @param samplingFun A list of method to deal with samplingCov (only modal (for character), mean (for numeric), and canopy (to calculate canopy closure) functions that are currently available.
+#' @param speciesDF A dataframe includes the species, location along the transects, and the replicate column generated from the dist3D function.
+#' @param sortID A column used to order points based on a sequence, either time-based or ID-based.
+#' @param Xcol A quoted column name representing X coordinates within the dataFrame.
+#' @param Ycol A quoted column name representing Y coordinates within the dataFrame.
+#' @param whichCol A column containing all the species for which to extract detection matrices .
+#' @param whichSp A selected species or entity name within the "whichCol" column to be extracted as detection matrices.
+#' @param samplingCov Sampling covariates recorded during the surveys that are to be extracted from each replicate (default is FALSE).
+#' @param samplingFun A list of methods to handle samplingCov, specifically designed for SWTS survey, including only modal (for character), mean (for numeric), and canopy (to calculate canopy closure) functions, are currently available.
 #'
-#' @return A data-frame contains detection matrix for selected species along with its geographic coordinates and sampling covariates.
+#' @return A data frame containing the detection matrix for selected species or entities, along with their geographic coordinates and sampling covariates.
 #'
 #'
 #' @export
 #' @importFrom  magrittr %>%
 #'
-speciesDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
+spatialDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
                            samplingCov = FALSE, samplingFun = FALSE){
 
   # Create a Presence/Absence (0/1) column based on the species occurrence
