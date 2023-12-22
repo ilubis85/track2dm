@@ -19,19 +19,22 @@
 #'
 #' @export
 spatialDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elevData,
-                               whichCol, whichSp, Xcol, Ycol, samplingCov = FALSE, samplingFun = FALSE) {
+                             whichCol, whichSp, Xcol, Ycol, samplingCov = FALSE, samplingFun = FALSE) {
 
   # Intersect spData data with gridCell
-  occ_clip <- terra::intersect(spData, gridCell)
+  occ_clip <- sf::st_intersection(spData, gridCell)
+
+  # Convert spatial data into dataframe, add X and Y
+  occ_clip_df <- data.frame(sf::st_drop_geometry(occ_clip), sf::st_coordinates(occ_clip))
 
   # Create list of subgridCol
-  subgrid_list <- occ_clip@data[, subgridCol] %>% unique()
+  subgrid_list <- occ_clip_df[, subgridCol] %>% unique()
 
   # Remove quote from the column names of the grid cell
   subgridCol_id <- noquote(subgridCol)
 
   # Compute number of row (nrow) for each subgrid in a new dataframe
-  new_df <- data.frame(subgridCol = occ_clip@data[, subgridCol])
+  new_df <- data.frame(subgridCol = occ_clip_df[, subgridCol])
 
   # Specify the subgridCol names
   names(new_df)[names(new_df) == "subgridCol"] <- subgridCol_id
@@ -41,9 +44,9 @@ spatialDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
 
   # SEARCH AND REMOVE if data contain < 2 rows (occasions)
   # STOP!!! IF THERE ARE DUPLICATED COLUMN NAMES!!!
-  if (sum(duplicated(colnames(occ_clip@data)))== 0){
+  if (sum(duplicated(colnames(occ_clip)))== 0){
     # Join table
-    occ_clip_clean <- dplyr::left_join(occ_clip@data, new_df, by = subgridCol) %>%
+    occ_clip_clean <- dplyr::left_join(occ_clip_df, new_df, by = subgridCol) %>%
       # Filter out if it contains , 2 rows
       dplyr::filter(nrow >= 3)
 
@@ -68,17 +71,17 @@ spatialDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
   for (i in seq_along(new_subgrid_list)) {
 
     # Select each subgrids
-    subgrid_i <- subset(occ_clip_clean, occ_clip_clean[, subgridCol] == new_subgrid_list[i])
+    subgrid_i <- base::subset(occ_clip_clean, occ_clip_clean[, subgridCol] == new_subgrid_list[i])
 
     # Calculate 3D distance
-    subgrid_i_3d <- track2dm::dist3D(dataFrame = subgrid_i, Xcol = Xcol, Ycol = Ycol,
+    subgrid_i_3d <- track2dm::dist3D(dataFrame = subgrid_i, Xcol = 'X', Ycol = "Y",
                                      elevData = elevData,  repLength = repLength)
 
     # Create detection matrix for selected species
-    subgrid_i_DM <- track2dm::speciesDM(speciesDF = subgrid_i_3d, sortID = sortID,
-                                            whichCol = whichCol, Xcol = Xcol, Ycol = Ycol,
-                                            whichSp = whichSp, samplingCov = samplingCov,
-                                            samplingFun = samplingFun)
+    subgrid_i_DM <- track2dm::spatialDM(speciesDF = subgrid_i_3d, sortID = sortID,
+                                        whichCol = whichCol, Xcol = Xcol, Ycol = Ycol,
+                                        whichSp = whichSp, samplingCov = samplingCov,
+                                        samplingFun = samplingFun)
     # Extract only presence-absence of the species and covariates
     # Extract detection
     dm_species[[i]] <- subgrid_i_DM %>% dplyr::select(starts_with("R"))
