@@ -6,7 +6,7 @@
 #' @param sortID A column used to order points based on a sequence, either time-based or ID-based.
 #' @param Xcol A quoted column name representing X coordinates within the dataFrame.
 #' @param Ycol A quoted column name representing Y coordinates within the dataFrame.
-#' @param whichCol A column containing all the species for which to extract detection matrices .
+#' @param whichCol A column containing all the species for which to extract detection matrices.
 #' @param whichSp A selected species or entity name within the "whichCol" column to be extracted as detection matrices.
 #' @param samplingCov Sampling covariates recorded during the surveys that are to be extracted from each replicate (default is FALSE).
 #' @param samplingFun A list of methods to handle samplingCov, specifically designed for SWTS survey, including only modal (for character), mean (for numeric), and canopy (to calculate canopy closure) functions, are currently available.
@@ -49,9 +49,13 @@ spatialDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
         dplyr::filter(row_number() == 1)
       species_info <- data.frame("Replicate" = species_occured[,"Replicate"],
                                  "Presence" = species_occured[,"Presence"],
-                                 "X" = species_occured[,"X"],
-                                 "Y" = species_occured[,"Y"],
+                                 "X" = species_occured[,Xcol],
+                                 "Y" = species_occured[,Ycol],
                                  whichCol = species_occured[,whichCol])
+
+      # make sure X and Y names following the given variable
+      names(species_info)[3] <- Xcol
+      names(species_info)[4] <- Ycol
 
       # Rename the species colum names
       # Put the quote on the whichCol
@@ -88,9 +92,13 @@ spatialDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
       species_occured <- speciesDF_rep_r %>% dplyr::filter(Presence == 1)
       species_info <- data.frame("Replicate" = species_occured[,"Replicate"],
                                  "Presence" = species_occured[,"Presence"],
-                                 "X" = species_occured[,"X"],
-                                 "Y" = species_occured[,"Y"],
+                                 "X" = species_occured[,Xcol],
+                                 "Y" = species_occured[,Ycol],
                                  whichCol = species_occured[,whichCol])
+
+      # make sure X and Y names following the given variable
+      names(species_info)[3] <- Xcol
+      names(species_info)[4] <- Ycol
 
       # Rename the species colum names
       # Put the quote on the whichCol
@@ -130,9 +138,13 @@ spatialDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
       # Extract species info
       species_info <- data.frame("Replicate" = species_occured[,"Replicate"],
                                  "Presence" = species_occured[,"Presence"],
-                                 "X" = species_occured[,"X"],
-                                 "Y" = species_occured[,"Y"],
+                                 "X" = species_occured[,Xcol],
+                                 "Y" = species_occured[,Ycol],
                                  whichCol = "NA")
+
+      # make sure X and Y names following the given variable
+      names(species_info)[3] <- Xcol
+      names(species_info)[4] <- Ycol
 
       # Rename the species colum names
       # Put the quote on the whichCol
@@ -219,7 +231,7 @@ spatialDM <-  function(speciesDF, sortID, Xcol, Ycol, whichCol, whichSp,
 
   # XY Coordinate centroid (XYcor)
   # Combine X and Y
-  XYcor <-  matrixDM %>% dplyr::select(Xcol, Ycol) %>%
+  XYcor <-  matrixDM[,c(Xcol, Ycol)] %>%
     # Unite X and Y as one
     tidyr::unite(data=., col="XY", Xcol:Ycol, sep = "_") %>%
     t() %>% as.data.frame() # Transform and save as dataframe
