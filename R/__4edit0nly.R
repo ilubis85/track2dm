@@ -62,34 +62,18 @@ plot(st_geometry(wknp_wp), pch=15, col='red', add=TRUE)
 
 # Make a grid
 grid_2km <- makeGrids(spObject = Kuala_Penet, cellSize = 2000, clip = F)
+
+# Plot
 plot(st_geometry(grid_2km), border='blue', add=TRUE)
 # DONE !!
 
 #### EDIT sliceGrid ####
 # slice grids
-grid_slice <- track2dm::sliceGrids(mainGrids = grid_2km, mainID = "id", aggreFact = 2)
+grid_slice <- sliceGrids(mainGrids = grid_2km, mainID = "Grid_id", aggreFact = 2)
+
 plot(st_geometry(grid_slice), border='yellow', add=TRUE)
 
 # DONE !!
-
-
-
-
-
-##### EDIT speciesDM_Grid ####
-# Tiger
-occ19_sub@data %>% colnames()
-occ19_sub@data$Species %>% table
-
-# NOT DONE YET
-(tiger_dm_19_grid <- track2dm::speciesDM_grid(spData = occ19_sub, sortID = "DateTim", repLength = 1000,
-                                        gridCell = test_grid, elevData = elev, whichCol = "Species",
-                                        whichSp = "PAT-Harimau", subgridCol = "GridID",
-                                        Xcol = "X", Ycol = "Y",
-                                        samplingCov = FALSE,
-                                        samplingFun =  FALSE))
-tiger_dm_19_grid %>% colnames()
-# DONE
 
 ############################
 #### IV - DATA CLEANING ####
@@ -120,7 +104,7 @@ points(test_1, pch=17, col='green')
 #### copyID ####
 wp_patrol_wpID_1 <- track2dm::copyID(points1 = test_1, points2 = wp_patrol_1)
 
-wp_patrol_wpID_1 %>% view()
+wp_patrol_wpID_1
 
 # sf::write_sf(obj = wp_patrol_wpID_2, dsn = "E:/myRpackages/track2dm_test/zahra_250723_zip",
 #              layer ="wp_patrol_wpID_2", driver="ESRI Shapefile", overwrite_layer = TRUE)
@@ -150,40 +134,47 @@ track2pts_df <- data.frame(st_drop_geometry(track2pts),
                            st_coordinates(track2pts))
 
 # # Add elevation
-wknp_elev <- terra::rast(x = "D:/data_spasial/GIS_INA/ras_01_topography/SRTM_30m_utm.tif")
-
-# convert to 47n
-wknp_resort_47n <- st_transform(x = wknp_resort, crs = terra::crs(wknp_elev))
-
-elev_crop <- terra::crop(x = wknp_elev, y = wknp_resort_47n)
-
-# Convert to utm48s
-wknp_elev_48s <- terra::project(x = elev_crop, y = terra::crs(wknp_resort))
+wknp_elev <- terra::rast(x = "D:/GIS_INA/ras_01_topography/WKNP_utm48s.tif")
 
 # Plot
-plot(wknp_elev_48s)
+plot(wknp_elev)
 plot(st_geometry(wknp_resort), add=TRUE)
 
 # Calculate 3D distance
 (track2pts_df_3d <- track2dm::dist3D(dataFrame = track2pts_df, Xcol = "X", Ycol = "Y",
-                                 elevData = wknp_elev_48s,  repLength = 2000, distType = "2D"))
+                                 elevData = wknp_elev,  repLength = 2000, distType = "3D"))
 # DONE !!!
 
 #### speciesDM ####
 # Select which species
-track2pts_df_3d %>% view()
+# track2pts_df_3d %>% view()
 track2pts_df_3d$species %>% table()
 
 # Extract DM
-(elephant_dm <- track2dm::speciesDM(speciesDF = track2pts_df_3d, sortID = "Id",
+(elephant_dm <- track2dm::spatialDM(speciesDF = track2pts_df_3d, sortID = "Id",
                                     Xcol = "X", Ycol = "Y", whichCol = "species",
                                     whichSp = "Gajah Sumatera - Elephas maximus",
                                     samplingCov = FALSE, samplingFun = FALSE))
 # DONE !!
 
+# Extract DM over the grid cells
+# Create gridcells
+grids <- track2dm::makeGrids(spObject = track2pts, cellSize = 2000, clip = FALSE)
+plot(st_geometry(grids))
+plot(st_geometry(track2pts), pch=20, col='red', add=TRUE)
+
+# Extract detection matrices from each grid cell
+(elephant_dm_grids <- spatialDM_grid(spData = track2pts, repLength = 200, gridCell = grids,
+                                               subgridCol = 'Grid_id', elevData = wknp_elev, sortID = 'id',
+                                               Xcol = "x", Ycol = "y", whichCol = "species",
+                                               whichSp = "Gajah Sumatera - Elephas maximus",
+                                               samplingCov = FALSE, samplingFun = FALSE))
+
+
 #### dm2spatial ####
 # Test dm2spatial
 elephant_dm_sf <- track2dm::dm2spatial(detectMatrix = elephant_dm, spProject = wknp_resort)
+elephant_dm_grids_sf <- track2dm::dm2spatial(detectMatrix = elephant_dm_grids, spProject = wknp_resort)
 
 # Plot
 plot(st_geometry(wknp_tracks), col="gray40", pch=15, cex=0.5)
@@ -192,7 +183,8 @@ plot(elephant_dm_sf, col="red", pch=16, add=T)
 
 library(tmap)
 tm_shape(wknp_tracks) + tm_lines() +
-  tm_shape(elephant_dm_sf) + tm_dots(col = 'Detection', size=1.5)
+  tm_shape(grids) + tm_polygons(col = 'Grid_id') +
+  tm_shape(elephant_dm_grids_sf) + tm_dots(col = 'Detection', size=1.5)
 
 # Simpan file shp yang telah kita buat
 sf::write_sf(obj = elephant_dm_sf, dsn = "D:/myRpackage/Package_testing/track2dm_bugs/zahra_250723",
