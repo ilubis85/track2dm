@@ -36,7 +36,7 @@ dist3D <- function(dataFrame, Xcol, Ycol, elevData, repLength, distType = "3D"){
       whichGrid <- paste(dataFrame[1,Xcol], dataFrame[1,Ycol], sep = "_")
 
       # Put into a message
-      message(paste("Elevation (z) data contains NA values",whichGrid, sep=" in "))
+      message(paste("Elevation (z) data includes NA values",whichGrid, sep=" in "))
 
       # Remove any rows contain NA values in Z
       dataFrame <- dataFrame %>% tidyr::drop_na(Z)
