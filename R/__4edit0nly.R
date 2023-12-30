@@ -187,8 +187,8 @@ tm_shape(wknp_tracks) + tm_lines() +
   tm_shape(elephant_dm_grids_sf) + tm_dots(col = 'Detection', size=1.5)
 
 # Simpan file shp yang telah kita buat
-sf::write_sf(obj = elephant_dm_sf, dsn = "D:/myRpackage/Package_testing/track2dm_bugs/zahra_250723",
-             layer ="elephant_dm_sf", driver="ESRI Shapefile", overwrite_layer = TRUE)
+# sf::write_sf(obj = elephant_dm_sf, dsn = "D:/myRpackage/Package_testing/track2dm_bugs/zahra_250723",
+#              layer ="elephant_dm_sf", driver="ESRI Shapefile", overwrite_layer = TRUE)
 
 
 # DONE!!
@@ -222,16 +222,22 @@ wp_track_test_1_df <- data.frame(st_drop_geometry(wp_track_test_1),
 # track2pts_df_3d %>% view()
 wp_track_test_1_df_3d$Jenis_satw %>% table()
 
-
-
 # Extract DM
 (elephant_dm_test_1 <- track2dm::spatialDM(speciesDF = wp_track_test_1_df_3d, sortID = "Id",
                                     Xcol = "X", Ycol = "Y", whichCol = "Jenis_satw",
                                     whichSp = "Gajah Sumatera - Elephas maximus",
                                     samplingCov = FALSE, samplingFun = FALSE))
 
+# Create gridcells
+grids <- track2dm::makeGrids(spObject = wp_track_test_1, cellSize = 5000, clip = FALSE)
+plot(st_geometry(grids))
+plot(st_geometry(wp_track_test_1), pch=20, col='red', add=TRUE)
 
-
-
-
+# Extract detection matrices from each grid cell
+(elephant_dm_test_1_grids <- spatialDM_grid(spData = wp_track_test_1, repLength = 1000, gridCell = grids,
+                                     subgridCol = 'Grid_id', elevData = wknp_elev, sortID = 'id',
+                                     Xcol = "X", Ycol = "Y", whichCol = "Jenis_satw",
+                                     whichSp = "Gajah Sumatera - Elephas maximus",
+                                     samplingCov = FALSE, samplingFun = FALSE))
+# Looks great !!
 
