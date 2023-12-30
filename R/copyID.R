@@ -17,6 +17,9 @@ copyID <- function(points1, points2){
   points1_sf <- sf::st_as_sf(points1)
   points2_sf <- sf::st_as_sf(points2)
 
+  # Remove any X and Y column from waypoints
+  points2_sf <- points2_sf %>% dplyr::select(-starts_with(c('X', 'Y', 'x', 'y')))
+
   # For each point, create a buffer with length is about a half of between 2 points from "points1"
   # Then check if there are any other points from "points2" within the buffer area
   # If there are more than one points of points2, get the nearest one
