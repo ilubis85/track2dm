@@ -17,13 +17,13 @@ dist3D <- function(dataFrame, Xcol, Ycol, elevData, repLength, distType = "3D"){
   # Calculate 3D as default
   if(distType == "3D"){
 
-    # Check if elevation is a Terra object
-    if(class(elevData)!="SpatRaster"){
-      stop(" raster data is not a SpatRaster from terra package")
-    }
-
     # Add elevation data from DEM that has been provided
     dataFrame$Z <- terra::extract(elevData, dataFrame[,c(Xcol, Ycol)])
+
+    # Check if elevation is a Terra object
+    if(sum(is.na(dataFrame$Z))== nrow(dataFrame)){
+      stop("All points have missing elevation values")
+    }
 
     # Add new column of distance to the track dataframe
     dataFrame$Dist <- as.numeric("")
