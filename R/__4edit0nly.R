@@ -155,6 +155,7 @@ track2pts_df_3d$species %>% table()
                                     Xcol = "X", Ycol = "Y", whichCol = "species",
                                     whichSp = "Gajah Sumatera - Elephas maximus",
                                     samplingCov = FALSE, samplingFun = FALSE))
+
 # DONE !!
 
 # Extract DM over the grid cells
@@ -166,10 +167,9 @@ plot(st_geometry(track2pts), pch=20, col='red', add=TRUE)
 # Extract detection matrices from each grid cell
 (elephant_dm_grids <- spatialDM_grid(spData = track2pts, repLength = 200, gridCell = grids,
                                                subgridCol = 'Grid_id', elevData = wknp_elev, sortID = 'id',
-                                               Xcol = "x", Ycol = "y", whichCol = "species",
+                                               Xcol = "X", Ycol = "Y", whichCol = "species",
                                                whichSp = "Gajah Sumatera - Elephas maximus",
                                                samplingCov = FALSE, samplingFun = FALSE))
-
 
 #### dm2spatial ####
 # Test dm2spatial
@@ -188,10 +188,49 @@ tm_shape(wknp_tracks) + tm_lines() +
 
 # Simpan file shp yang telah kita buat
 sf::write_sf(obj = elephant_dm_sf, dsn = "D:/myRpackage/Package_testing/track2dm_bugs/zahra_250723",
-                layer ="elephant_dm_sf", driver="ESRI Shapefile", overwrite_layer = TRUE)
+             layer ="elephant_dm_sf", driver="ESRI Shapefile", overwrite_layer = TRUE)
 
 
 # DONE!!
+
+#### ADD More data for testing ####
+wp_test_1 <- sf::st_read("E:/myRpackages/track2dm_test/zahra_250723_zip/WP_wk_dummy.shp")
+track_test_1 <- sf::st_read("E:/myRpackages/track2dm_test/zahra_250723_zip/track_to_dm_wk_dummy.shp")
+
+# Plot
+plot(st_geometry(track_test_1), col='grey')
+plot(st_geometry(wp_test_1), pch=20, col='red')
+
+# Combine wp and track
+wp_track_test_1 <- track2dm::track2points(trackSp = track_test_1, track_id_1 = "Patrol_ID", track_id_2 = "Patrol_D",
+                                          minDist = 100, waypointSp = wp_test_1, point_id_1 = "Patrol_ID",
+                                          point_id_2 = "Waypoint_D") # does not work
+
+# Save to file
+# sf::write_sf(wp_track_test_1,"E:/myRpackages/track2dm_test/zahra_250723_zip/trackpts_wk_dummy.shp")
+
+# convert to dataframe
+wp_track_test_1_df <- data.frame(st_drop_geometry(wp_track_test_1),
+                           st_coordinates(wp_track_test_1))
+
+# Calculate 3D distance
+(wp_track_test_1_df_3d <- track2dm::dist3D(dataFrame =wp_track_test_1_df, Xcol = "X", Ycol = "Y",
+                                     elevData = wknp_elev,  repLength = 2000, distType = "3D"))
+
+# Create dm
+# Select which species
+# track2pts_df_3d %>% view()
+wp_track_test_1_df_3d$Jenis_satw %>% table()
+
+
+
+# Extract DM
+(elephant_dm_test_1 <- track2dm::spatialDM(speciesDF = wp_track_test_1_df_3d, sortID = "Id",
+                                    Xcol = "X", Ycol = "Y", whichCol = "Jenis_satw",
+                                    whichSp = "Gajah Sumatera - Elephas maximus",
+                                    samplingCov = FALSE, samplingFun = FALSE))
+
+
 
 
 
