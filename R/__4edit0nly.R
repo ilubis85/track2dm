@@ -194,6 +194,7 @@ tm_shape(wknp_tracks) + tm_lines() +
 # DONE!!
 
 #### ADD More data for testing ####
+# SMART PATROL DATA
 wp_test_1 <- sf::st_read("E:/myRpackages/track2dm_test/zahra_250723_zip/WP_wk_dummy.shp")
 track_test_1 <- sf::st_read("E:/myRpackages/track2dm_test/zahra_250723_zip/track_to_dm_wk_dummy.shp")
 
@@ -240,4 +241,58 @@ plot(st_geometry(wp_track_test_1), pch=20, col='red', add=TRUE)
                                      whichSp = "Gajah Sumatera - Elephas maximus",
                                      samplingCov = FALSE, samplingFun = FALSE))
 # Looks great !!
+# Occupancy survey
+# Read file
+# Add grid cell
+grid17km <-  sf::read_sf(dsn= "D:/myPhD_thesis/05_Ch3_tiger_pathways/4_Spatial_data", layer="Grid_SWTS_LE_final")
 
+# Add elevation
+elev <- terra::rast("D:/myPhD_thesis/05_Ch3_tiger_pathways/4_Spatial_data/Elev_30m.tif")
+
+# Get the occupancy data
+occ20 <-  sf::read_sf(dsn= "D:/myPhD_thesis/05_Ch3_tiger_pathways/3_Occupancy_2020/OCC_2020/02_preprocessed_data",
+                         layer="Occupancy_2020_pt")
+
+# Plot data
+plot(st_geometry(grid17km), border="black")
+plot(st_geometry(occ20), col="red", pch=16, cex=0.5, add=TRUE)
+
+# Remove ID column from grid cell
+grid17km <- grid17km %>% dplyr::select(-Id)
+
+# For testing, use small subset of the grids
+grid17km$GridID %>% table()
+grid17km_sub <- grid17km %>% filter(GridID >= "N26W28" & GridID < "N26W29")
+
+# Recreate the smaller gridcell
+grid4.25km_sub <- track2dm::sliceGrids(mainGrids = grid17km_sub, mainID = 'GridID',
+                                       aggreFact = 4)
+
+# Intersect occupancy data
+occ20_N26W28 <- sf::st_intersection(occ20, grid17km_sub)
+
+# Plot
+plot(st_geometry(grid4.25km_sub), border = "grey")
+plot(st_geometry(grid17km_sub), border = "red", add=TRUE)
+plot(st_geometry(occ20_N26W28), col="red", pch=16, cex=0.5, add=TRUE)
+
+# Which species
+table(occ20_N26W28$Species)
+
+# Create dm for tiger
+# Create detection matrix
+tiger_dm <- track2dm::spatialDM_grid(spData = occ20, sortID = "DateTim", repLength = 3000,
+                                           gridCell = grid4.25km_sub, elevData = elev, whichCol = "Species",
+                                           whichSp = "PAT-Harimau", subgridCol = "Subgrid_id", Xcol = "X", Ycol = "Y",
+                                           samplingCov =  "Habitat", samplingFun =  modal)
+tiger_dm
+
+# Spatialise dm
+tiger_dm_sf <- track2dm::dm2spatial(detectMatrix = tiger_dm, spProject = terra::crs(grid17km))
+
+# Plot
+library(tmap)
+tm_shape(grid4.25km_sub) + tm_polygons() +
+  tm_shape(tiger_dm_sf) + tm_dots(col = 'Detection', size=1.5)
+
+# Looks great !!!!
