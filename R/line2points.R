@@ -30,7 +30,7 @@ line2points <- function(spLineDF, minDist){
       spPoints <- sf::st_line_sample(x = spLine_sf, n = 1, type = "random")
 
       # Return points at specified distance along a line
-      orderID <- st_cast(sfPoints, to = 'POINT') %>% st_coordinates() %>% as.data.frame() %>%
+      orderID <- sf::st_cast(sfPoints, to = 'POINT') %>% sf::st_coordinates() %>% as.data.frame() %>%
         # Add ID
         dplyr::transmute(Id = 1:nrow(.), X, Y)
 
@@ -42,7 +42,7 @@ line2points <- function(spLineDF, minDist){
                                      type = "regular")
 
       # Return points at specified distance along a line
-      orderID <- st_cast(sfPoints, to = 'POINT') %>% st_coordinates() %>% as.data.frame() %>%
+      orderID <- sf::st_cast(sfPoints, to = 'POINT') %>% sf::st_coordinates() %>% as.data.frame() %>%
         # Add ID
         dplyr::transmute(Id = 1:nrow(.), X, Y)
     }

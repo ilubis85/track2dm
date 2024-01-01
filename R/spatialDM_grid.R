@@ -84,7 +84,7 @@ spatialDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
                                         samplingFun = samplingFun)
     # Extract only presence-absence of the species and covariates
     # Extract detection
-    dm_species[[i]] <- subgrid_i_DM %>% dplyr::select(starts_with("R"))
+    dm_species[[i]] <- subgrid_i_DM %>% dplyr::select(dplyr::starts_with("R"))
 
     # Extract covariates for N number of covariates
     # If samplingCov is FALSE, type 'None
@@ -96,18 +96,18 @@ spatialDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
       # Create an otput
       ncovar = list()
       for (j in seq_along(samplingCov)) {
-        ncovar[[j]] <- subgrid_i_DM %>% dplyr::select(starts_with(samplingCov[j]))
+        ncovar[[j]] <- subgrid_i_DM %>% dplyr::select(dplyr::starts_with(samplingCov[j]))
       }
       # Combine
       dm_covar[[i]] <- do.call(cbind,  ncovar)
 
     } # If sampling covariates is 1, extract it directly
     else {
-      dm_covar[[i]] <- subgrid_i_DM %>% dplyr::select(starts_with(samplingCov))
+      dm_covar[[i]] <- subgrid_i_DM %>% dplyr::select(dplyr::starts_with(samplingCov))
     }
 
     # Extract XY coordinates
-    dm_XY[[i]] <- subgrid_i_DM %>% dplyr::select(starts_with("XY"))
+    dm_XY[[i]] <- subgrid_i_DM %>% dplyr::select(dplyr::starts_with("XY"))
 
     # Progress bar
     pb$tick()
@@ -134,7 +134,7 @@ spatialDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
     # Add output list
     covars <- list()
     for (k in seq_along(samplingCov)) {
-      covars[[k]] <- dm_covar_df %>% dplyr::select(starts_with(samplingCov[[k]]))
+      covars[[k]] <- dm_covar_df %>% dplyr::select(dplyr::starts_with(samplingCov[[k]]))
     }
 
     # Combine as one

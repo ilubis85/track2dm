@@ -48,13 +48,13 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
     track_j <- tracks[[j]]
 
     # Extract ID from colums
-    id_1 <- track_j[, track_id_1] %>% st_drop_geometry() %>% as.vector()
-    id_2 <- track_j[, track_id_2] %>% st_drop_geometry() %>% as.vector()
+    id_1 <- track_j[, track_id_1] %>% sf::st_drop_geometry() %>% as.vector()
+    id_2 <- track_j[, track_id_2] %>% sf::st_drop_geometry() %>% as.vector()
 
     # Then select way point based on track category
     waypoints[[j]] <- waypointsf %>%
-      filter(across(all_of(point_id_1), ~. == id_1) &
-               across(all_of(point_id_2), ~. == id_2))
+      dplyr::filter(dplyr::across(dplyr::all_of(point_id_1), ~. == id_1) &
+                      dplyr::across(dplyr::all_of(point_id_2), ~. == id_2))
 
   }
   # 3 : CREATE DM FOR EACH COMBINATION OF TRACKS AND WP

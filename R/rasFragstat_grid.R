@@ -19,11 +19,6 @@
 rasFragstat_grid <- function(landCover, landLevel = "landscape", lClass = FALSE,
                            subGrids, lsmFunc, as_Raster = TRUE, rasRes = 1000){
 
-  # Check if raster is a terra object
-  if(class(landCover)!="SpatRaster"){
-    stop(" raster data is not a SpatRaster from terra package")
-  }
-
   # Convert to sf and terra object
   subGrids_sf <- sf::st_as_sf(subGrids)
 
