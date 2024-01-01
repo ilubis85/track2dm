@@ -1,6 +1,6 @@
-#' @title Calculate lines density for each grid cell and convert to raster.
+#' @title Compute line density for individual grid cells and convert the results into a raster format.
 #'
-#' @description A function to calculate density for each grid cell and convert to raster.
+#' @description A function to compute line density for individual grid cells and convert the results into a raster format.
 #'
 #' @param sfData An sf object of multiple lines in UTM projection.
 #' @param subGrids Grid cells within the landscape of interest, each grid cell can be identified with id column, also in UTM.
@@ -12,7 +12,7 @@
 #'
 #' @export
 # Create a function to calculate density for each grid cell and convert to raster
-vecDensity_grid <- function(sfData, subGrids, as_Raster = TRUE, rasRes = 1000){
+lineDens_grid <- function(sfData, subGrids, as_Raster = TRUE, rasRes = 1000){
   # Suppress warning
   options(warn=-1)
 
