@@ -20,7 +20,7 @@ sliceGrids <- function(mainGrids, mainID, aggreFact){
   if (nrow(mainGrids_sf) == 1){
 
     # calculate the length of one side of the first grid
-    side_length <- sf::st_length(sf::st_cast(mainGrid_i, "LINESTRING"))[1]/4
+    side_length <- sf::st_length(sf::st_cast(mainGrids_sf, "LINESTRING"))[1]/4
 
     # Create a raster based on aggregate factor
     raster_cell <- terra::rast(ext=terra::ext(mainGrids_sf), res=side_length/aggreFact)
@@ -42,10 +42,11 @@ sliceGrids <- function(mainGrids, mainID, aggreFact){
 
     # Combine names from the two grids
     subgrid_sf <- subgrid_sf %>%
-      dplyr::mutate(subgrid_id = paste(mainGrids_sf[,mainID[1]], Subgrid_id, sep = "_"))
+      dplyr::mutate(subgrid_id = paste(mainGrids_sf[,mainID[1]], Subgrid_id, sep = "_")) %>%
+      dplyr::select(Subgrid_id)
 
     # Create final output
-    final_output <- subgrid_sp
+    final_output <- subgrid_sf
 
   } else { # For multiple rows/features
 
@@ -98,7 +99,8 @@ sliceGrids <- function(mainGrids, mainID, aggreFact){
 
       # Combine names from the two grids
       subgrid_sf <- subgrid_sf %>%
-        dplyr::mutate(subgrid_id = paste(mainGrids_sf[,mainID[1]], Subgrid_id, sep = "_"))
+        dplyr::mutate(subgrid_id = paste(mainGrids_sf[,mainID[1]], Subgrid_id, sep = "_"))%>%
+        dplyr::select(Subgrid_id)
 
       # Final output
       output_grids[[i]] <- subgrid_sf
