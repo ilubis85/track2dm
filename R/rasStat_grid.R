@@ -12,12 +12,8 @@
 #'
 #' @export
 # Create a function to crop raster and calculate statistic for each grids
-grid_rast_stat <- function(rasterData, subGrids, myFunc, as_Raster = TRUE, rasRes = 1000){
+rasStat_grid <- function(rasterData, subGrids, myFunc, as_Raster = TRUE, rasRes = 1000){
 
-  # Check if raster is a terra object
-  if(class(rasterData)!="SpatRaster"){
-    stop(" raster data is not a SpatRaster from terra package")
-  }
   # Convert to sf and terra object
   subGrids_sf <- sf::st_as_sf(subGrids)
 
