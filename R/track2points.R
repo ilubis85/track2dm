@@ -30,8 +30,9 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
   track_list <- tracksf %>% sf::st_drop_geometry() %>%
     dplyr::select(track_id_1, track_id_2) %>% unique()
 
+  # Convert to individual line as "LINESTRING"
   for (i in 1:nrow(track_list)) {
-    tracks[[i]]  <- tracksf[i,]
+    tracks[[i]]   <- sf::st_cast(tracksf[i,], "LINESTRING", do_split=FALSE) # Do not split object
   }
 
   # Merge tracks with similar columns
