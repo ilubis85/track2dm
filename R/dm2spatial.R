@@ -14,11 +14,11 @@ dm2spatial <- function(detectMatrix, spProject){
 
   # Separate and transform detection
   new_deTect <- detectMatrix %>%
-    dplyr::select(dplyr::starts_with("R")) %>%
+    dplyr::select(dplyr::starts_with("R"), ends_with(c("ID", "Id", "id"))) %>%
     # Transform column to row
     tidyr::pivot_longer(cols = dplyr::starts_with("R")) %>%
     # Rearrange
-    dplyr::mutate("Rep" = 1:nrow(.)) %>% dplyr::transmute(Rep, "Detection"=value)
+    dplyr::rename("Detection"=value, "Replicate"=name)
 
   # Separate, transform, and separate X and Y Coordinates
   new_XYcor <- detectMatrix %>%
