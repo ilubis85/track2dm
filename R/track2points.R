@@ -38,7 +38,7 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
     tracks_i  <- sf::st_cast(tracksf[i,], "LINESTRING", do_split=FALSE) # Do not split object
 
     # Remove traks that have track length < 2 x minDist
-    if (as.numeric(st_length(tracks_i)) < 2*minDist){
+    if (as.numeric(sf::st_length(tracks_i)) < 2*minDist){
       tracks_skip[[i]] <- tracks_i
 
       # Else, skip
@@ -46,8 +46,8 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
   }
 
   # Discard NULL
-  tracks_skip <- tracks_skip %>% discard(is.null)
-  tracks_keep <- tracks_keep %>% discard(is.null)
+  tracks_skip <- tracks_skip %>% purrr::discard(is.null)
+  tracks_keep <- tracks_keep %>% purrr::discard(is.null)
 
   # Print message
   print(paste("number of tracks", length(tracks_keep), sep = " is "))
@@ -100,10 +100,10 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
     tracks_pts_k <- track2dm::line2points(spLineDF = tracks_k, minDist = minDist)
 
     # Show plot
-    plot(st_geometry(tracks_k), lwd=1.4, col="lightblue")
-    plot(st_geometry(waypoints_k), pch=16, cex=0.8, col='grey40', add=TRUE)
-    plot(st_geometry(tracks_pts_k), pch=8, col='red', add=TRUE)
-    text(x = base::mean(waypoints_k$X), y = base::mean(waypoints_k$Y),
+    plot(sf::st_geometry(tracks_k), lwd=1.4, col="lightblue")
+    plot(sf::st_geometry(waypoints_k), pch=16, cex=0.8, col='grey40', add=TRUE)
+    plot(sf::st_geometry(tracks_pts_k), pch=8, col='red', add=TRUE)
+    graphics::text(x = base::mean(waypoints_k$X), y = base::mean(waypoints_k$Y),
          font=1, cex=1.3, paste("track", k, sep = " "))
 
     # Then copy the ID
