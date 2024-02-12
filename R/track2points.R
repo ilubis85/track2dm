@@ -23,30 +23,46 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
   waypointsf <- sf::st_as_sf(waypointSp)
 
   # 1 : SPLIT TRACKS
-  tracks <- list()
+  tracks_skip <- list() # Remove if track length < minDist
+  tracks_keep <- list()
 
   # List of tracks
   # track_list <- trackSp@data[, c(track_id_1, track_id_2)] %>% unique()
   track_list <- tracksf %>% sf::st_drop_geometry() %>%
-    dplyr::select(track_id_1, track_id_2) %>% unique()
+    dplyr::select(track_id_1, track_id_2) %>%  # Select
+    dplyr::group_by_(track_id_1, track_id_2) %>%  # Select
+    dplyr::arrange(track_id_1, track_id_2, .by_group=TRUE) %>% unique()
 
   # Convert to individual line as "LINESTRING"
   for (i in 1:nrow(track_list)) {
-    tracks[[i]]   <- sf::st_cast(tracksf[i,], "LINESTRING", do_split=FALSE) # Do not split object
+    tracks_i  <- sf::st_cast(tracksf[i,], "LINESTRING", do_split=FALSE) # Do not split object
+
+    # Remove traks that have track length < 2 x minDist
+    if (as.numeric(st_length(tracks_i)) < 2*minDist){
+      tracks_skip[[i]] <- tracks_i
+
+      # Else, skip
+    }else{tracks_keep[[i]] <- tracks_i}
   }
 
-  # Merge tracks with similar columns
-  print(paste("track_length", length(tracks), sep = " = "))
+  # Discard NULL
+  tracks_skip <- tracks_skip %>% discard(is.null)
+  tracks_keep <- tracks_keep %>% discard(is.null)
+
+  # Print message
+  print(paste("number of tracks", length(tracks_keep), sep = " is "))
+  n_skip <- paste("number of tracks discarded due to track length", paste(2*minDist, "mtrs", sep = " "), sep = " <= ")
+  print(paste(n_skip, length(tracks_skip), sep = " is "))
 
   # 2 : SELECT WAYPOINT BASED ON SELECTED TRACK
   waypoints <- list()
-  for (j in seq_along(tracks)) {
+  for (j in seq_along(tracks_keep)) {
 
     # Suppress warning
     options(warn=-1)
 
     # Select tracks
-    track_j <- tracks[[j]]
+    track_j <- tracks_keep[[j]]
 
     # Extract ID from colums
     id_1 <- track_j[, track_id_1] %>% sf::st_drop_geometry() %>% as.vector()
@@ -62,19 +78,19 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
   # Create progress bar
   pb = progress::progress_bar$new(
     format = "  processing [:bar] :percent in :elapsed",
-    total = length(tracks), clear = FALSE, width= 60)
+    total = length(tracks_keep), clear = FALSE, width= 60)
 
   # Output
   track_pts <- list()
 
   # Convert each track to multipoints
-  for (k in 1:length(tracks)) {
+  for (k in 1:length(tracks_keep)) {
 
     # Suppress warning
     options(warn=-1)
 
     # Select individual item
-    tracks_k <- tracks[[k]]
+    tracks_k <- tracks_keep[[k]]
     waypoints_k <- waypoints[[k]]
 
     # Add WP_ID for each waypoints, to be copied on the track
@@ -84,9 +100,11 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
     tracks_pts_k <- track2dm::line2points(spLineDF = tracks_k, minDist = minDist)
 
     # Show plot
-    # plot(st_geometry(tracks_k), col="grey")
-    # plot(st_geometry(waypoints_k), pch=16, cex=0.8, col='black', add=TRUE)
-    # plot(st_geometry(tracks_pts_k), pch=1, col='red', add=TRUE)
+    plot(st_geometry(tracks_k), lwd=1.4, col="lightblue")
+    plot(st_geometry(waypoints_k), pch=16, cex=0.8, col='grey40', add=TRUE)
+    plot(st_geometry(tracks_pts_k), pch=8, col='red', add=TRUE)
+    text(x = base::mean(waypoints_k$X), y = base::mean(waypoints_k$Y),
+         font=1, cex=1.3, paste("track", k, sep = " "))
 
     # Then copy the ID
     track_pt_wpID <- track2dm::copyID(points1 = tracks_pts_k, points2 = waypoints_k)
@@ -101,7 +119,7 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
 
     # Progress bar
     pb$tick()
-    Sys.sleep(1 / length(tracks))
+    Sys.sleep(1 / length(tracks_keep))
   }
   # 4 : Combine as a result
   result_com <- do.call(rbind, track_pts)
