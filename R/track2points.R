@@ -69,11 +69,17 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
     id_2 <- track_j[, track_id_2] %>% sf::st_drop_geometry() %>% as.vector()
 
     # Then select way point based on track category
-    waypoints[[j]] <- waypointsf %>%
+    waypoints_j <- waypointsf %>%
       dplyr::filter(dplyr::across(dplyr::all_of(point_id_1), ~. == id_1) &
                       dplyr::across(dplyr::all_of(point_id_2), ~. == id_2))
 
+    # Remove traks that have its nrow(waypoints) == NULL
+    if (nrow(waypoints_j) <= 1){
+      next
+      # Else, skip
+    }else{waypoints[[j]] <- waypoints_j}
   }
+
   # 3 : CREATE DM FOR EACH COMBINATION OF TRACKS AND WP
   # Create progress bar
   pb = progress::progress_bar$new(
@@ -93,26 +99,34 @@ track2points <- function(trackSp, track_id_1, track_id_2, minDist, waypointSp, p
     tracks_k <- tracks_keep[[k]]
     waypoints_k <- waypoints[[k]]
 
-    # Add WP_ID for each waypoints, to be copied on the track
-    waypoints_k <- waypoints_k %>% dplyr::mutate(WP_ID = 1:nrow(waypoints_k))
+    # If waypoints_k is null, skip
+    if(is.null(nrow(waypoints_k)) == TRUE){
 
-    # Convert tracks to multipoints
-    tracks_pts_k <- track2dm::line2points(spLineDF = tracks_k, minDist = minDist)
+      # Print a message that it has no observation
+      track_id_no_observe <- sf::st_drop_geometry(tracks_k)[,track_id_1] %>% as.vector()
+      print(paste(paste('skip', paste(track_id_no_observe, ',', sep = ""), sep = " "), 'it contains no observations', sep = " "))
 
-    # Show plot
-    plot(sf::st_geometry(tracks_k), lwd=1.4, col="lightblue")
-    plot(sf::st_geometry(waypoints_k), pch=16, cex=0.8, col='grey40', add=TRUE)
-    plot(sf::st_geometry(tracks_pts_k), pch=8, col='red', add=TRUE)
-    graphics::text(x = base::mean(waypoints_k$X), y = base::mean(waypoints_k$Y),
-         font=1, cex=1.3, paste("track", k, sep = " "))
+      #and skip the file
+      next
 
-    # Then copy the ID
-    track_pt_wpID <- track2dm::copyID(points1 = tracks_pts_k, points2 = waypoints_k)
+      # Else, continue
+    } else{
+      # Add WP_ID for each waypoints, to be copied on the track
+      waypoints_k <- waypoints_k %>% dplyr::mutate(WP_ID = 1:nrow(waypoints_k))
 
-    # Fill empty point_id_1 and point_id_2 columns
-    # track_pt_wpID <- track_pt_wpID %>%
-    #   dplyr::mutate_at(dplyr::vars(point_id_1, point_id_2), dplyr::na_if, y="") %>%
-    #   tidyr::fill(point_id_1, point_id_2)
+      # Convert tracks to multipoints
+      tracks_pts_k <- track2dm::line2points(spLineDF = tracks_k, minDist = minDist)
+
+      # Show plot
+      plot(sf::st_geometry(tracks_k), lwd=1.4, col="lightblue")
+      plot(sf::st_geometry(waypoints_k), pch=16, cex=0.8, col='grey40', add=TRUE)
+      plot(sf::st_geometry(tracks_pts_k), pch=8, col='red', add=TRUE)
+      graphics::text(x = base::mean(waypoints_k$X), y = base::mean(waypoints_k$Y),
+                     font=1, cex=1.3, paste("track", k, sep = " "))
+
+      # Then copy the ID
+      track_pt_wpID <- track2dm::copyID(points1 = tracks_pts_k, points2 = waypoints_k)
+    }
 
     # Combine result
     track_pts[[k]] <- track_pt_wpID
