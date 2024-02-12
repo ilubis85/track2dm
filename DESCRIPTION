@@ -18,6 +18,6 @@ Imports:
     magrittr(>= 2.0.3),
     progress(>= 1.2.2),
     purrr(>= 1.0.2),
-    graphics(>= 4.3.1),
+    graphics(>= 4.3.1)
 Depends: 
     R (>= 4.3.0)
