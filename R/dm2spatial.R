@@ -14,7 +14,7 @@ dm2spatial <- function(detectMatrix, spProject){
 
   # Separate and transform detection
   new_deTect <- detectMatrix %>%
-    dplyr::select(dplyr::starts_with("R"), ends_with(c("ID", "Id", "id"))) %>%
+    dplyr::select(dplyr::starts_with("R"), dplyr::ends_with(c("ID", "Id", "id"))) %>%
     # Transform column to row
     tidyr::pivot_longer(cols = dplyr::starts_with("R")) %>%
     # Rearrange
