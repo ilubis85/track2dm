@@ -147,10 +147,12 @@ spatialDM_grid <- function(spData, sortID, repLength, gridCell, subgridCol, elev
   dm_XY_df <- dplyr::bind_rows(dm_XY)
 
   # Combine data in the final result
-  final_result <- cbind(dm_species_df, dm_covar_df, dm_XY_df) %>% as.data.frame(row.names = 1:nrow(.))
+  # final_result <- cbind(dm_species_df, dm_covar_df, dm_XY_df) %>% as.data.frame(row.names = 1:nrow(.))
+  # # Add grid ID
+  # final_result[,subgridCol] <-  new_subgrid_list
 
-  # Add grid ID
-  final_result[,subgridCol] <-  new_subgrid_list
+  final_result <- data.frame('Grid_ID' = new_subgrid_list, dm_species_df, dm_covar_df, dm_XY_df) %>%
+    as.data.frame(row.names = 1:nrow(.))
 
   # Return the result
   return(final_result)
