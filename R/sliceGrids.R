@@ -14,6 +14,9 @@
 # Create a function to create random subgrids within main grids
 sliceGrids <- function(mainGrids, mainID, aggreFact){
 
+  # Suppress warning
+  options(warn=-1)
+
   # Convert to sf
   mainGrids_sf <- sf::st_as_sf(mainGrids)
 
@@ -38,11 +41,11 @@ sliceGrids <- function(mainGrids, mainID, aggreFact){
     subgrid_sf <- sf::st_as_sf(subgrid_sp)
 
     # Create ID
-    subgrid_sf$Subgrid_id <- 1:nrow(subgrid_sf)
+    subgrid_sf$Subgrid <- 1:nrow(subgrid_sf)
 
     # Combine names from the two grids
     subgrid_sf <- subgrid_sf %>%
-      dplyr::mutate(subgrid_id = paste(mainGrids_sf[,mainID[1]], Subgrid_id, sep = "_")) %>%
+      dplyr::mutate(Subgrid_id = paste(grid_names[i,], Subgrid, sep = "_")) %>%
       dplyr::select(Subgrid_id)
 
     # Create final output
@@ -60,7 +63,7 @@ sliceGrids <- function(mainGrids, mainID, aggreFact){
     mainGrids_df <- mainGrids_sf %>% sf::st_drop_geometry()
 
     # Create a list of grid names
-    grid_names <-  mainGrids_df[,mainID] %>% unique()
+    grid_names <-  mainGrids_df[,mainID] %>% unique() %>% as.data.frame()
 
     # Create progress bar
     pb = progress::progress_bar$new(
@@ -68,10 +71,11 @@ sliceGrids <- function(mainGrids, mainID, aggreFact){
       total = nrow(mainGrids_sf), clear = FALSE, width= 60)
 
     # Iterate the function for all grids available
-    for (i in nrow(mainGrids_sf)) {
+    for (i in 1:nrow(mainGrids_sf)) {
 
       # Subset grid
-      mainGrid_i <- mainGrids_sf[,mainID == grid_names[i]]
+      mainGrid_i <- mainGrids_sf %>%
+        dplyr::filter(dplyr::across(dplyr::all_of(mainID), ~. == grid_names[i,]))
 
       # calculate the length of one side of the first grid
       side_length <- sf::st_length(sf::st_cast(mainGrid_i, "LINESTRING"))[1]/4
@@ -95,11 +99,11 @@ sliceGrids <- function(mainGrids, mainID, aggreFact){
       subgrid_sf <- sf::st_as_sf(subgrid_sp)
 
       # Create ID
-      subgrid_sf$Subgrid_id <- 1:nrow(subgrid_sf)
+      subgrid_sf$Subgrid <- 1:nrow(subgrid_sf)
 
       # Combine names from the two grids
       subgrid_sf <- subgrid_sf %>%
-        dplyr::mutate(subgrid_id = paste(mainGrids_sf[,mainID[1]], Subgrid_id, sep = "_"))%>%
+        dplyr::mutate(Subgrid_id = paste(grid_names[i,], Subgrid, sep = "_")) %>%
         dplyr::select(Subgrid_id)
 
       # Final output
@@ -107,7 +111,7 @@ sliceGrids <- function(mainGrids, mainID, aggreFact){
 
       # Progress bar
       pb$tick()
-      Sys.sleep(1 / length(mainGrids_sf))
+      Sys.sleep(1 / nrow(mainGrids_sf))
     }
 
     # Combine the result
