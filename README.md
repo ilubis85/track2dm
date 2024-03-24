@@ -423,10 +423,10 @@ tm_shape(elevation) +
 
 <div class="figure" style="text-align: left">
 
-<img src="man/figures/README-fig_2-1.png" alt="Titik titik yang menunjukkan kehadiran (titik hitam) dan ketidakhadiran (titik merah) satwa rusa pada setiap replikasi spasial berukuran 2km" width="75%" />
+<img src="man/figures/README-fig_2-1.png" alt="Titik titik yang menunjukkan kehadiran (titik hitam) dan ketidakhadiran (titik merah) satwa rusa pada setiap replikasi spasial berukuran 1km" width="75%" />
 <p class="caption">
 Titik titik yang menunjukkan kehadiran (titik hitam) dan ketidakhadiran
-(titik merah) satwa rusa pada setiap replikasi spasial berukuran 2km
+(titik merah) satwa rusa pada setiap replikasi spasial berukuran 1km
 </p>
 
 </div>

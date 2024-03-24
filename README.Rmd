@@ -189,7 +189,7 @@ rusa_grids_dm
 
 Hasil matriks deteksi kemudian dapat divisualisasikan sama seperti sebelumnya.
 
-```{r fig_2, out.width='75%', fig.align='left',  fig.pos="H", fig.cap="Titik titik yang menunjukkan kehadiran (titik hitam) dan ketidakhadiran (titik merah) satwa rusa pada setiap replikasi spasial berukuran 2km", collapse = TRUE, echo = TRUE}
+```{r fig_2, out.width='75%', fig.align='left',  fig.pos="H", fig.cap="Titik titik yang menunjukkan kehadiran (titik hitam) dan ketidakhadiran (titik merah) satwa rusa pada setiap replikasi spasial berukuran 1km", collapse = TRUE, echo = TRUE}
 # Konversi matriks deteksi menjadi data spasial
 rusa_dm_grid_sp <- track2dm::dm2spatial(detectMatrix = rusa_grids_dm, 
                                         spProject = terra::crs(elevation))
