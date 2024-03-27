@@ -89,22 +89,21 @@ devtools::install_github("ilubis85/track2dm")
 
 ## Bagaimana cara kerjanya?
 
-Dalam pustaka track2dm, beberapa contoh data tersedia untuk tujuan
-simulasi. Terdapat dua contoh data; data pengamatan, yang mencatat data
-kehadiran satwa sepanjang jalur transek dalam format Ms. Excell, dan
-data elevasi dalam format raster yang diperlukan saat pembuatan matriks
-deteksi.
+Dalam pustaka track2dm, terdapat contoh data untuk tujuan simulasi yakni
+data hasil pengamatan, yang mencatat data kehadiran satwa sepanjang
+jalur transek dalam format Ms. Excell.
+
+Sementara untuk mendapatkan nilai Z atau ketinggian, diperlukan nilai
+elevasi dari Digital Elevation Model (DEM).
 
 ``` r
 # Memanggil data
 # Data observasi
 data("occu_survey")
 
-# Data elevasi
-data("elevation")
-
-# Konversi data raster menjadi objeck SpatRast dan beri nama
-elevation <- as(elevation, 'SpatRaster')
+# Memanggil data elevasi
+library(terra)
+elevation <- rast("D:/WCS_domain/Training_track2dm_Bogor_2023/Data_spasial/Elev_dummy.tif")
 names(elevation) <- names('Elevasi')
 ```
 
@@ -141,6 +140,12 @@ dan demonstrasi pustaka track2dm.
 
 Pustaka track2dm memiliki beragam fungsi untuk memudahkan dalam membuat
 matriks deteksi seperti yang terlihat pada tabel berikut.
+
+    #> 
+    #> Attaching package: 'knitr'
+    #> The following object is masked from 'package:terra':
+    #> 
+    #>     spin
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -206,7 +211,7 @@ berdasarkan ID atau waktu pengamatan
 </tr>
 <tr>
 <td style="text-align:left;">
-dm2spatial
+dm2spatial()
 </td>
 <td style="text-align:left;">
 Konversi deteksi mariks menjadi data spasial untuk memudahkan dalam
@@ -318,6 +323,15 @@ matriks deteksi untuk tujuan peninjauan hasil. Ini dapat dilakukan
 dengan mengkonversi matriks deteksi menjadi data spasial menggunakan
 fungsi **dm2spatial()**. Dataframe yang dihasilkan kemudian dapat
 diplotkan pada peta menggunakan pustaka *tmap*.
+
+    #> The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,
+    #> which was just loaded, will retire in October 2023.
+    #> Please refer to R-spatial evolution reports for details, especially
+    #> https://r-spatial.org/r/2023/05/15/evolution4.html.
+    #> It may be desirable to make the sf package available;
+    #> package maintainers should consider adding sf to Suggests:.
+    #> The sp package is now running under evolution status 2
+    #>      (status 2 uses the sf package in place of rgdal)
 
 <div class="figure" style="text-align: left">
 

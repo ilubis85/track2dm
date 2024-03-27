@@ -57,18 +57,17 @@ devtools::install_github("ilubis85/track2dm")
 
 ## Bagaimana cara kerjanya?
 
-Dalam pustaka track2dm, beberapa contoh data tersedia untuk tujuan simulasi. Terdapat dua contoh data; data pengamatan, yang mencatat data kehadiran satwa sepanjang jalur transek dalam format Ms. Excell, dan data elevasi dalam format raster yang diperlukan saat pembuatan matriks deteksi. 
+Dalam pustaka track2dm, terdapat contoh data untuk tujuan simulasi yakni data hasil pengamatan, yang mencatat data kehadiran satwa sepanjang jalur transek dalam format Ms. Excell.
 
+Sementara untuk mendapatkan nilai Z atau ketinggian, diperlukan nilai elevasi dari Digital Elevation Model (DEM). 
 ```{r example, message=FALSE}
 # Memanggil data
 # Data observasi
 data("occu_survey")
 
-# Data elevasi
-data("elevation")
-
-# Konversi data raster menjadi objeck SpatRast dan beri nama
-elevation <- as(elevation, 'SpatRaster')
+# Memanggil data elevasi
+library(terra)
+elevation <- rast("D:/WCS_domain/Training_track2dm_Bogor_2023/Data_spasial/Elev_dummy.tif")
 names(elevation) <- names('Elevasi')
 ```
 
@@ -82,7 +81,7 @@ head(occu_survey, 5)
 Pustaka track2dm memiliki beragam fungsi untuk memudahkan dalam membuat matriks deteksi seperti yang terlihat pada tabel berikut. 
 
 ```{r echo=FALSE}
-functions <- c("dist3D()", "spatialDM()", "makeGrids()", "sliceGrids()", "spatialDM_grid()", "track2points()", "dm2spatial")
+functions <- c("dist3D()", "spatialDM()", "makeGrids()", "sliceGrids()", "spatialDM_grid()", "track2points()", "dm2spatial()")
 
 purposes <- c("Menghitung jarak antar titik berdasarkan nilai X, Y, dan Z (ketinggian)",
               "Membuat matriks deteksi dari data hasil pengamatan dalam jalur/transek",
