@@ -35,7 +35,7 @@ rasStat_grid <- function(rasterData, subGrids, myFunc, as_Raster = TRUE, rasRes 
     raster_clip <- terra::crop(rasterData, grid_sub)
 
     # Calculate mean values for each subgrid
-    statRaster <- terra::extract(raster_clip, grid_sub, fun = myFunc, na.rm = TRUE)
+    statRaster <- terra::extract(raster_clip, grid_sub, fun = myFunc, na.rm = FALSE)
 
     # Add the result to the grid
     subGrids_sf[ i,"value"] <- statRaster[2]
