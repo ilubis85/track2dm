@@ -42,7 +42,7 @@ rasFragstat_grid <- function(landCover, landLevel = "landscape", lClass = FALSE,
 
     # Check if sub cell is overlap with raster
     # If it does not overlap, put -999
-    if(sum(sf::st_overlaps(grid_sub, landCover_sf, sparse = FALSE)) == FALSE){
+    if(sum(sf::st_intersects(grid_sub, landCover_sf, sparse = FALSE)) == FALSE){
       subGrids_sf[ i ,"value"] <- -999
 
     } else {
